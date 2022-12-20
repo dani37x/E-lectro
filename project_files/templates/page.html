@@ -1,1 +1,10 @@
-<h1> hey</h1>
+{% if current_user.is_authenticated %}
+  Hi {{ current_user.usernname }}!
+{% endif %}
+
+{% if current_user.is_anonymous %}
+    <a href="{{ url_for('login') }}"> login </a>
+{% endif %}
+
+<br>
+<a href="{{ url_for('logout') }}"> logout </a>
