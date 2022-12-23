@@ -1,0 +1,18 @@
+<form method="post" action="">    
+    <table border="1px">
+        <th> select </th>
+        <th> username</th>
+        <th> actions</th>
+        {% for user in users %}
+        <tr>
+            <td><input type="checkbox" name="id" value="{{ user.id }}"</td>
+            <td>{{ user.username }}</td>
+            <td>
+                <a href="{{ url_for('update_user', id=user.id) }}"> edit </a>
+                <a href="{{ url_for('delete_user', id=user.id) }}"> delete </a>
+            </td>
+        </tr>
+        {% endfor %}
+        <input type="submit">
+    </table>
+    </form>

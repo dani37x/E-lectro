@@ -13,14 +13,13 @@ from .database import User, Blocked
 from.functions import checker
 
 
-
-
 @app.before_first_request
 def before_first_request():
     db.create_all()
     # user = Blocked(username='mama', ip='127.0.0.1')
     # db.session.add(user)
     # db.session.commit()
+    # checker(username=current_user.username)
 
 
 @login_manager.user_loader
@@ -31,7 +30,6 @@ def load_user(user_id):
 @app.route('/', methods=['GET', 'POST'])
 @login_required
 def page():
-  # checker(username=current_user.username)
   return render_template('page.html')
 
 
@@ -90,15 +88,38 @@ def logout():
 def admin():
   # if current_user.username != 'mama':
   #   abort(404)
-  
+
+  return render_template('admin.html')
+
+@app.route('/admin/users', methods=['GET', 'POST'])
+@login_required
+def admin_user():
+  #if current_user.username != 'mama':
+  #   abort(404)
   users = User.query.all() 
-  blocked = Blocked.query.all()
+  if request.method == 'POST':
+    data = request.form.getlist('id')
+    print(data)
+  
+  return render_template('admin_user.html', users=users)
 
-  return render_template('admin.html', users=users, blocked=blocked)
+
+@app.route('/admin/blocked', methods=['GET', 'POST'])
+@login_required
+def admin_blocked():
+  #if current_user.username != 'mama':
+  #   abort(404)
+  blocked = Blocked.query.all() 
+  if request.method == 'GET':
+    data = request.form.getlist('id')
+    print(data)
+    # blocked = 
+  
+  return render_template('admin_blocked.html', blocked=blocked)
 
 
-@app.route('/update/<int:id>', methods=['GET', 'POST'])
-def update(id):
+@app.route('/update-user/<int:id>', methods=['GET', 'POST'])
+def update_user(id):
   user = User.query.get_or_404(id)
   if request.method == 'POST':
     user.username = request.form['username']
@@ -110,26 +131,49 @@ def update(id):
     user.active = True if 'True' in active else False
     try:
       db.session.commit()
-      return redirect(url_for('admin'))
+      return redirect(url_for('admin_user'))
     except Exception as e:
       return 'xd'
   else:
-    return render_template("update.html", user=user )
+    return render_template('update_user.html', user=user )
 
 
-@app.route('/delete/<int:id>')
-def delete(object,id):
-  objects = [Blocked, User]
-  for i in objects:
-    if str(i) == str(object):
-      object = i
-  name_to_delete = object.query.get_or_404(id)
+@app.route('/delete-user/<int:id>')
+def delete_user(id):
+
+  name_to_delete = User.query.get_or_404(id)
   try:
     db.session.delete(name_to_delete)
     db.session.commit()
-    return redirect(url_for('admin'))
+    return redirect(url_for('admin_user'))
   except Exception as e:
     return 'xd'
+
+
+@app.route('/update-blocked/<int:id>', methods=['GET', 'POST'])
+def update_blocked(id):
+  blocked = Blocked.query.get_or_404(id)
+  if request.method == 'POST':
+    blocked.username = request.form['username']
+    blocked.ip = request.form['ip']
+    try:
+      db.session.commit()
+      return redirect(url_for('admin_blocked'))
+    except Exception as e:
+      return 'xd'
+  else:
+    return render_template('update_blocked.html', blocked=blocked )
+
+@app.route('/delete-blocked/<int:id>')
+def delete_blocked(id):
+
+  name_to_delete = Blocked.query.get_or_404(id)
+  try:
+    db.session.delete(name_to_delete)
+    db.session.commit()
+    return redirect(url_for('admin_blocked'))
+  except Exception as e:
+    return 'xd'    
 
 
 @app.route('/backup', methods=['GET', 'POST'])

@@ -1,31 +1,10 @@
+<!-- {% for model in models %}
 
+{{ model.name }}
 
-<table border="1px">
-    <th> username</th>
-    <th> actions</th>
-    {% for user in users %}
-    <tr>
-        <td>{{ user.username }}</td>
-        <td>
-            <a href="{{ url_for('update', id=user.id)}}"> edit </a>
-            <a href="{{ url_for('delete', id=user.id)}}"> delete </a>
-        </td>
-    </tr>
-    {% endfor %}
-</table>
+{% endfor %} -->
+
+<h3> MODELS </h3>
+<a href="{{ url_for('admin_user') }}"> Users </a>
 <br>
-<br>
-<table border="1px">
-    <th> username </th>
-    <th> ip </th>
-    <th> delete </th>
-    {% for block in blocked %}
-    <tr>
-        <td>{{ block.username }}</td>
-        <td>{{ block.ip }}</td>
-        <td>
-            <!-- <a href="{{ url_for('delete', id=block.id)}}"> delete</a> -->
-        </td>
-    </tr>
-    {% endfor %}
-</table>
+<a href="{{ url_for('admin_blocked') }}"> Blocked Users </a>
