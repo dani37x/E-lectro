@@ -12,13 +12,15 @@ from .database import User, Blocked
 
 from.functions import checker
 
+from .actions import delete_rows
+
 
 @app.before_first_request
 def before_first_request():
     db.create_all()
-    # user = Blocked(username='mama', ip='127.0.0.1')
-    # db.session.add(user)
-    # db.session.commit()
+    user = Blocked(username='mama', ip='127.0.0.1')
+    db.session.add(user)
+    db.session.commit()
     # checker(username=current_user.username)
 
 
@@ -99,7 +101,10 @@ def admin_user():
   users = User.query.all() 
   if request.method == 'POST':
     data = request.form.getlist('id')
-    print(data)
+    selected_action = request.form['action']
+    if selected_action == 'delete user':
+      delete_rows(User, data)
+      return redirect( url_for('admin_user'))
   
   return render_template('admin_user.html', users=users)
 
@@ -110,9 +115,16 @@ def admin_blocked():
   #if current_user.username != 'mama':
   #   abort(404)
   blocked = Blocked.query.all() 
-  if request.method == 'GET':
+  if request.method == 'POST':
     data = request.form.getlist('id')
-    print(data)
+    selected_action = request.form['action']
+    if selected_action == 'delete user':
+      delete_rows(Blocked, data)
+      return redirect( url_for('admin_blocked'))
+
+
+
+    # print(data)
     # blocked = 
   
   return render_template('admin_blocked.html', blocked=blocked)

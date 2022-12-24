@@ -1,20 +1,29 @@
-<form method="get" action="">    
+<form method="post" action="">
+<label for="action">Choose action:</label>
+<select id="action" name="action">
+  <option value="delete user"> delete users</option>
+  <!-- <option value="saab">Saab</option> -->
+  <!-- <option value="fiat">Fiat</option>
+  <option value="audi">Audi</option> -->
+</select>    
     <table border="1px">
         <th> select </th>
         <th> username</th>
         <th> ip</th>
         <th> actions</th>
-        {% for user in users %}
+        {% for block in blocked %}
         <tr>
-            <td><input type="checkbox" name="id" value="{{ user.id }}"</td>
-            <td>{{ blocked.username }}</td>
-            <td>{{ blocked.ip }}</td>
+            <td><input type="checkbox" name="id" value="{{ block.id }}"</td>
+            <td>{{ block.username }}</td>
+            <td>{{ block.ip }}</td>
             <td>
-                <a href="{{ url_for('update_blocked', id=blocked.id) }}"> edit </a>
-                <a href="{{ url_for('delete_blocked', id=blocked.id) }}"> delete </a>
+                <a href="{{ url_for('update_blocked', id=block.id) }}"> edit </a>
+                <a href="{{ url_for('delete_blocked', id=block.id) }}"> delete </a>
             </td>
         </tr>
         {% endfor %}
         <input type="submit">
     </table>
     </form>
+<br>
+    <a href="{{ url_for('admin') }}"> admin panel</a>
