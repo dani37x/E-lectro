@@ -12,7 +12,7 @@ from .database import User, Blocked
 
 from.functions import checker
 
-from .actions import delete_rows
+from .actions import delete_rows, block_user
 
 
 @app.before_first_request
@@ -100,10 +100,24 @@ def admin_user():
   #   abort(404)
   users = User.query.all() 
   if request.method == 'POST':
+    searching = request.form['search']
+    if searching != None and searching != '':
+      users = (
+        User.query.filter(User.username.contains(searching)
+          | (User.first_name.contains(searching))
+          | (User.surname.contains(searching))
+          | (User.email.contains(searching))
+          | (User.active.contains(searching))).all()
+      )
+      return render_template('admin_user.html', users=users)
+      # print(users)
     data = request.form.getlist('id')
     selected_action = request.form['action']
     if selected_action == 'delete user':
       delete_rows(User, data)
+      return redirect( url_for('admin_user'))
+    if selected_action == 'block user':
+      block_user(data=data)
       return redirect( url_for('admin_user'))
   
   return render_template('admin_user.html', users=users)
@@ -116,17 +130,20 @@ def admin_blocked():
   #   abort(404)
   blocked = Blocked.query.all() 
   if request.method == 'POST':
+    searching = request.form['search']
+    if searching != None and searching != '':
+      blocked = (
+        Blocked.query.filter(User.username.contains(searching)
+          | (Blocked.ip.contains(searching))).all()
+      )
+      return render_template('admin_user.html', blocked=blocked)
+      
     data = request.form.getlist('id')
     selected_action = request.form['action']
     if selected_action == 'delete user':
       delete_rows(Blocked, data)
       return redirect( url_for('admin_blocked'))
 
-
-
-    # print(data)
-    # blocked = 
-  
   return render_template('admin_blocked.html', blocked=blocked)
 
 
@@ -143,7 +160,7 @@ def update_user(id):
     user.active = True if 'True' in active else False
     try:
       db.session.commit()
-      return redirect(url_for('admin_user'))
+      return redirect( url_for('admin_user'))
     except Exception as e:
       return 'xd'
   else:

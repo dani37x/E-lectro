@@ -1,11 +1,14 @@
 <form method="post" action="">
-<label for="action">Choose action:</label>
-<select id="action" name="action">
-  <option value="delete user"> delete users</option>
-  <!-- <option value="saab">Saab</option> -->
-  <!-- <option value="fiat">Fiat</option>
-  <option value="audi">Audi</option> -->
-</select>    
+    <label for="action">Choose action:</label>
+    <select id="action" name="action">
+    <option value="delete user"> delete users</option>
+    <!-- <option value="saab">Saab</option> -->
+    <!-- <option value="fiat">Fiat</option>
+    <option value="audi">Audi</option> -->
+    </select>
+    <br>
+    <label for="search">Serach:</label>
+    <input type="text" id="search" name="search">
     <table border="1px">
         <th> select </th>
         <th> username</th>
@@ -24,6 +27,6 @@
         {% endfor %}
         <input type="submit">
     </table>
-    </form>
+</form>
 <br>
     <a href="{{ url_for('admin') }}"> admin panel</a>
