@@ -10,9 +10,11 @@ def delete_rows(model, data):
 def block_user(data):
     for user in data:
         user_to_block = User.query.get(id=user)
+        user_to_block.active = False
+        
         new_row = Blocked(
             username=user_to_block.username,
-            ip='127.0.0.1'
+            ip=user_to_block.ip
         )
-        db.session.add( new_row)
+        db.session.add(new_row)
         db.session.commit()

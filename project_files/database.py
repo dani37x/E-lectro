@@ -10,6 +10,7 @@ class User(UserMixin, db.Model):
     surname = db.Column(db.String(30), unique=False, nullable=False)
     email = db.Column(db.String(50), unique=True, nullable=False)
     password = db.Column(db.String(20), unique=False, nullable=False)
+    ip = db.Column(db.String(20), unique=False, nullable=False)
     active = db.Column(db.Boolean, default=True, nullable=False)
 
     def __repr__(self):

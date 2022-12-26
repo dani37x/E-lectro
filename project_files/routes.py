@@ -35,6 +35,9 @@ def page():
   return render_template('page.html')
 
 
+# login, register, logout
+
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
   form = UserLogin()
@@ -68,7 +71,8 @@ def register():
       surname=surname,
       email=email,
       password=password,
-      active = True
+      ip=request.remote_addr,
+      active=True
     )
     try:
       db.session.add(user)
@@ -83,6 +87,9 @@ def register():
 def logout():
     logout_user()
     return redirect('login')
+
+
+# admin panel
 
 
 @app.route('/admin', methods=['GET', 'POST'])
@@ -110,7 +117,7 @@ def admin_user():
           | (User.active.contains(searching))).all()
       )
       return render_template('admin_user.html', users=users)
-      # print(users)
+
     data = request.form.getlist('id')
     selected_action = request.form['action']
     if selected_action == 'delete user':
@@ -147,7 +154,33 @@ def admin_blocked():
   return render_template('admin_blocked.html', blocked=blocked)
 
 
+# admin operations like add, update, delete 
+
+
+@app.route('/add-user', methods=['GET', 'POST'])
+@login_required
+def add_user():
+  if request.method == 'POST':
+    new_user = User(
+      username=request.form['username'],
+      first_name=request.form['first_name'],
+      surname=request.form['surname'],
+      email=request.form['email'],
+      password=request.form['password'],
+      ip='127.0.0.1',
+      active=True
+    )
+    try:
+      db.session.add(new_user)
+      db.session.commit()
+    except Exception as e:
+      return 'xd'
+    return redirect( url_for('admin_user'))
+  return render_template('add_user.html')
+
+
 @app.route('/update-user/<int:id>', methods=['GET', 'POST'])
+@login_required
 def update_user(id):
   user = User.query.get_or_404(id)
   if request.method == 'POST':
@@ -168,6 +201,7 @@ def update_user(id):
 
 
 @app.route('/delete-user/<int:id>')
+@login_required
 def delete_user(id):
 
   name_to_delete = User.query.get_or_404(id)
@@ -179,7 +213,26 @@ def delete_user(id):
     return 'xd'
 
 
+
+@app.route('/add-blocked', methods=['GET', 'POST'])
+@login_required
+def add_blocked():
+  if request.method == 'POST':
+    new_blocked = Blocked(
+      username=request.form['username'],
+      ip=request.form['ip'],
+    )
+    try:
+      db.session.add(new_blocked)
+      db.session.commit()
+    except Exception as e:
+      return 'xd'
+    return redirect( url_for('admin_blocked'))
+  return render_template('add_blocked.html')
+
+
 @app.route('/update-blocked/<int:id>', methods=['GET', 'POST'])
+@login_required
 def update_blocked(id):
   blocked = Blocked.query.get_or_404(id)
   if request.method == 'POST':
@@ -193,7 +246,9 @@ def update_blocked(id):
   else:
     return render_template('update_blocked.html', blocked=blocked )
 
+
 @app.route('/delete-blocked/<int:id>')
+@login_required
 def delete_blocked(id):
 
   name_to_delete = Blocked.query.get_or_404(id)
@@ -205,12 +260,18 @@ def delete_blocked(id):
     return 'xd'    
 
 
+# backup
+
+
 @app.route('/backup', methods=['GET', 'POST'])
 @login_required
 def backup():
   users = User.query.all()
   blocked = Blocked.query.all()
   return render_template('backup.html', users=users)
+
+
+# error handlers 
 
 
 @app.errorhandler(404)
