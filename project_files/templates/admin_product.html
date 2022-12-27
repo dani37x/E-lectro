@@ -1,0 +1,39 @@
+<a href="{{ url_for('add_product') }}"> add product </a>
+<br>
+
+<form method="post" action="">
+    <label for="action">Choose action:</label>
+    <select id="action" name="action">
+    <option value="delete user"> delete users</option>
+    <!-- <option value="saab">Saab</option> -->
+    <!-- <option value="fiat">Fiat</option>
+    <option value="audi">Audi</option> -->
+    </select>
+    <br>
+    <label for="search">Serach:</label>
+    <input type="text" id="search" name="search">
+    <table border="1px">
+        <th> select </th>
+        <th> name </th>
+        <th> category </th>
+        <th> company </th>
+        <th> price </th>
+        <th> actions</th>
+        {% for product in products %}
+        <tr>
+            <td><input type="checkbox" name="id" value="{{ product.id }}"</td>
+            <td>{{ product.name }}</td>
+            <td>{{ product.category }}</td>
+            <td>{{ product.company }}</td>
+            <td>{{ product.price }}</td>
+            <td>
+                <a href="{{ url_for('update_product', id=product.id) }}"> edit </a>
+                <a href="{{ url_for('delete_product', id=product.id) }}"> delete </a>
+            </td>
+        </tr>
+        {% endfor %}
+        <input type="submit">
+    </table>
+</form>
+<br>
+    <a href="{{ url_for('admin') }}"> admin panel</a>

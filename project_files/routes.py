@@ -8,11 +8,13 @@ from flask import Flask, render_template, url_for, redirect, flash, request, abo
 
 from .form import UserCreator, UserLogin
 
-from .database import User, Blocked
+from .database import User, Blocked, Product
 
 from.functions import checker
 
 from .actions import delete_rows, block_user
+
+
 
 
 @app.before_first_request
@@ -154,6 +156,31 @@ def admin_blocked():
   return render_template('admin_blocked.html', blocked=blocked)
 
 
+@app.route('/admin/product', methods=['GET', 'POST'])
+@login_required
+def admin_product():
+  #if current_user.username != 'mama':
+  #   abort(404)
+  products = Product.query.all() 
+  if request.method == 'POST':
+    searching = request.form['search']
+    if searching != None and searching != '':
+      products = (
+        Product.query.filter(Product.name.contains(searching)
+          | (Product.category.contains(searching))
+          | (Product.company.contains(searching))).all()
+      )
+      return render_template('admin_user.html', products=products)
+      
+    data = request.form.getlist('id')
+    selected_action = request.form['action']
+    if selected_action == 'delete user':
+      delete_rows(Blocked, data)
+      return redirect( url_for('admin_product'))
+
+  return render_template('admin_product.html', products=products)
+
+
 # admin operations like add, update, delete 
 
 
@@ -256,6 +283,56 @@ def delete_blocked(id):
     db.session.delete(name_to_delete)
     db.session.commit()
     return redirect(url_for('admin_blocked'))
+  except Exception as e:
+    return 'xd'    
+
+
+@app.route('/add-product', methods=['GET', 'POST'])
+@login_required
+def add_product():
+  if request.method == 'POST':
+    new_product = Product(
+      name=request.form['name'],
+      category=request.form['category'],
+      company=request.form['company'],
+      price=request.form['price'],
+    )
+    try:
+      db.session.add(new_product)
+      db.session.commit()
+    except Exception as e:
+      return 'xd'
+    return redirect( url_for('admin_product'))
+  return render_template('add_product.html')
+
+
+@app.route('/update-product/<int:id>', methods=['GET', 'POST'])
+@login_required
+def update_product(id):
+  product = Product.query.get_or_404(id)
+  if request.method == 'POST':
+    product.name = request.form['name']
+    product.category = request.form['category']
+    product.company = request.form['company']
+    product.price = request.form['price']
+    try:
+      db.session.commit()
+      return redirect(url_for('admin_product'))
+    except Exception as e:
+      return 'xd'
+  else:
+    return render_template('update_product.html', product=product )
+
+
+@app.route('/delete-product/<int:id>')
+@login_required
+def delete_product(id):
+
+  name_to_delete = Product.query.get_or_404(id)
+  try:
+    db.session.delete(name_to_delete)
+    db.session.commit()
+    return redirect(url_for('admin_product'))
   except Exception as e:
     return 'xd'    
 
