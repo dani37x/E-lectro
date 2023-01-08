@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, EmailField, PasswordField
+from wtforms import StringField, EmailField, PasswordField, BooleanField
 from wtforms.validators import DataRequired, Length, EqualTo, ValidationError
 
 from .database import User
@@ -78,6 +78,7 @@ class UserLogin(FlaskForm):
     username = StringField(description='username', validators=[DataRequired(), Length(max=30)])
     email = EmailField(description='e-mail', validators=[DataRequired(), Length(max=50)])
     password = PasswordField(description='password', validators=[DataRequired(), Length(max=50)])
+    remember = BooleanField(description='remember me')
 
 
 

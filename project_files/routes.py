@@ -51,7 +51,8 @@ def login():
       if user:
         user = User.query.filter_by(password=form.password.data).first()
         if user:
-          login_user(user, remember=True)
+          print(form.remember.data)
+          login_user(user, remember=form.remember.data)
           return redirect( url_for('page'))
 
   return render_template('login.html', form=form)
