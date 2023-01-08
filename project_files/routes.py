@@ -1,12 +1,13 @@
 from project_files import app
 from project_files import db
 from project_files import login_manager
+from project_files import mail
 
 from flask_login import login_user, logout_user, login_required, current_user
-
 from flask import Flask, render_template, url_for, redirect, flash, request, abort
+from flask_mail import Message
 
-from .form import UserCreator, UserLogin
+from .form import UserCreator, UserLogin, RemindPassword, NewPassword
 
 from .database import User, Blocked, Product
 
@@ -37,7 +38,7 @@ def page():
   return render_template('page.html')
 
 
-# login, register, logout
+# login, register, logout, remind password, new password
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -61,18 +62,17 @@ def register():
   form = UserCreator()
 
   if form.validate_on_submit():
-    username = form.username.data
-    first_name = form.first_name.data
-    surname = form.surname.data
-    email = form.email.data
-    password = form.password.data
-
+    # username = form.username.data
+    # first_name = form.first_name.data
+    # surname = form.surname.data
+    # email = form.email.data
+    # password = form.password.data
     user = User(
-      username=username,
-      first_name=first_name,
-      surname=surname,
-      email=email,
-      password=password,
+      username=form.username.data,
+      first_name=form.first_name.data,
+      surname=form.surname.data,
+      email=form.email.data,
+      password=form.password.data,
       ip=request.remote_addr,
       active=True
     )
@@ -84,11 +84,53 @@ def register():
       return 'xd'
   return render_template('register.html', form=form)
 
+
 @app.route("/logout")
 @login_required
 def logout():
     logout_user()
     return redirect('login')
+
+
+@app.route("/remind_password", methods=['GET', 'POST'])
+# @track_time_spent('remind_password')
+def remind_password():
+    form = RemindPassword()
+    if form.validate_on_submit():
+      user = User.query.filter_by(username=form.username.data).first()
+      if user:
+          user = User.query.filter_by(email=form.email.data).first()
+          if user:
+              msg = Message(
+                  'Your password to our service',
+                  sender='peter@mailtrap.io',
+                  recipients=['paul@mailtrap.io']
+              )
+              user = User.query.filter_by(email=form.email.data).first()
+              msg.body = f"Here you are {user.password}"
+              try:
+                  mail.send(msg)
+                  return redirect( url_for('new_password'))
+              except Exception as e:
+                  return 'error with mailtrapem'
+    return render_template('remind_password.html', form=form)
+
+
+@app.route("/new_password", methods=['GET', 'POST'])
+def new_password():
+    form = NewPassword()
+    if form.validate_on_submit():
+        user = User.query.filter_by(username=form.username.data).first()
+        if user:
+            user = User.query.filter_by(password=form.current_password.data).first()
+            if user:
+                user.password = form.password.data
+                try:
+                    db.session.commit()
+                    return redirect( url_for('logout'))
+                except Exception as e:
+                    return 'Error with password chaning'
+    return render_template('new_password.html', form=form)
 
 
 # admin panel
@@ -174,8 +216,8 @@ def admin_product():
       
     data = request.form.getlist('id')
     selected_action = request.form['action']
-    if selected_action == 'delete user':
-      delete_rows(Blocked, data)
+    if selected_action == 'delete products':
+      delete_rows(Product, data)
       return redirect( url_for('admin_product'))
 
   return render_template('admin_product.html', products=products)
@@ -201,7 +243,7 @@ def add_user():
       db.session.add(new_user)
       db.session.commit()
     except Exception as e:
-      return 'xd'
+      return 'xd' + e
     return redirect( url_for('admin_user'))
   return render_template('add_user.html')
 

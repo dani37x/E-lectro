@@ -4,7 +4,7 @@
 <form method="post" action="">
     <label for="action">Choose action:</label>
     <select id="action" name="action">
-    <option value="delete user"> delete users</option>
+    <option value="delete products"> delete products</option>
     <!-- <option value="saab">Saab</option> -->
     <!-- <option value="fiat">Fiat</option>
     <option value="audi">Audi</option> -->
@@ -21,7 +21,7 @@
         <th> actions</th>
         {% for product in products %}
         <tr>
-            <td><input type="checkbox" name="id" value="{{ product.id }}"</td>
+            <td><input type="checkbox" name="id" value="{{ product.id }}"></td>
             <td>{{ product.name }}</td>
             <td>{{ product.category }}</td>
             <td>{{ product.company }}</td>

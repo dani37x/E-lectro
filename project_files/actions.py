@@ -1,9 +1,12 @@
 from project_files import db
+
 from .database import User, Blocked
 
 
 def delete_rows(model, data):
+    print( model, data)
     for number in data:
+        print(model.query.filter_by(id=number))
         model.query.filter_by(id=number).delete()
         db.session.commit()
 

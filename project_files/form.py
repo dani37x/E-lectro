@@ -38,19 +38,14 @@ def password_checking(form, field):
     if contain == False:
       raise ValidationError('Password must contain number')
 
-def existing_user(form, field):
-  try:
-    if field.data in User.query.filter(User.username).all():
-      raise ValidationError('this username already exist in our database')
-  except Exception as e:
-    return 'xd'
 
+def existing_user(form, field):
+    if field.data in User.query.filter(User.username).all():
+        raise ValidationError('this username already exist')
+    
 def existing_email(form, field):
-  try:
     if field.data in User.query.filter(User.email).all():
-      raise ValidationError('this email already exist in our database')
-  except Exception as e:
-    return 'xd'
+        raise ValidationError('this email already exist')
 
 
 class UserCreator(FlaskForm):
@@ -83,3 +78,23 @@ class UserLogin(FlaskForm):
     username = StringField(description='username', validators=[DataRequired(), Length(max=30)])
     email = EmailField(description='e-mail', validators=[DataRequired(), Length(max=50)])
     password = PasswordField(description='password', validators=[DataRequired(), Length(max=50)])
+
+
+
+class NewPassword(FlaskForm):
+    username = StringField(description='username', validators=[DataRequired(), Length(max=30)])
+    current_password = PasswordField(description='current password', validators=[DataRequired()])
+    password = PasswordField(description='password', validators=[DataRequired()])
+    password_2 = PasswordField(description='repeat password', validators=[
+      DataRequired(),
+      EqualTo('password'),
+      password_checking
+    ])
+    
+class RemindPassword(FlaskForm):
+    username = StringField(description='username', validators=[
+      DataRequired(),
+      Length(max=30),
+      existing_user,
+    ])
+    email = EmailField(description='e-mail', validators=[DataRequired(), Length(max=50)])
