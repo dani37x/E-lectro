@@ -4,14 +4,14 @@ from project_files import login_manager
 from project_files import mail
 
 from flask_login import login_user, logout_user, login_required, current_user
-from flask import Flask, render_template, url_for, redirect, flash, request, abort
+from flask import render_template, url_for, redirect, flash, request, abort
 from flask_mail import Message
 
 from .form import UserCreator, UserLogin, RemindPassword, NewPassword
 
 from .database import User, Blocked, Product
 
-from.functions import checker
+from.functions import checker, check_admin, not_null
 
 from .actions import delete_rows, block_user
 
@@ -93,7 +93,6 @@ def logout():
 
 
 @app.route("/remind_password", methods=['GET', 'POST'])
-# @track_time_spent('remind_password')
 def remind_password():
     form = RemindPassword()
     if form.validate_on_submit():
@@ -109,10 +108,10 @@ def remind_password():
               user = User.query.filter_by(email=form.email.data).first()
               msg.body = f"Here you are {user.password}"
               try:
-                  mail.send(msg)
-                  return redirect( url_for('new_password'))
+                mail.send(msg)
+                return redirect( url_for('new_password'))
               except Exception as e:
-                  return 'error with mailtrapem'
+                  return 'error with mailtrap'
     return render_template('remind_password.html', form=form)
 
 
@@ -138,17 +137,15 @@ def new_password():
 
 @app.route('/admin', methods=['GET', 'POST'])
 @login_required
+# @check_admin('admin')
 def admin():
-  # if current_user.username != 'mama':
-  #   abort(404)
 
   return render_template('admin.html')
 
 @app.route('/admin/users', methods=['GET', 'POST'])
 @login_required
+# @check_admin('admin_user')
 def admin_user():
-  #if current_user.username != 'mama':
-  #   abort(404)
   users = User.query.all() 
   if request.method == 'POST':
     searching = request.form['search']
@@ -176,9 +173,8 @@ def admin_user():
 
 @app.route('/admin/blocked', methods=['GET', 'POST'])
 @login_required
+# @check_admin('admin_blocked')
 def admin_blocked():
-  #if current_user.username != 'mama':
-  #   abort(404)
   blocked = Blocked.query.all() 
   if request.method == 'POST':
     searching = request.form['search']
@@ -200,9 +196,8 @@ def admin_blocked():
 
 @app.route('/admin/product', methods=['GET', 'POST'])
 @login_required
+# @check_admin('admin_product')
 def admin_product():
-  #if current_user.username != 'mama':
-  #   abort(404)
   products = Product.query.all() 
   if request.method == 'POST':
     searching = request.form['search']
@@ -228,6 +223,7 @@ def admin_product():
 
 @app.route('/add-user', methods=['GET', 'POST'])
 @login_required
+# @check_admin('add_user')
 def add_user():
   if request.method == 'POST':
     new_user = User(
@@ -250,15 +246,17 @@ def add_user():
 
 @app.route('/update-user/<int:id>', methods=['GET', 'POST'])
 @login_required
+# @check_admin('update_user')
 def update_user(id):
   user = User.query.get_or_404(id)
   if request.method == 'POST':
-    user.username = request.form['username']
-    user.first_name = request.form['first_name']
-    user.surname = request.form['surname']
-    user.email = request.form['email']
-    user.password = request.form['password']
-    active = request.form['active']
+    user.username = not_null(request.form['username'])
+    user.first_name = not_null(request.form['first_name'])
+    user.surname = not_null(request.form['surname'])
+    user.email = not_null(request.form['email'])
+    user.password = not_null(request.form['password'])
+    # user.account_type = not_null(request.form[''account_type])
+    active = not_null(request.form['active'])
     user.active = True if 'True' in active else False
     try:
       db.session.commit()
@@ -271,6 +269,7 @@ def update_user(id):
 
 @app.route('/delete-user/<int:id>')
 @login_required
+# @check_admin('delete_user')
 def delete_user(id):
 
   name_to_delete = User.query.get_or_404(id)
@@ -285,6 +284,7 @@ def delete_user(id):
 
 @app.route('/add-blocked', methods=['GET', 'POST'])
 @login_required
+# @check_admin('add_blocked')
 def add_blocked():
   if request.method == 'POST':
     new_blocked = Blocked(
@@ -302,11 +302,13 @@ def add_blocked():
 
 @app.route('/update-blocked/<int:id>', methods=['GET', 'POST'])
 @login_required
+# @check_admin('update_blocked')
 def update_blocked(id):
   blocked = Blocked.query.get_or_404(id)
   if request.method == 'POST':
-    blocked.username = request.form['username']
-    blocked.ip = request.form['ip']
+    blocked.username = not_null(request.form['username'])
+    blocked.ip = not_null( request.form['ip'])
+    # if blocked.username != '' and blocked.ip != '':
     try:
       db.session.commit()
       return redirect(url_for('admin_blocked'))
@@ -318,6 +320,7 @@ def update_blocked(id):
 
 @app.route('/delete-blocked/<int:id>')
 @login_required
+# @check_admin('delete_blocked')
 def delete_blocked(id):
 
   name_to_delete = Blocked.query.get_or_404(id)
@@ -331,6 +334,7 @@ def delete_blocked(id):
 
 @app.route('/add-product', methods=['GET', 'POST'])
 @login_required
+# @check_admin('add_product')
 def add_product():
   if request.method == 'POST':
     new_product = Product(
@@ -350,16 +354,17 @@ def add_product():
 
 @app.route('/update-product/<int:id>', methods=['GET', 'POST'])
 @login_required
+# @check_admin('update_product')
 def update_product(id):
   product = Product.query.get_or_404(id)
   if request.method == 'POST':
-    product.name = request.form['name']
-    product.category = request.form['category']
-    product.company = request.form['company']
-    product.price = request.form['price']
+    product.name = not_null(request.form['name'])
+    product.category = not_null(request.form['category'])
+    product.company = not_null(request.form['company'])
+    product.price = not_null(request.form['price'])
     try:
       db.session.commit()
-      return redirect(url_for('admin_product'))
+      return redirect( url_for('admin_product'))
     except Exception as e:
       return 'xd'
   else:
@@ -368,6 +373,7 @@ def update_product(id):
 
 @app.route('/delete-product/<int:id>')
 @login_required
+# @check_admin('delete_product')
 def delete_product(id):
 
   name_to_delete = Product.query.get_or_404(id)
@@ -384,6 +390,7 @@ def delete_product(id):
 
 @app.route('/backup', methods=['GET', 'POST'])
 @login_required
+# @check_admin('backup')
 def backup():
   users = User.query.all()
   blocked = Blocked.query.all()

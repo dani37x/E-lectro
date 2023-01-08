@@ -3,5 +3,6 @@
 *.jpg
 .idea
 *.db
+E-lectro\instance\user.db
 *.sqlite3
 __pycache__
