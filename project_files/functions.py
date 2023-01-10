@@ -6,13 +6,14 @@ from functools import wraps
 from .database import Blocked
 
 
-def checker(username):
-    check = Blocked.query.filter_by(ip=request.remote_addr).first()
-    if check != None:
-        abort(403, description='You are banned')
-    check = Blocked.query.filter_by(username=username).first()
-    if check != None:
-        abort(403, description='You are banned')
+
+# def checker(username):
+#     check = Blocked.query.filter_by(ip=request.remote_addr).first()
+#     if check != None:
+#         abort(403, description='You are banned')
+#     check = Blocked.query.filter_by(username=username).first()
+#     if check != None:
+#         abort(403, description='You are banned')
 
 
 def check_admin(name):
@@ -47,3 +48,6 @@ def not_null(field):
     else:
         raise ValueError
           
+ 
+
+
