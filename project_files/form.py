@@ -40,12 +40,12 @@ def password_checking(form, field):
 
 
 def existing_user(form, field):
-    if field.data in User.query.filter(User.username).all():
-        raise ValidationError('this username already exist')
+  if field.data in User.query.filter(User.username).all():
+      raise ValidationError('this username already exist')
     
 def existing_email(form, field):
-    if field.data in User.query.filter(User.email).all():
-        raise ValidationError('this email already exist')
+  if field.data in User.query.filter(User.email).all():
+      raise ValidationError('this email already exist')
 
 
 class UserCreator(FlaskForm):
@@ -93,9 +93,5 @@ class NewPassword(FlaskForm):
     ])
     
 class RemindPassword(FlaskForm):
-    username = StringField(description='username', validators=[
-      DataRequired(),
-      Length(max=30),
-      existing_user,
-    ])
+    username = StringField(description='username', validators=[DataRequired(), Length(max=30)])
     email = EmailField(description='e-mail', validators=[DataRequired(), Length(max=50)])

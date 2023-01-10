@@ -1,7 +1,6 @@
 from project_files import app
 from project_files import db
 from project_files import login_manager
-from project_files import mail
 
 from flask_login import login_user, logout_user, login_required, current_user
 from flask import render_template, url_for, redirect, flash, request, abort
@@ -11,9 +10,9 @@ from .form import UserCreator, UserLogin, RemindPassword, NewPassword
 
 from .database import User, Blocked, Product
 
-from.functions import checker, check_admin, not_null
+from .functions import check_admin, not_null, check_user
 
-from .actions import delete_rows, block_user
+from .actions import delete_rows, block_user, message
 
 
 
@@ -34,6 +33,7 @@ def load_user(user_id):
 
 @app.route('/', methods=['GET', 'POST'])
 @login_required
+# @check_user('page')
 def page():
   return render_template('page.html')
 
@@ -80,6 +80,11 @@ def register():
     try:
       db.session.add(user)
       db.session.commit()
+      try:
+        message(kind='register', sender='electro@team.com', recipents=form.email.data)
+      except Exception as e:
+        print(e)
+        return 'Errow with mail' 
       return redirect( url_for('login'))
     except Exception as e:
       return 'xd'
@@ -87,6 +92,7 @@ def register():
 
 
 @app.route("/logout")
+# @check_user('logout')
 @login_required
 def logout():
     logout_user()
@@ -94,6 +100,7 @@ def logout():
 
 
 @app.route("/remind_password", methods=['GET', 'POST'])
+# @check_user('remind_password')
 def remind_password():
     form = RemindPassword()
     if form.validate_on_submit():
@@ -101,22 +108,16 @@ def remind_password():
       if user:
           user = User.query.filter_by(email=form.email.data).first()
           if user:
-              msg = Message(
-                  'Your password to our service',
-                  sender='peter@mailtrap.io',
-                  recipients=['paul@mailtrap.io']
-              )
-              user = User.query.filter_by(email=form.email.data).first()
-              msg.body = f"Here you are {user.password}"
-              try:
-                mail.send(msg)
-                return redirect( url_for('new_password'))
-              except Exception as e:
-                  return 'error with mailtrap'
+            try:
+              message(kind='password',sender='electro@team.com', recipents=form.email.data)
+            except Exception as e:
+              return 'Error with mail'
+            return redirect( url_for('new_password'))
     return render_template('remind_password.html', form=form)
 
 
 @app.route("/new_password", methods=['GET', 'POST'])
+# @check_user('new_password')
 def new_password():
     form = NewPassword()
     if form.validate_on_submit():
@@ -129,7 +130,8 @@ def new_password():
                     db.session.commit()
                     return redirect( url_for('logout'))
                 except Exception as e:
-                    return 'Error with password chaning'
+                  print(e)
+                  return 'Error with password chaning'
     return render_template('new_password.html', form=form)
 
 
@@ -138,6 +140,7 @@ def new_password():
 
 @app.route('/admin', methods=['GET', 'POST'])
 @login_required
+# @check_user('admin')
 # @check_admin('admin')
 def admin():
 
@@ -146,6 +149,7 @@ def admin():
 @app.route('/admin/users', methods=['GET', 'POST'])
 @login_required
 # @check_admin('admin_user')
+# @check_user('admin_user')
 def admin_user():
   users = User.query.all() 
   if request.method == 'POST':
@@ -162,12 +166,22 @@ def admin_user():
 
     data = request.form.getlist('id')
     selected_action = request.form['action']
-    if selected_action == 'delete user':
-      delete_rows(User, data)
-      return redirect( url_for('admin_user'))
-    if selected_action == 'block user':
-      block_user(data=data)
-      return redirect( url_for('admin_user'))
+    try:
+      if selected_action == 'delete user':
+        delete_rows(User, data)
+        return redirect( url_for('admin_user'))
+      if selected_action == 'block user':
+        block_user(data=data)
+      if selected_action == 'test email':
+        users_emails= []
+        for id in data:
+          user = User.query.filter_by(id=id).first()
+          users_emails.append(user.email)
+        message(kind='no-reply', sender=current_user.username, recipents=users_emails)
+        return redirect( url_for('admin_user'))
+    except Exception as e:
+      print(e)
+      return 'Error with actions'
   
   return render_template('admin_user.html', users=users)
 
@@ -175,6 +189,7 @@ def admin_user():
 @app.route('/admin/blocked', methods=['GET', 'POST'])
 @login_required
 # @check_admin('admin_blocked')
+# @check_user('admin_blocked')
 def admin_blocked():
   blocked = Blocked.query.all() 
   if request.method == 'POST':
@@ -198,6 +213,7 @@ def admin_blocked():
 @app.route('/admin/product', methods=['GET', 'POST'])
 @login_required
 # @check_admin('admin_product')
+# @check_user('admin_product')
 def admin_product():
   products = Product.query.all() 
   if request.method == 'POST':
@@ -225,21 +241,24 @@ def admin_product():
 @app.route('/add-user', methods=['GET', 'POST'])
 @login_required
 # @check_admin('add_user')
+# @check_user('add_user')
 def add_user():
   if request.method == 'POST':
     new_user = User(
-      username=request.form['username'],
-      first_name=request.form['first_name'],
-      surname=request.form['surname'],
-      email=request.form['email'],
-      password=request.form['password'],
+      username=not_null(request.form['username']),
+      first_name=not_null(request.form['first_name']),
+      surname=not_null(request.form['surname']),
+      email=not_null(request.form['email']),
+      password=not_null(request.form['password']),
       ip='127.0.0.1',
+      # account_type='user',
       active=True
     )
     try:
       db.session.add(new_user)
       db.session.commit()
     except Exception as e:
+      print(e)
       return 'xd' + e
     return redirect( url_for('admin_user'))
   return render_template('add_user.html')
@@ -248,6 +267,7 @@ def add_user():
 @app.route('/update-user/<int:id>', methods=['GET', 'POST'])
 @login_required
 # @check_admin('update_user')
+# @check_user('update_user')
 def update_user(id):
   user = User.query.get_or_404(id)
   if request.method == 'POST':
@@ -263,6 +283,7 @@ def update_user(id):
       db.session.commit()
       return redirect( url_for('admin_user'))
     except Exception as e:
+      print(e)
       return 'xd'
   else:
     return render_template('update_user.html', user=user )
@@ -271,6 +292,7 @@ def update_user(id):
 @app.route('/delete-user/<int:id>')
 @login_required
 # @check_admin('delete_user')
+# @check_user('delete_user')
 def delete_user(id):
 
   name_to_delete = User.query.get_or_404(id)
@@ -279,6 +301,7 @@ def delete_user(id):
     db.session.commit()
     return redirect(url_for('admin_user'))
   except Exception as e:
+    print(e)
     return 'xd'
 
 
@@ -286,16 +309,18 @@ def delete_user(id):
 @app.route('/add-blocked', methods=['GET', 'POST'])
 @login_required
 # @check_admin('add_blocked')
+# @check_user('add_blocked')
 def add_blocked():
   if request.method == 'POST':
     new_blocked = Blocked(
-      username=request.form['username'],
-      ip=request.form['ip'],
+      username=not_null(request.form['username']),
+      ip=not_null(request.form['ip']),
     )
     try:
       db.session.add(new_blocked)
       db.session.commit()
     except Exception as e:
+      print(e)
       return 'xd'
     return redirect( url_for('admin_blocked'))
   return render_template('add_blocked.html')
@@ -304,16 +329,17 @@ def add_blocked():
 @app.route('/update-blocked/<int:id>', methods=['GET', 'POST'])
 @login_required
 # @check_admin('update_blocked')
+# @check_user('update_blocked')
 def update_blocked(id):
   blocked = Blocked.query.get_or_404(id)
   if request.method == 'POST':
     blocked.username = not_null(request.form['username'])
     blocked.ip = not_null( request.form['ip'])
-    # if blocked.username != '' and blocked.ip != '':
     try:
       db.session.commit()
       return redirect(url_for('admin_blocked'))
     except Exception as e:
+      print(e)
       return 'xd'
   else:
     return render_template('update_blocked.html', blocked=blocked )
@@ -322,6 +348,7 @@ def update_blocked(id):
 @app.route('/delete-blocked/<int:id>')
 @login_required
 # @check_admin('delete_blocked')
+# @check_user('delete_blocked')
 def delete_blocked(id):
 
   name_to_delete = Blocked.query.get_or_404(id)
@@ -336,18 +363,20 @@ def delete_blocked(id):
 @app.route('/add-product', methods=['GET', 'POST'])
 @login_required
 # @check_admin('add_product')
+# @check_user('add_product')
 def add_product():
   if request.method == 'POST':
     new_product = Product(
-      name=request.form['name'],
-      category=request.form['category'],
-      company=request.form['company'],
-      price=request.form['price'],
+      name=not_null(request.form['name']),
+      category=not_null(request.form['category']),
+      company=not_null(request.form['company']),
+      price=not_null(request.form['price']),
     )
     try:
       db.session.add(new_product)
       db.session.commit()
     except Exception as e:
+      print(e)
       return 'xd'
     return redirect( url_for('admin_product'))
   return render_template('add_product.html')
@@ -356,6 +385,7 @@ def add_product():
 @app.route('/update-product/<int:id>', methods=['GET', 'POST'])
 @login_required
 # @check_admin('update_product')
+# @check_user('update_product')
 def update_product(id):
   product = Product.query.get_or_404(id)
   if request.method == 'POST':
@@ -367,6 +397,7 @@ def update_product(id):
       db.session.commit()
       return redirect( url_for('admin_product'))
     except Exception as e:
+      print(e)
       return 'xd'
   else:
     return render_template('update_product.html', product=product )
@@ -375,6 +406,7 @@ def update_product(id):
 @app.route('/delete-product/<int:id>')
 @login_required
 # @check_admin('delete_product')
+# @check_user('delete_product')
 def delete_product(id):
 
   name_to_delete = Product.query.get_or_404(id)
@@ -383,6 +415,7 @@ def delete_product(id):
     db.session.commit()
     return redirect(url_for('admin_product'))
   except Exception as e:
+    print(e)
     return 'xd'    
 
 
@@ -392,6 +425,7 @@ def delete_product(id):
 @app.route('/backup', methods=['GET', 'POST'])
 @login_required
 # @check_admin('backup')
+# @check_user('backup')
 def backup():
   users = User.query.all()
   blocked = Blocked.query.all()
