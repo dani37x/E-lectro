@@ -1,4 +1,6 @@
-from flask import request, abort
+from project_files import db
+
+from flask import request, abort, session
 from flask_login import  current_user
 
 from functools import wraps
@@ -46,8 +48,24 @@ def not_null(field):
     if field != '' and field != None:
         return field
     else:
-        raise ValueError
-          
+        raise ValueError      
  
 
+
+def max_reminders():
+    print(session['remind_one'], session['remind_two'])
+    if session['remind_one'] == 'not set':
+        session['remind_one']  = request.remote_addr
+        return True
+    if session['remind_two'] == 'not set':
+        session['remind_two'] = request.remote_addr
+        return True
+    else:
+        blocked = Blocked(username='anonymous', ip=request.remote_addr)
+        # add to blocked timed ban
+        db.session.add(blocked)
+        db.session.commit()
+        return False
+
+    
 

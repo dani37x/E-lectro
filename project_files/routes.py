@@ -3,27 +3,27 @@ from project_files import db
 from project_files import login_manager
 
 from flask_login import login_user, logout_user, login_required, current_user
-from flask import render_template, url_for, redirect, flash, request, abort
+from flask import render_template, url_for, redirect, flash, request, abort, session
 from flask_mail import Message
 
 from .form import UserCreator, UserLogin, RemindPassword, NewPassword
 
 from .database import User, Blocked, Product
 
-from .functions import check_admin, not_null, check_user
+from .functions import check_admin, not_null, check_user, max_reminders
 
 from .actions import delete_rows, block_user, message
-
 
 
 
 @app.before_first_request
 def before_first_request():
     db.create_all()
-    user = Blocked(username='mama', ip='127.0.0.1')
-    db.session.add(user)
-    db.session.commit()
-    # checker(username=current_user.username)
+    session['remind_one'] = 'not set'
+    session['remind_two'] = 'not set'
+    # user = Blocked(username='mama', ip='127.0.0.1')
+    # db.session.add(user)
+    # db.session.commit()
 
 
 @login_manager.user_loader
@@ -35,9 +35,24 @@ def load_user(user_id):
 @login_required
 # @check_user('page')
 def page():
-  return render_template('page.html')
+  session['current'] = current_user.username
+  print(current_user.username)
+  print(session['current'])
+  products = Product.query.all()
+  if request.method == 'POST':
+    queryset = request.form['search']
+    products = (
+      Product.query.filter(Product.name.contains(queryset)
+        | (Product.category.contains(queryset))
+        | (Product.company.contains(queryset))).all()
+    )
+  return render_template('page.html', products=products)
 
 
+@app.route('/info', methods=['GET', 'POST'])
+@login_required
+def second_page():
+  return session.get('current', 'not set')
 # login, register, logout, remind password, new password
 
 
@@ -45,11 +60,12 @@ def page():
 def login():
   form = UserLogin()
   if form.validate_on_submit():
-    user = User.query.filter_by(username=form.username.data).first()
+    user = User.query.filter_by(email=form.email.data).first()
     if user:
       user = User.query.filter_by(email=form.email.data).first()
       if user:
-        user = User.query.filter_by(password=form.password.data).first()
+        user = User.query.filter_by(username=form.username.data).first()
+        
         if user:
           print(form.remember.data)
           login_user(user, remember=form.remember.data)
@@ -102,17 +118,25 @@ def logout():
 @app.route("/remind_password", methods=['GET', 'POST'])
 # @check_user('remind_password')
 def remind_password():
+
     form = RemindPassword()
+
     if form.validate_on_submit():
       user = User.query.filter_by(username=form.username.data).first()
       if user:
           user = User.query.filter_by(email=form.email.data).first()
           if user:
-            try:
-              message(kind='password',sender='electro@team.com', recipents=form.email.data)
-            except Exception as e:
-              return 'Error with mail'
-            return redirect( url_for('new_password'))
+            if max_reminders():
+
+              try:
+                message(kind='password',sender='electro@team.com', recipents=form.email.data)
+                return redirect( url_for('new_password'))
+              except Exception as e:
+                return 'Error with mail'
+
+            else:
+              abort(403)
+
     return render_template('remind_password.html', form=form)
 
 
@@ -173,7 +197,7 @@ def admin_user():
       if selected_action == 'block user':
         block_user(data=data)
       if selected_action == 'test email':
-        users_emails= []
+        users_emails = []
         for id in data:
           user = User.query.filter_by(id=id).first()
           users_emails.append(user.email)

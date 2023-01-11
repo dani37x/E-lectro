@@ -6,5 +6,37 @@
     <a href="{{ url_for('login') }}"> login </a>
 {% endif %}
 
+<form method="post" action="">
+  <label for="action">Sorting</label>
+  <select id="action" name="action">
+  <!-- <option value="descending"> descending</option>
+  <option value="ascending"> ascending</option> -->
+  </select>
+  <label for="search">Serach:</label>
+  <input type="text" id="search" name="search">
+  <table border="1px">
+      <th> name </th>
+      <th> category </th>
+      <th> company </th>
+      {% for product in products %}
+      <tr>
+          <td>{{ product.name }}</td>
+          <td>{{ product.category }}</td>
+          <td>{{ product.company }}</td>
+      </tr>
+      {% endfor %}
+      <input type="submit">
+  </table>
+</form>
+
+
+<br>
+<br>
+<br>
+
+
+
+
+
 <br>
 <a href="{{ url_for('logout') }}"> logout </a>
