@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, session
 
 from flask_sqlalchemy import SQLAlchemy
 
@@ -8,6 +8,8 @@ from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 
 from flask_mail import Mail, Message
+
+from datetime import timedelta
 
 import os
 
@@ -25,7 +27,7 @@ login_manager.init_app(app)
 limiter = Limiter(
     app,
     key_func=get_remote_address,
-    default_limits=["30 per hour", "10 per minute", "100 per day"],
+    default_limits=["450 per hour", "100 per minute", "1000 per day"],
     storage_uri="memory://",
 )
 
@@ -38,3 +40,9 @@ app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME', 'not set')
 app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD', 'not set')
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USE_SSL'] = False
+
+
+#    set on when server would start
+
+# session.permanent = True
+# app.permanent_session_lifetime = timedelta(hours=24)

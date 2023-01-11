@@ -19,7 +19,7 @@
         <th> actions</th>
         {% for user in users %}
         <tr>
-            <td><input type="checkbox" name="id" value="{{ user.id }}"</td>
+            <td><input type="checkbox" name="id" value="{{ user.id }}"></td>
             <td>{{ user.username }}</td>
             <td>
                 <a href="{{ url_for('update_user', id=user.id) }}"> edit </a>
