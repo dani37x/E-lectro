@@ -7,6 +7,8 @@ from functools import wraps
 
 from .database import Blocked
 
+import json
+import os
 
 
 # def checker(username):
@@ -51,9 +53,8 @@ def not_null(field):
         raise ValueError      
  
 
-
 def max_reminders():
-    print(session['remind_one'], session['remind_two'])
+    # print(session['remind_one'], session['remind_two'])
     if session['remind_one'] == 'not set':
         session['remind_one']  = request.remote_addr
         return True
@@ -67,5 +68,25 @@ def max_reminders():
         db.session.commit()
         return False
 
+
+
+def save_to_json(username, ip, searched):
+  path = os.environ.get('data.json', 'not set')
+
+  objects_list = []
+
+  with open(path) as fp:
+    objects_list = json.load(fp)
+    for obj in objects_list:
+      print(obj)
+
+  objects_list.append({
+        "username": f"{username}",
+        "ip": f"{ip}",
+        "searched": f"{searched}"
+    })
+
+  with open(path, 'w') as json_file:
+    json.dump(objects_list, json_file, indent=4, separators=(',', ': '))
     
 
