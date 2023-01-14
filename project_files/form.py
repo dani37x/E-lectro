@@ -39,13 +39,23 @@ def password_checking(form, field):
       raise ValidationError('Password must contain number')
 
 
+# more words if it is required :)
+
+not_allowed= ['fuck', 'shit', 'hitler', 'stalin', '666']
+
 def existing_user(form, field):
   if field.data in User.query.filter(User.username).all():
       raise ValidationError('this username already exist')
+  for word in not_allowed:
+    if word in field.data or string.upper(word) in field.data:
+      raise ValidationError('set different value')
     
 def existing_email(form, field):
   if field.data in User.query.filter(User.email).all():
       raise ValidationError('this email already exist')
+  for word in not_allowed:
+    if word in field.data or string.upper(word) in field.data:
+      raise ValidationError('set different value')
 
 
 class UserCreator(FlaskForm):

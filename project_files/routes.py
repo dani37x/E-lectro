@@ -10,7 +10,7 @@ from .form import UserCreator, UserLogin, RemindPassword, NewPassword
 
 from .database import User, Blocked, Product
 
-from .functions import check_admin, not_null, check_user, max_reminders
+from .functions import check_admin, not_null, check_user, max_reminders, save_to_json
 
 from .actions import delete_rows, block_user, message
 
@@ -31,22 +31,29 @@ def load_user(user_id):
     return User.query.get(user_id)
 
 
+
 @app.route('/', methods=['GET', 'POST'])
 @login_required
 # @check_user('page')
 def page():
-  session['current'] = current_user.username
-  print(current_user.username)
-  print(session['current'])
   products = Product.query.all()
   if request.method == 'POST':
     queryset = request.form['search']
+
     products = (
       Product.query.filter(Product.name.contains(queryset)
         | (Product.category.contains(queryset))
         | (Product.company.contains(queryset))).all()
     )
-  return render_template('page.html', products=products)
+
+    if len(queryset) > 1:
+      save_to_json(
+        username=current_user.username,
+        ip=request.remote_addr,
+        searched=queryset
+      )
+
+  return render_template('page.html', products=products, user=current_user.username)
 
 
 @app.route('/info', methods=['GET', 'POST'])
@@ -259,8 +266,7 @@ def admin_product():
   return render_template('admin_product.html', products=products)
 
 
-# admin operations like add, update, delete 
-
+# admin operations like add, update, delete
 
 @app.route('/add-user', methods=['GET', 'POST'])
 @login_required
