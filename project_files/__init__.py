@@ -9,6 +9,8 @@ from flask_limiter.util import get_remote_address
 
 from flask_mail import Mail, Message
 
+from flask_apscheduler import APScheduler
+
 from datetime import timedelta
 
 import os
@@ -46,3 +48,9 @@ app.config['MAIL_USE_SSL'] = False
 
 # session.permanent = True
 # app.permanent_session_lifetime = timedelta(hours=24)
+
+
+scheduler = APScheduler()
+scheduler.init_app(app)
+
+
