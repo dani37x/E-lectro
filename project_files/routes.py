@@ -36,7 +36,9 @@ def load_user(user_id):
 @login_required
 # @check_user('page')
 def page():
+
   products = Product.query.all()
+
   if request.method == 'POST':
     queryset = request.form['search']
 
@@ -65,8 +67,11 @@ def second_page():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+
   form = UserLogin()
+
   if form.validate_on_submit():
+
     user = User.query.filter_by(email=form.email.data).first()
     if user:
       user = User.query.filter_by(email=form.email.data).first()
@@ -91,6 +96,7 @@ def register():
     # surname = form.surname.data
     # email = form.email.data
     # password = form.password.data
+
     user = User(
       username=form.username.data,
       first_name=form.first_name.data,
@@ -98,19 +104,25 @@ def register():
       email=form.email.data,
       password=form.password.data,
       ip=request.remote_addr,
+      # account_type='user',
       active=True
     )
+
     try:
       db.session.add(user)
       db.session.commit()
+      
       try:
         message(kind='register', sender='electro@team.com', recipents=form.email.data)
       except Exception as e:
         print(e)
-        return 'Errow with mail' 
+        return 'Errow with mail'
+
       return redirect( url_for('login'))
+
     except Exception as e:
       return 'xd'
+
   return render_template('register.html', form=form)
 
 
@@ -129,6 +141,7 @@ def remind_password():
     form = RemindPassword()
 
     if form.validate_on_submit():
+
       user = User.query.filter_by(username=form.username.data).first()
       if user:
           user = User.query.filter_by(email=form.email.data).first()
@@ -150,19 +163,24 @@ def remind_password():
 @app.route("/new_password", methods=['GET', 'POST'])
 # @check_user('new_password')
 def new_password():
+
     form = NewPassword()
+
     if form.validate_on_submit():
+
         user = User.query.filter_by(username=form.username.data).first()
         if user:
             user = User.query.filter_by(password=form.current_password.data).first()
             if user:
                 user.password = form.password.data
+
                 try:
                     db.session.commit()
                     return redirect( url_for('logout'))
                 except Exception as e:
                   print(e)
                   return 'Error with password chaning'
+
     return render_template('new_password.html', form=form)
 
 
@@ -182,10 +200,15 @@ def admin():
 # @check_admin('admin_user')
 # @check_user('admin_user')
 def admin_user():
+
   users = User.query.all() 
+
   if request.method == 'POST':
+
     searching = request.form['search']
+
     if searching != None and searching != '':
+
       users = (
         User.query.filter(User.username.contains(searching)
           | (User.first_name.contains(searching))
@@ -197,12 +220,16 @@ def admin_user():
 
     data = request.form.getlist('id')
     selected_action = request.form['action']
+
     try:
+
       if selected_action == 'delete user':
         delete_rows(User, data)
         return redirect( url_for('admin_user'))
+
       if selected_action == 'block user':
         block_user(data=data)
+
       if selected_action == 'test email':
         users_emails = []
         for id in data:
@@ -210,6 +237,7 @@ def admin_user():
           users_emails.append(user.email)
         message(kind='no-reply', sender=current_user.username, recipents=users_emails)
         return redirect( url_for('admin_user'))
+
     except Exception as e:
       print(e)
       return 'Error with actions'
@@ -222,8 +250,11 @@ def admin_user():
 # @check_admin('admin_blocked')
 # @check_user('admin_blocked')
 def admin_blocked():
+
   blocked = Blocked.query.all() 
+
   if request.method == 'POST':
+
     searching = request.form['search']
     if searching != None and searching != '':
       blocked = (
@@ -234,6 +265,7 @@ def admin_blocked():
       
     data = request.form.getlist('id')
     selected_action = request.form['action']
+
     if selected_action == 'delete user':
       delete_rows(Blocked, data)
       return redirect( url_for('admin_blocked'))
@@ -246,8 +278,11 @@ def admin_blocked():
 # @check_admin('admin_product')
 # @check_user('admin_product')
 def admin_product():
+
   products = Product.query.all() 
+
   if request.method == 'POST':
+
     searching = request.form['search']
     if searching != None and searching != '':
       products = (
@@ -259,6 +294,7 @@ def admin_product():
       
     data = request.form.getlist('id')
     selected_action = request.form['action']
+
     if selected_action == 'delete products':
       delete_rows(Product, data)
       return redirect( url_for('admin_product'))
@@ -273,7 +309,9 @@ def admin_product():
 # @check_admin('add_user')
 # @check_user('add_user')
 def add_user():
+
   if request.method == 'POST':
+
     new_user = User(
       username=not_null(request.form['username']),
       first_name=not_null(request.form['first_name']),
@@ -284,13 +322,16 @@ def add_user():
       # account_type='user',
       active=True
     )
+
     try:
       db.session.add(new_user)
       db.session.commit()
     except Exception as e:
       print(e)
       return 'xd' + e
+
     return redirect( url_for('admin_user'))
+
   return render_template('add_user.html')
 
 
@@ -299,8 +340,11 @@ def add_user():
 # @check_admin('update_user')
 # @check_user('update_user')
 def update_user(id):
+
   user = User.query.get_or_404(id)
+
   if request.method == 'POST':
+
     user.username = not_null(request.form['username'])
     user.first_name = not_null(request.form['first_name'])
     user.surname = not_null(request.form['surname'])
@@ -309,12 +353,14 @@ def update_user(id):
     # user.account_type = not_null(request.form[''account_type])
     active = not_null(request.form['active'])
     user.active = True if 'True' in active else False
+
     try:
       db.session.commit()
       return redirect( url_for('admin_user'))
     except Exception as e:
       print(e)
       return 'xd'
+  
   else:
     return render_template('update_user.html', user=user )
 
@@ -330,6 +376,7 @@ def delete_user(id):
     db.session.delete(name_to_delete)
     db.session.commit()
     return redirect(url_for('admin_user'))
+
   except Exception as e:
     print(e)
     return 'xd'
@@ -342,16 +389,21 @@ def delete_user(id):
 # @check_user('add_blocked')
 def add_blocked():
   if request.method == 'POST':
+
     new_blocked = Blocked(
       username=not_null(request.form['username']),
       ip=not_null(request.form['ip']),
+      # date=not_null(request.form['date']),
     )
+
     try:
       db.session.add(new_blocked)
       db.session.commit()
+
     except Exception as e:
       print(e)
       return 'xd'
+
     return redirect( url_for('admin_blocked'))
   return render_template('add_blocked.html')
 
@@ -361,16 +413,23 @@ def add_blocked():
 # @check_admin('update_blocked')
 # @check_user('update_blocked')
 def update_blocked(id):
+
   blocked = Blocked.query.get_or_404(id)
+
   if request.method == 'POST':
+
     blocked.username = not_null(request.form['username'])
     blocked.ip = not_null( request.form['ip'])
+    # blocked.date = not_null( request.form['date'])
+
     try:
       db.session.commit()
       return redirect(url_for('admin_blocked'))
+
     except Exception as e:
       print(e)
       return 'xd'
+
   else:
     return render_template('update_blocked.html', blocked=blocked )
 
@@ -395,20 +454,26 @@ def delete_blocked(id):
 # @check_admin('add_product')
 # @check_user('add_product')
 def add_product():
+
   if request.method == 'POST':
+
     new_product = Product(
       name=not_null(request.form['name']),
       category=not_null(request.form['category']),
       company=not_null(request.form['company']),
       price=not_null(request.form['price']),
     )
+
     try:
       db.session.add(new_product)
       db.session.commit()
+
     except Exception as e:
       print(e)
       return 'xd'
+
     return redirect( url_for('admin_product'))
+
   return render_template('add_product.html')
 
 
@@ -417,18 +482,23 @@ def add_product():
 # @check_admin('update_product')
 # @check_user('update_product')
 def update_product(id):
+
   product = Product.query.get_or_404(id)
+
   if request.method == 'POST':
     product.name = not_null(request.form['name'])
     product.category = not_null(request.form['category'])
     product.company = not_null(request.form['company'])
     product.price = not_null(request.form['price'])
+
     try:
       db.session.commit()
       return redirect( url_for('admin_product'))
+
     except Exception as e:
       print(e)
       return 'xd'
+
   else:
     return render_template('update_product.html', product=product )
 
@@ -444,6 +514,7 @@ def delete_product(id):
     db.session.delete(name_to_delete)
     db.session.commit()
     return redirect(url_for('admin_product'))
+
   except Exception as e:
     print(e)
     return 'xd'    
@@ -457,8 +528,10 @@ def delete_product(id):
 # @check_admin('backup')
 # @check_user('backup')
 def backup():
+
   users = User.query.all()
   blocked = Blocked.query.all()
+  
   return render_template('backup.html', users=users)
 
 
