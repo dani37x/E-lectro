@@ -71,22 +71,28 @@ def max_reminders():
 
 
 def save_to_json(username, ip, searched):
-  path = os.environ.get('data.json', 'not set')
+    path = 'D:\projekty\E-lectro\instance\data.json'
 
-  objects_list = []
+    objects_list = []
 
-  with open(path) as fp:
-    objects_list = json.load(fp)
-    for obj in objects_list:
-      print(obj)
+    with open(path) as fp:
+        objects_list = json.load(fp)
+        # for obj in objects_list:
+        #     print(obj)
 
-  objects_list.append({
-        "username": f"{username}",
-        "ip": f"{ip}",
-        "searched": f"{searched}"
-    })
+    objects_list.append({
+            "username": f"{username}",
+            "ip": f"{ip}",
+            "searched": f"{searched}"
+        })
 
-  with open(path, 'w') as json_file:
-    json.dump(objects_list, json_file, indent=4, separators=(',', ': '))
+    with open(path, 'w') as json_file:
+        json.dump(objects_list, json_file, indent=4, separators=(',', ': '))
     
 
+
+from project_files import scheduler
+
+@scheduler.task('cron', id='get_note', second=30)
+def get_notes():
+    print('dziaaaalaa')
