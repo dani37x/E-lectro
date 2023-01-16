@@ -6,6 +6,7 @@ from .database import User
 
 import string
 
+
 def password_checking(form, field):
     if len(field.data) < 9 or len(field.data) > 20:
       raise ValidationError('Password must have minimum 9 length and maximum 20 length')
@@ -41,20 +42,21 @@ def password_checking(form, field):
 
 # more words if it is required :)
 
-not_allowed= ['fuck', 'shit', 'hitler', 'stalin', '666']
+not_allowed= ['fuck', 'shit', 'hitler', 'stalin', '666', 'admin', 'mod']
 
 def existing_user(form, field):
   if field.data in User.query.filter(User.username).all():
       raise ValidationError('this username already exist')
   for word in not_allowed:
-    if word in field.data or string.upper(word) in field.data:
+    if word in field.data or word.upper() in field.data:
       raise ValidationError('set different value')
     
+
 def existing_email(form, field):
   if field.data in User.query.filter(User.email).all():
       raise ValidationError('this email already exist')
   for word in not_allowed:
-    if word in field.data or string.upper(word) in field.data:
+    if word in field.data or word.upper() in field.data:
       raise ValidationError('set different value')
 
 

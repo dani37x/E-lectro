@@ -16,12 +16,14 @@
         <th> select </th>
         <th> username</th>
         <th> ip</th>
+        <th> blocked to</th>
         <th> actions</th>
         {% for block in blocked %}
         <tr>
             <td><input type="checkbox" name="id" value="{{ block.id }}"</td>
             <td>{{ block.username }}</td>
             <td>{{ block.ip }}</td>
+            <td>{{ block.date }}</td>
             <td>
                 <a href="{{ url_for('update_blocked', id=block.id) }}"> edit </a>
                 <a href="{{ url_for('delete_blocked', id=block.id) }}"> delete </a>
