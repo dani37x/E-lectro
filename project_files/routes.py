@@ -11,6 +11,7 @@ from .form import UserCreator, UserLogin, RemindPassword, NewPassword
 from .database import User, Blocked, Product
 
 from .functions import check_admin, not_null, check_user, max_reminders, save_to_json
+from .functions import unblock
 
 from .actions import delete_rows, block_user, message
 
@@ -18,12 +19,14 @@ from .actions import delete_rows, block_user, message
 
 @app.before_first_request
 def before_first_request():
-    db.create_all()
+    # db.create_all()
     session['remind_one'] = 'not set'
     session['remind_two'] = 'not set'
+    # unblock()
     # user = Blocked(username='mama', ip='127.0.0.1')
     # db.session.add(user)
     # db.session.commit()
+
 
 
 @login_manager.user_loader
@@ -36,7 +39,7 @@ def load_user(user_id):
 @login_required
 # @check_user('page')
 def page():
-
+  # unblock()
   products = Product.query.all()
 
   if request.method == 'POST':
@@ -74,15 +77,21 @@ def login():
 
     user = User.query.filter_by(email=form.email.data).first()
     if user:
-      user = User.query.filter_by(email=form.email.data).first()
+      user = User.query.filter_by(password=form.password.data).first()
       if user:
         user = User.query.filter_by(username=form.username.data).first()
-        
         if user:
-          print(form.remember.data)
-          login_user(user, remember=form.remember.data)
-          return redirect( url_for('page'))
 
+          wheter_blocked = Blocked.query.filter_by(username=user.username).first()
+          if wheter_blocked:
+            if unblock(blocked_user=wheter_blocked):
+
+              login_user(user, remember=form.remember.data)
+              return redirect( url_for('page'))
+
+            else:
+              return abort(403)
+            
   return render_template('login.html', form=form)
 
 
@@ -104,7 +113,7 @@ def register():
       email=form.email.data,
       password=form.password.data,
       ip=request.remote_addr,
-      # account_type='user',
+      account_type='user',
       active=True
     )
 
@@ -319,7 +328,7 @@ def add_user():
       email=not_null(request.form['email']),
       password=not_null(request.form['password']),
       ip='127.0.0.1',
-      # account_type='user',
+      account_type=not_null(request.form['account_type']),
       active=True
     )
 
@@ -350,7 +359,7 @@ def update_user(id):
     user.surname = not_null(request.form['surname'])
     user.email = not_null(request.form['email'])
     user.password = not_null(request.form['password'])
-    # user.account_type = not_null(request.form[''account_type])
+    user.account_type = not_null(request.form['account_type'])
     active = not_null(request.form['active'])
     user.active = True if 'True' in active else False
 
@@ -393,7 +402,7 @@ def add_blocked():
     new_blocked = Blocked(
       username=not_null(request.form['username']),
       ip=not_null(request.form['ip']),
-      # date=not_null(request.form['date']),
+      date=not_null(request.form['date']),
     )
 
     try:
@@ -420,7 +429,7 @@ def update_blocked(id):
 
     blocked.username = not_null(request.form['username'])
     blocked.ip = not_null( request.form['ip'])
-    # blocked.date = not_null( request.form['date'])
+    blocked.date = not_null( request.form['date'])
 
     try:
       db.session.commit()
@@ -484,7 +493,6 @@ def add_product():
 def update_product(id):
 
   product = Product.query.get_or_404(id)
-
   if request.method == 'POST':
     product.name = not_null(request.form['name'])
     product.category = not_null(request.form['category'])
@@ -531,7 +539,7 @@ def backup():
 
   users = User.query.all()
   blocked = Blocked.query.all()
-  
+
   return render_template('backup.html', users=users)
 
 

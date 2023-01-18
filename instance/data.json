@@ -33,5 +33,10 @@
         "username": "mama",
         "ip": "127.0.0.1",
         "searched": "2"
+    },
+    {
+        "username": "mama",
+        "ip": "127.0.0.1",
+        "searched": "home"
     }
 ]
