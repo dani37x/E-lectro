@@ -42,7 +42,7 @@ def password_checking(form, field):
 
 # more words if it is required :)
 
-not_allowed= ['fuck', 'shit', 'hitler', 'stalin', '666', 'admin', 'mod']
+not_allowed= ['fuck', 'shit', 'hitler', 'stalin', '666', 'admin', 'mod', 'product', 'blocked', 'user']
 
 def existing_user(form, field):
   if field.data in User.query.filter(User.username).all():

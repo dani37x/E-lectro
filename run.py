@@ -1,7 +1,9 @@
-from project_files import app, scheduler
+from project_files import app
 from project_files import routes
-# from project_files.functions import get_notes
 
+
+
+
+import os
 if __name__ =="__main__":
-  scheduler.start()
-  app.run(debug=True)
+    app.run(debug=True)
