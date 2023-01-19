@@ -34,12 +34,31 @@ def load_user(user_id):
     return User.query.get(user_id)
 
 
+@app.route('/test', methods=['GET', 'POST'])
+def test():
+  user = Blocked(username='kekw', ip='127.0.0.1', date='1-1-2022')
+  db.session.add(user)
+  db.session.commit()
+  for i in range(0,3):
+    user = User(
+      username=f'kekw{i}',
+      first_name='kekw',
+      surname='kekw',
+      email=f'kekw@x{i}.pl',
+      password='kekw!2@Kopyto',
+      ip=f'192.15.24{i}',
+      account_type='admin',
+      active=True
+    )
+    db.session.add(user)
+    db.session.commit()
+  return redirect( url_for('login'))
+
 
 @app.route('/', methods=['GET', 'POST'])
 @login_required
 # @check_user('page')
 def page():
-  # unblock()
   products = Product.query.all()
 
   if request.method == 'POST':
@@ -80,7 +99,7 @@ def login():
       password=form.password.data,
       username=form.username.data
     ).first()
-    
+
     if user:
 
       wheter_blocked = Blocked.query.filter_by(username=user.username).first()
