@@ -75,23 +75,27 @@ def login():
 
   if form.validate_on_submit():
 
-    user = User.query.filter_by(email=form.email.data).first()
+    user = User.query.filter_by(
+      email=form.email.data,
+      password=form.password.data,
+      username=form.username.data
+    ).first()
+    
     if user:
-      user = User.query.filter_by(password=form.password.data).first()
-      if user:
-        user = User.query.filter_by(username=form.username.data).first()
-        if user:
 
-          wheter_blocked = Blocked.query.filter_by(username=user.username).first()
-          if wheter_blocked:
-            if unblock(blocked_user=wheter_blocked):
+      wheter_blocked = Blocked.query.filter_by(username=user.username).first()
+      if wheter_blocked:
+        if unblock(blocked_user=wheter_blocked):
 
-              login_user(user, remember=form.remember.data)
-              return redirect( url_for('page'))
+          login_user(user, remember=form.remember.data)
+          return redirect( url_for('page'))
 
-            else:
-              return abort(403)
-            
+        else:
+          return abort(403)
+
+      login_user(user, remember=form.remember.data)
+      return redirect( url_for('page'))
+
   return render_template('login.html', form=form)
 
 
