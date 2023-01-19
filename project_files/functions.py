@@ -1,5 +1,4 @@
 from project_files import db
-from project_files import scheduler
 
 from flask import request, abort, session
 from flask_login import  current_user
@@ -71,10 +70,14 @@ def max_reminders():
         return True
 
     else:
-        blocked = Blocked(username='anonymous', ip=request.remote_addr) #str(datetime.datetime.now() + datetime.timedelta(days=7))
-        # add to blocked timed ban
+        blocked = Blocked(
+            username='anonymous',
+             ip=request.remote_addr,
+              date=str((datetime.now() + timedelta(days=1)).strftime("%d-%m-%Y")))
         db.session.add(blocked)
         db.session.commit()
+        session['remind_one'] == 'not set'
+        session['remind_two'] == 'not set'
         return False
 
 

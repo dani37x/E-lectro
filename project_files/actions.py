@@ -19,15 +19,17 @@ def delete_rows(model, data):
 def block_user(data):
     for id in data:
         user_to_block = User.query.get(id)
-        print(user_to_block)
+
+        wheter_blocked = Blocked.query.filter_by(username=user_to_block.username).first()
+        if wheter_blocked == None:
         
-        new_row = Blocked(
-            username=user_to_block.username,
-            ip=user_to_block.ip,
-            date=str((datetime.now() + timedelta(days=7)).strftime("%d-%m-%Y"))
-        )
-        db.session.add(new_row)
-        db.session.commit()
+            new_row = Blocked(
+                username=user_to_block.username,
+                ip=user_to_block.ip,
+                date=str((datetime.now() + timedelta(days=7)).strftime("%d-%m-%Y"))
+            )
+            db.session.add(new_row)
+            db.session.commit()
 
 
 def message(kind, sender, recipents):
