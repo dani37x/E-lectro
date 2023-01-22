@@ -25,6 +25,7 @@ class Blocked(db.Model):
 
     def __repr__(self):
         return f'Blocked {self.username}'
+    
 
 
 class Product(db.Model):

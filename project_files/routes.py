@@ -13,7 +13,7 @@ from .database import User, Blocked, Product
 from .functions import check_admin, not_null, check_user, max_reminders, save_to_json
 from .functions import unblock
 
-from .actions import delete_rows, block_user, message
+from .actions import delete_rows, block_user, message, backup
 
 
 
@@ -24,12 +24,10 @@ def before_first_request():
     session['remind_two'] = 'not set'
 
 
-
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(user_id)
 
-from .functions import backup
 
 @app.route('/test', methods=['GET', 'POST'])
 def test():
@@ -126,11 +124,6 @@ def register():
   form = UserCreator()
 
   if form.validate_on_submit():
-    # username = form.username.data
-    # first_name = form.first_name.data
-    # surname = form.surname.data
-    # email = form.email.data
-    # password = form.password.data
 
     user = User(
       username=form.username.data,
@@ -271,7 +264,9 @@ def admin_user():
           user = User.query.filter_by(id=id).first()
           users_emails.append(user.email)
         message(kind='no-reply', sender=current_user.username, recipents=users_emails)
-        return redirect( url_for('admin_user'))
+      
+      if selected_action == 'backup':
+        backup(User)
 
     except Exception as e:
       print(e)
@@ -304,6 +299,9 @@ def admin_blocked():
     if selected_action == 'delete user':
       delete_rows(Blocked, data)
       return redirect( url_for('admin_blocked'))
+    
+    if selected_action == 'backup':
+      backup(Blocked)
 
   return render_template('admin_blocked.html', blocked=blocked)
 
@@ -333,6 +331,9 @@ def admin_product():
     if selected_action == 'delete products':
       delete_rows(Product, data)
       return redirect( url_for('admin_product'))
+    
+    if selected_action == 'backup':
+      backup(Product)
 
   return render_template('admin_product.html', products=products)
 
