@@ -5,7 +5,7 @@ from flask_login import  current_user
 
 from functools import wraps
 
-from .database import Blocked
+from .database import Blocked, User, Product
 
 import json
 import os
@@ -120,5 +120,3 @@ def unblock(blocked_user):
             return False
     else:
         return False
-
-

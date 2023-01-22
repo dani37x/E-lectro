@@ -13,7 +13,7 @@ from .database import User, Blocked, Product
 from .functions import check_admin, not_null, check_user, max_reminders, save_to_json
 from .functions import unblock
 
-from .actions import delete_rows, block_user, message
+from .actions import delete_rows, block_user, message, backup
 
 
 
@@ -22,11 +22,6 @@ def before_first_request():
     # db.create_all()
     session['remind_one'] = 'not set'
     session['remind_two'] = 'not set'
-    # unblock()
-    # user = Blocked(username='mama', ip='127.0.0.1')
-    # db.session.add(user)
-    # db.session.commit()
-
 
 
 @login_manager.user_loader
@@ -34,12 +29,37 @@ def load_user(user_id):
     return User.query.get(user_id)
 
 
+@app.route('/test', methods=['GET', 'POST'])
+def test():
+  # try:
+  #   user = Blocked(username='kekw', ip='127.0.0.1', date='1-1-2022')
+  #   db.session.add(user)
+  #   db.session.commit()
+  #   for i in range(0,3):
+  #     user = User(
+  #       username=f'kekw{i}',
+  #       first_name='kekw',
+  #       surname='kekw',
+  #       email=f'kekw@x{i}.pl',
+  #       password='kekw!2@Kopyto',
+  #       ip=f'192.15.24{i}',
+  #       account_type='admin',
+  #       active=True
+  #     )
+  #     db.session.add(user)
+  #     db.session.commit()
+  # except Exception as e:
+  #   print(e)
+
+  backup()
+
+  return 'test'
+
 
 @app.route('/', methods=['GET', 'POST'])
 @login_required
 # @check_user('page')
 def page():
-  # unblock()
   products = Product.query.all()
 
   if request.method == 'POST':
@@ -80,7 +100,7 @@ def login():
       password=form.password.data,
       username=form.username.data
     ).first()
-    
+
     if user:
 
       wheter_blocked = Blocked.query.filter_by(username=user.username).first()
@@ -104,11 +124,6 @@ def register():
   form = UserCreator()
 
   if form.validate_on_submit():
-    # username = form.username.data
-    # first_name = form.first_name.data
-    # surname = form.surname.data
-    # email = form.email.data
-    # password = form.password.data
 
     user = User(
       username=form.username.data,
@@ -249,7 +264,9 @@ def admin_user():
           user = User.query.filter_by(id=id).first()
           users_emails.append(user.email)
         message(kind='no-reply', sender=current_user.username, recipents=users_emails)
-        return redirect( url_for('admin_user'))
+      
+      if selected_action == 'backup':
+        backup(User)
 
     except Exception as e:
       print(e)
@@ -282,6 +299,9 @@ def admin_blocked():
     if selected_action == 'delete user':
       delete_rows(Blocked, data)
       return redirect( url_for('admin_blocked'))
+    
+    if selected_action == 'backup':
+      backup(Blocked)
 
   return render_template('admin_blocked.html', blocked=blocked)
 
@@ -311,6 +331,9 @@ def admin_product():
     if selected_action == 'delete products':
       delete_rows(Product, data)
       return redirect( url_for('admin_product'))
+    
+    if selected_action == 'backup':
+      backup(Product)
 
   return render_template('admin_product.html', products=products)
 
@@ -530,21 +553,6 @@ def delete_product(id):
   except Exception as e:
     print(e)
     return 'xd'    
-
-
-# backup
-
-
-@app.route('/backup', methods=['GET', 'POST'])
-@login_required
-# @check_admin('backup')
-# @check_user('backup')
-def backup():
-
-  users = User.query.all()
-  blocked = Blocked.query.all()
-
-  return render_template('backup.html', users=users)
 
 
 # error handlers 
