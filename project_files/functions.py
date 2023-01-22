@@ -5,7 +5,7 @@ from flask_login import  current_user
 
 from functools import wraps
 
-from .database import Blocked
+from .database import Blocked, User, Product
 
 import json
 import os
@@ -122,3 +122,47 @@ def unblock(blocked_user):
         return False
 
 
+def backup(model):
+    path = f'D:\projekty\E-lectro\instance\{model}.json'
+
+    data_from_file = []
+    with open(path) as fp:
+        data_from_file = json.load(fp)
+
+
+    user_columns = (
+        'id',
+        'username',
+        'first_name',
+        'surname',
+        'email',
+        'password',
+        'ip',
+        'account_type',
+        'active' 
+    )
+    product_columns = ('id', 'name', 'category', 'company', 'price')
+    blocked_columns = ('id', 'username', 'ip', 'date')
+
+    if str(model) == User:
+        columns = user_columns
+    elif str(model) == Product:
+        columns = product_columns
+    else:
+        columns = blocked_columns
+
+    objects_list = []
+
+    model_data = model.query.all()
+    for row in model_data:
+        data = {}
+        for column_name in columns:
+            data[column_name] = getattr(row, column_name)
+        objects_list.append(data)
+
+    print('plik', data_from_file)
+    print('obiekty2', objects_list)
+
+    if objects_list != data_from_file:
+        with open(path, 'w') as json_file:
+            json.dump(objects_list, json_file, indent=4, separators=(',', ': '))

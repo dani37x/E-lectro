@@ -22,10 +22,6 @@ def before_first_request():
     # db.create_all()
     session['remind_one'] = 'not set'
     session['remind_two'] = 'not set'
-    # unblock()
-    # user = Blocked(username='mama', ip='127.0.0.1')
-    # db.session.add(user)
-    # db.session.commit()
 
 
 
@@ -33,26 +29,33 @@ def before_first_request():
 def load_user(user_id):
     return User.query.get(user_id)
 
+from .functions import backup
 
 @app.route('/test', methods=['GET', 'POST'])
 def test():
-  user = Blocked(username='kekw', ip='127.0.0.1', date='1-1-2022')
-  db.session.add(user)
-  db.session.commit()
-  for i in range(0,3):
-    user = User(
-      username=f'kekw{i}',
-      first_name='kekw',
-      surname='kekw',
-      email=f'kekw@x{i}.pl',
-      password='kekw!2@Kopyto',
-      ip=f'192.15.24{i}',
-      account_type='admin',
-      active=True
-    )
-    db.session.add(user)
-    db.session.commit()
-  return redirect( url_for('login'))
+  # try:
+  #   user = Blocked(username='kekw', ip='127.0.0.1', date='1-1-2022')
+  #   db.session.add(user)
+  #   db.session.commit()
+  #   for i in range(0,3):
+  #     user = User(
+  #       username=f'kekw{i}',
+  #       first_name='kekw',
+  #       surname='kekw',
+  #       email=f'kekw@x{i}.pl',
+  #       password='kekw!2@Kopyto',
+  #       ip=f'192.15.24{i}',
+  #       account_type='admin',
+  #       active=True
+  #     )
+  #     db.session.add(user)
+  #     db.session.commit()
+  # except Exception as e:
+  #   print(e)
+
+  backup()
+
+  return 'test'
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -549,21 +552,6 @@ def delete_product(id):
   except Exception as e:
     print(e)
     return 'xd'    
-
-
-# backup
-
-
-@app.route('/backup', methods=['GET', 'POST'])
-@login_required
-# @check_admin('backup')
-# @check_user('backup')
-def backup():
-
-  users = User.query.all()
-  blocked = Blocked.query.all()
-
-  return render_template('backup.html', users=users)
 
 
 # error handlers 
