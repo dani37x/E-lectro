@@ -60,28 +60,11 @@ def message(kind, sender, recipents):
 
 def backup(model):
 
-    user_columns = (
-        'id',
-        'username',
-        'first_name',
-        'surname',
-        'email',
-        'password',
-        'ip',
-        'account_type',
-        'active' 
-    )
-    product_columns = ('id', 'name', 'category', 'company', 'price')
-    blocked_columns = ('id', 'username', 'ip', 'date')
-
     if model == User:
-        columns = user_columns
         path = r'D:\projekty\E-lectro\instance\User.json'
     elif model == Product:
-        columns = product_columns
         path = r'D:\projekty\E-lectro\instance\Product.json'
     else:
-        columns = blocked_columns
         path = r'D:\projekty\E-lectro\instance\Blocked.json'
 
 
@@ -90,6 +73,7 @@ def backup(model):
         data_from_file = json.load(fp)
 
     objects_list = []
+    columns = tuple([m.key for m in model.__table__.columns])
 
     model_data = model.query.all()
     for row in model_data:
