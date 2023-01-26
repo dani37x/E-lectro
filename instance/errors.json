@@ -1,0 +1,7 @@
+[
+    {
+        "error": "Could not build url for endpoint 'delet'. Did you mean 'delete_user' instead?",
+        "time": "2023-01-26 22:54:20.967898",
+        "endpoint": "delete_user"
+    }
+]

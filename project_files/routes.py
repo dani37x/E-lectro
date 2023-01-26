@@ -4,14 +4,13 @@ from project_files import login_manager
 
 from flask_login import login_user, logout_user, login_required, current_user
 from flask import render_template, url_for, redirect, flash, request, abort, session
-from flask_mail import Message
 
 from .form import UserCreator, UserLogin, RemindPassword, NewPassword
 
 from .database import User, Blocked, Product
 
 from .functions import check_admin, not_null, check_user, max_reminders, save_to_json
-from .functions import unblock
+from .functions import unblock, save_error
 
 from .actions import delete_rows, block_user, message, backup
 
@@ -409,12 +408,13 @@ def delete_user(id):
 
   name_to_delete = User.query.get_or_404(id)
   try:
-    db.session.delete(name_to_delete)
+    return redirect( url_for('delet'))
+    # db.session.delete(name_to_delete)
     db.session.commit()
     return redirect(url_for('admin_user'))
 
   except Exception as e:
-    print(e)
+    save_error(e, delete_user.__name__)
     return 'xd'
 
 
