@@ -122,7 +122,7 @@ def unblock(blocked_user):
         return False
 
 
-def save_error(error, endpoint):
+def save_error(error, site):
 
     path = 'D:\projekty\E-lectro\instance\errors.json'
 
@@ -134,7 +134,7 @@ def save_error(error, endpoint):
     objects_list.append({
             "error": f"{error}",
             "time": f"{datetime.now()}",
-            "endpoint": f"{endpoint}"
+            "site": f"{site}"
         })
 
     with open(path, 'w') as json_file:
