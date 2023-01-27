@@ -120,3 +120,22 @@ def unblock(blocked_user):
             return False
     else:
         return False
+
+
+def save_error(error, site):
+
+    path = 'D:\projekty\E-lectro\instance\errors.json'
+
+    objects_list = []
+
+    with open(path) as fp:
+        objects_list = json.load(fp)
+
+    objects_list.append({
+            "error": f"{error}",
+            "time": f"{datetime.now()}",
+            "site": f"{site}"
+        })
+
+    with open(path, 'w') as json_file:
+        json.dump(objects_list, json_file, indent=4, separators=(',', ': '))
