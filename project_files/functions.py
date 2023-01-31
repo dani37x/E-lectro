@@ -77,7 +77,7 @@ def max_reminders():
 
 
 
-def save_to_json(username, ip, searched):
+def user_searched(username, ip, searched):
     path = 'D:\projekty\E-lectro\instance\data.json'
 
     objects_list = []
@@ -126,11 +126,18 @@ def save_error(error, site):
     with open(path) as fp:
         objects_list = json.load(fp)
 
-    objects_list.append({
+    current_erros = []
+    durabity = string_to_date(str((datetime.now() - timedelta(days=7)).strftime("%d-%m-%Y")))
+    
+    for object in objects_list:
+        if string_to_date(object['time'][0:10]) > durabity:
+            current_erros.append(object)
+
+    current_erros.append({
             "error": f"{error}",
-            "time": f"{datetime.now()}",
+            "time": f"{str(datetime.now().strftime('%d-%m-%Y  %H:%M:%S'))}",
             "site": f"{site}"
         })
 
     with open(path, 'w') as json_file:
-        json.dump(objects_list, json_file, indent=4, separators=(',', ': '))
+        json.dump(current_erros, json_file, indent=4, separators=(',', ': '))
