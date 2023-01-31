@@ -104,6 +104,7 @@ def login():
 
       wheter_blocked = Blocked.query.filter_by(username=user.username).first()
       if wheter_blocked:
+
         if unblock(blocked_user=wheter_blocked):
 
           login_user(user, remember=form.remember.data)
@@ -148,6 +149,7 @@ def register():
       return redirect( url_for('login'))
 
     except Exception as e:
+      save_error(error=e, site=register.__name__)
       return 'xd'
 
   return render_template('register.html', form=form)
@@ -178,7 +180,9 @@ def remind_password():
               try:
                 message(kind='password',sender='electro@team.com', recipents=form.email.data)
                 return redirect( url_for('new_password'))
+
               except Exception as e:
+                save_error(error=e, site=remind_password.__name__)
                 return 'Error with mail'
 
             else:
@@ -205,7 +209,7 @@ def new_password():
                     db.session.commit()
                     return redirect( url_for('logout'))
                 except Exception as e:
-                  print(e)
+                  save_error(error=e, site=new_password.__name__)
                   return 'Error with password chaning'
 
     return render_template('new_password.html', form=form)
@@ -249,7 +253,6 @@ def admin_user():
     selected_action = request.form['action']
 
     try:
-
       if selected_action == 'delete user':
         delete_rows(User, data)
         return redirect( url_for('admin_user'))
@@ -268,7 +271,7 @@ def admin_user():
         backup(User)
 
     except Exception as e:
-      print(e)
+      save_error(error=e, site=admin_user.__name__)
       return 'Error with actions'
   
   return render_template('admin_user.html', users=users)
@@ -295,12 +298,17 @@ def admin_blocked():
     data = request.form.getlist('id')
     selected_action = request.form['action']
 
-    if selected_action == 'delete user':
-      delete_rows(Blocked, data)
-      return redirect( url_for('admin_blocked'))
-    
-    if selected_action == 'backup':
-      backup(Blocked)
+    try:
+      if selected_action == 'delete user':
+        delete_rows(Blocked, data)
+        return redirect( url_for('admin_blocked'))
+      
+      if selected_action == 'backup':
+        backup(Blocked)
+
+    except Exception as e:
+      save_error(error=e, site=admin_blocked.__name__)
+      return 'Error with actions'
 
   return render_template('admin_blocked.html', blocked=blocked)
 
@@ -327,12 +335,18 @@ def admin_product():
     data = request.form.getlist('id')
     selected_action = request.form['action']
 
-    if selected_action == 'delete products':
-      delete_rows(Product, data)
-      return redirect( url_for('admin_product'))
-    
-    if selected_action == 'backup':
-      backup(Product)
+    try:
+      if selected_action == 'delete products':
+        delete_rows(Product, data)
+        return redirect( url_for('admin_product'))
+      
+      if selected_action == 'backup':
+        backup(Product)
+        #flash message
+
+    except Exception as e:
+      save_error(error=e, site=admin_product.__name__)
+      return 'Error with actions'
 
   return render_template('admin_product.html', products=products)
 
@@ -361,9 +375,10 @@ def add_user():
     try:
       db.session.add(new_user)
       db.session.commit()
+
     except Exception as e:
-      print(e)
-      return 'xd' + e
+      save_error(error=e, site=add_user.__name__)
+      return 'xd'
 
     return redirect( url_for('admin_user'))
 
@@ -392,8 +407,9 @@ def update_user(id):
     try:
       db.session.commit()
       return redirect( url_for('admin_user'))
+
     except Exception as e:
-      print(e)
+      save_error(error=e, site=update_user.__name__)
       return 'xd'
   
   else:
@@ -407,14 +423,14 @@ def update_user(id):
 def delete_user(id):
 
   name_to_delete = User.query.get_or_404(id)
+
   try:
-    return redirect( url_for('delet'))
-    # db.session.delete(name_to_delete)
+    db.session.delete(name_to_delete)
     db.session.commit()
     return redirect(url_for('admin_user'))
 
   except Exception as e:
-    save_error(e, delete_user.__name__)
+    save_error(error=e, site=delete_user.__name__)
     return 'xd'
 
 
@@ -437,7 +453,7 @@ def add_blocked():
       db.session.commit()
 
     except Exception as e:
-      print(e)
+      save_error(error=e, site=add_blocked.__name__)
       return 'xd'
 
     return redirect( url_for('admin_blocked'))
@@ -463,7 +479,7 @@ def update_blocked(id):
       return redirect(url_for('admin_blocked'))
 
     except Exception as e:
-      print(e)
+      save_error(error=e, site=update_blocked.__name__)
       return 'xd'
 
   else:
@@ -482,6 +498,7 @@ def delete_blocked(id):
     db.session.commit()
     return redirect(url_for('admin_blocked'))
   except Exception as e:
+    save_error(error=e, site=delete_blocked.__name__)
     return 'xd'    
 
 
@@ -505,7 +522,7 @@ def add_product():
       db.session.commit()
 
     except Exception as e:
-      print(e)
+      save_error(error=e, site=add_product.__name__)
       return 'xd'
 
     return redirect( url_for('admin_product'))
@@ -531,7 +548,7 @@ def update_product(id):
       return redirect( url_for('admin_product'))
 
     except Exception as e:
-      print(e)
+      save_error(error=e, site=update_product.__name__)
       return 'xd'
 
   else:
@@ -551,18 +568,44 @@ def delete_product(id):
     return redirect(url_for('admin_product'))
 
   except Exception as e:
-    print(e)
+    save_error(error=e, site=delete_product.__name__)
     return 'xd'    
 
 
 # error handlers 
 
 
+@app.errorhandler(405)
+def handle_405(e):
+    save_error(error=e, site=handle_404.__name__)
+
+
 @app.errorhandler(404)
 def handle_404(e):
-    return render_template('404.html'), 404
+    save_error(error=e, site=handle_404.__name__)
+
+
+@app.errorhandler(403)
+def handle_403(e):
+    save_error(error=e, site=handle_403.__name__)
+
+
+@app.errorhandler(401)
+def handle_401(e):
+    save_error(error=e, site=handle_401.__name__)
+
+
+@app.errorhandler(400)
+def handle_400(e):
+    save_error(error=e, site=handle_400.__name__)
 
 
 @app.errorhandler(500)
 def handle_500(e):
-    return render_template('500.html'), 500
+    save_error(error=e, site=handle_500.__name__)
+
+
+@app.errorhandler(503)
+def handle_503(e):
+    save_error(error=e, site=handle_503.__name__)
+
