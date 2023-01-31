@@ -13,15 +13,6 @@ import os
 from datetime import datetime, date, timedelta
 
 
-# def checker(username):
-#     check = Blocked.query.filter_by(ip=request.remote_addr).first()
-#     if check != None:
-#         abort(403, description='You are banned')
-#     check = Blocked.query.filter_by(username=username).first()
-#     if check != None:
-#         abort(403, description='You are banned')
-
-
 def check_admin(name):
     def decorator(f):
         @wraps(f)
@@ -44,6 +35,10 @@ def check_user(name):
 
             check = Blocked.query.filter_by(username=current_user.username).first()
             if check != None:
+                abort(403)
+
+            check = User.query.filter_by(username=current_user.username).first()
+            if check.active == False:
                 abort(403)
 
             return f(*args, **kwargs)

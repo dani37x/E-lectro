@@ -104,7 +104,7 @@ def login():
 
       wheter_blocked = Blocked.query.filter_by(username=user.username).first()
       if wheter_blocked:
-        
+
         if unblock(blocked_user=wheter_blocked):
 
           login_user(user, remember=form.remember.data)
@@ -575,11 +575,37 @@ def delete_product(id):
 # error handlers 
 
 
+@app.errorhandler(405)
+def handle_405(e):
+    save_error(error=e, site=handle_404.__name__)
+
+
 @app.errorhandler(404)
 def handle_404(e):
-    return render_template('404.html'), 404
+    save_error(error=e, site=handle_404.__name__)
+
+
+@app.errorhandler(403)
+def handle_403(e):
+    save_error(error=e, site=handle_403.__name__)
+
+
+@app.errorhandler(401)
+def handle_401(e):
+    save_error(error=e, site=handle_401.__name__)
+
+
+@app.errorhandler(400)
+def handle_400(e):
+    save_error(error=e, site=handle_400.__name__)
 
 
 @app.errorhandler(500)
 def handle_500(e):
-    return render_template('500.html'), 500
+    save_error(error=e, site=handle_500.__name__)
+
+
+@app.errorhandler(503)
+def handle_503(e):
+    save_error(error=e, site=handle_503.__name__)
+
