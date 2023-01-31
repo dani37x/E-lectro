@@ -124,7 +124,7 @@ def unblock(blocked_user):
 
 def save_error(error, site):
 
-    path = 'D:\projekty\E-lectro\instance\errors.json'
+    path = 'D:\projekty\E-lectro\instance\events.json'
 
     objects_list = []
 
