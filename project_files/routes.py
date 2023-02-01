@@ -9,7 +9,7 @@ from .form import UserCreator, UserLogin, RemindPassword, NewPassword
 
 from .database import User, Blocked, Product
 
-from .functions import check_admin, not_null, check_user, max_reminders, save_to_json
+from .functions import check_admin, not_null, check_user, max_reminders, user_searched
 from .functions import unblock, save_error
 
 from .actions import delete_rows, block_user, message, backup
@@ -71,7 +71,7 @@ def page():
     )
 
     if len(queryset) > 1:
-      save_to_json(
+      user_searched(
         username=current_user.username,
         ip=request.remote_addr,
         searched=queryset
@@ -434,7 +434,6 @@ def delete_user(id):
     return 'xd'
 
 
-
 @app.route('/add-blocked', methods=['GET', 'POST'])
 @login_required
 # @check_admin('add_blocked')
@@ -570,42 +569,4 @@ def delete_product(id):
   except Exception as e:
     save_error(error=e, site=delete_product.__name__)
     return 'xd'    
-
-
-# error handlers 
-
-
-@app.errorhandler(405)
-def handle_405(e):
-    save_error(error=e, site=handle_404.__name__)
-
-
-@app.errorhandler(404)
-def handle_404(e):
-    save_error(error=e, site=handle_404.__name__)
-
-
-@app.errorhandler(403)
-def handle_403(e):
-    save_error(error=e, site=handle_403.__name__)
-
-
-@app.errorhandler(401)
-def handle_401(e):
-    save_error(error=e, site=handle_401.__name__)
-
-
-@app.errorhandler(400)
-def handle_400(e):
-    save_error(error=e, site=handle_400.__name__)
-
-
-@app.errorhandler(500)
-def handle_500(e):
-    save_error(error=e, site=handle_500.__name__)
-
-
-@app.errorhandler(503)
-def handle_503(e):
-    save_error(error=e, site=handle_503.__name__)
 

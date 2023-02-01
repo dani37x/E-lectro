@@ -17,6 +17,7 @@ class User(UserMixin, db.Model):
     def __repr__(self):
         return f'User {self.username}'
 
+
 class Blocked(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(30), unique=False, nullable=False)
@@ -26,7 +27,6 @@ class Blocked(db.Model):
     def __repr__(self):
         return f'Blocked {self.username}'
     
-
 
 class Product(db.Model):
     id = db.Column(db.Integer, primary_key=True)

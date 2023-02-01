@@ -45,7 +45,3 @@ app.config['MAIL_USE_SSL'] = False
 
 # session.permanent = True
 # app.permanent_session_lifetime = timedelta(hours=24)
-
-
-
-
