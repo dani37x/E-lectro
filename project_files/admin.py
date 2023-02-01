@@ -1,221 +1,17 @@
 from project_files import app
 from project_files import db
-from project_files import login_manager
 
-from flask_login import login_user, logout_user, login_required, current_user
-from flask import render_template, url_for, redirect, flash, request, abort, session
+from flask_login import login_required, current_user
+from flask import render_template, url_for, redirect, request
 
-from .form import UserCreator, UserLogin, RemindPassword, NewPassword
 
 from .database import User, Blocked, Product
 
-from .functions import check_admin, not_null, check_user, max_reminders, user_searched
-from .functions import unblock, save_error
+from .functions import not_null, save_error, check_admin, check_user
 
 from .actions import delete_rows, block_user, message, backup
 
 
-
-@app.before_first_request
-def before_first_request():
-    # db.create_all()
-    session['remind_one'] = 'not set'
-    session['remind_two'] = 'not set'
-
-
-@login_manager.user_loader
-def load_user(user_id):
-    return User.query.get(user_id)
-
-
-@app.route('/test', methods=['GET', 'POST'])
-def test():
-  # try:
-  #   user = Blocked(username='kekw', ip='127.0.0.1', date='1-1-2022')
-  #   db.session.add(user)
-  #   db.session.commit()
-  #   for i in range(0,3):
-  #     user = User(
-  #       username=f'kekw{i}',
-  #       first_name='kekw',
-  #       surname='kekw',
-  #       email=f'kekw@x{i}.pl',
-  #       password='kekw!2@Kopyto',
-  #       ip=f'192.15.24{i}',
-  #       account_type='admin',
-  #       active=True
-  #     )
-  #     db.session.add(user)
-  #     db.session.commit()
-  # except Exception as e:
-  #   print(e)
-
-  backup()
-
-  return 'test'
-
-
-@app.route('/', methods=['GET', 'POST'])
-@login_required
-# @check_user('page')
-def page():
-  products = Product.query.all()
-
-  if request.method == 'POST':
-    queryset = request.form['search']
-
-    products = (
-      Product.query.filter(Product.name.contains(queryset)
-        | (Product.category.contains(queryset))
-        | (Product.company.contains(queryset))).all()
-    )
-
-    if len(queryset) > 1:
-      user_searched(
-        username=current_user.username,
-        ip=request.remote_addr,
-        searched=queryset
-      )
-
-  return render_template('page.html', products=products, user=current_user.username)
-
-
-@app.route('/info', methods=['GET', 'POST'])
-@login_required
-def second_page():
-  return session.get('current', 'not set')
-# login, register, logout, remind password, new password
-
-
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-
-  form = UserLogin()
-
-  if form.validate_on_submit():
-
-    user = User.query.filter_by(
-      email=form.email.data,
-      password=form.password.data,
-      username=form.username.data
-    ).first()
-
-    if user:
-
-      wheter_blocked = Blocked.query.filter_by(username=user.username).first()
-      if wheter_blocked:
-
-        if unblock(blocked_user=wheter_blocked):
-
-          login_user(user, remember=form.remember.data)
-          return redirect( url_for('page'))
-
-        else:
-          return abort(403)
-
-      login_user(user, remember=form.remember.data)
-      return redirect( url_for('page'))
-
-  return render_template('login.html', form=form)
-
-
-@app.route('/register', methods=['GET', 'POST'])
-def register():
-  form = UserCreator()
-
-  if form.validate_on_submit():
-
-    user = User(
-      username=form.username.data,
-      first_name=form.first_name.data,
-      surname=form.surname.data,
-      email=form.email.data,
-      password=form.password.data,
-      ip=request.remote_addr,
-      account_type='user',
-      active=True
-    )
-
-    try:
-      db.session.add(user)
-      db.session.commit()
-      
-      try:
-        message(kind='register', sender='electro@team.com', recipents=form.email.data)
-      except Exception as e:
-        print(e)
-        return 'Errow with mail'
-
-      return redirect( url_for('login'))
-
-    except Exception as e:
-      save_error(error=e, site=register.__name__)
-      return 'xd'
-
-  return render_template('register.html', form=form)
-
-
-@app.route("/logout")
-# @check_user('logout')
-@login_required
-def logout():
-    logout_user()
-    return redirect('login')
-
-
-@app.route("/remind_password", methods=['GET', 'POST'])
-# @check_user('remind_password')
-def remind_password():
-
-    form = RemindPassword()
-
-    if form.validate_on_submit():
-
-      user = User.query.filter_by(username=form.username.data).first()
-      if user:
-          user = User.query.filter_by(email=form.email.data).first()
-          if user:
-            if max_reminders():
-
-              try:
-                message(kind='password',sender='electro@team.com', recipents=form.email.data)
-                return redirect( url_for('new_password'))
-
-              except Exception as e:
-                save_error(error=e, site=remind_password.__name__)
-                return 'Error with mail'
-
-            else:
-              abort(403)
-
-    return render_template('remind_password.html', form=form)
-
-
-@app.route("/new_password", methods=['GET', 'POST'])
-# @check_user('new_password')
-def new_password():
-
-    form = NewPassword()
-
-    if form.validate_on_submit():
-
-        user = User.query.filter_by(username=form.username.data).first()
-        if user:
-            user = User.query.filter_by(password=form.current_password.data).first()
-            if user:
-                user.password = form.password.data
-
-                try:
-                    db.session.commit()
-                    return redirect( url_for('logout'))
-                except Exception as e:
-                  save_error(error=e, site=new_password.__name__)
-                  return 'Error with password chaning'
-
-    return render_template('new_password.html', form=form)
-
-
-# admin panel
 
 
 @app.route('/admin', methods=['GET', 'POST'])
@@ -223,8 +19,8 @@ def new_password():
 # @check_user('admin')
 # @check_admin('admin')
 def admin():
-
   return render_template('admin.html')
+
 
 @app.route('/admin/users', methods=['GET', 'POST'])
 @login_required
