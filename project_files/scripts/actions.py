@@ -1,7 +1,7 @@
 from project_files import db
 from project_files import mail
 
-from .database import User, Blocked, Product
+from ..database import User, Blocked, Product
 
 from flask_mail import Message
 
@@ -13,7 +13,6 @@ import json
 def delete_rows(model, data):
     print( model, data)
     for number in data:
-        print(model.query.filter_by(id=number))
         model.query.filter_by(id=number).delete()
         db.session.commit()
 

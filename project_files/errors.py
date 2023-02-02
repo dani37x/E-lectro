@@ -1,6 +1,6 @@
 from project_files import app
 
-from .functions import save_error, recently_searched
+from .scripts.functions import save_error, recently_searched
 
 
 @app.errorhandler(405)

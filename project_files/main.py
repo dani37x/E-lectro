@@ -7,7 +7,7 @@ from flask import render_template, url_for, redirect, request, session
 
 from .database import User, Blocked, Product
 
-from .functions import check_admin, check_user, user_searched
+from .scripts.functions import check_admin, check_user, user_searched, recently_searched
 
 
 
@@ -64,7 +64,12 @@ def page():
         searched=queryset
       )
 
-  return render_template('page.html', products=products, user=current_user.username)
+  return render_template(
+    'page.html',
+    products=products,
+    user=current_user.username,
+    recently_searched=recently_searched(),
+  )
 
 
 @app.route('/info', methods=['GET', 'POST'])

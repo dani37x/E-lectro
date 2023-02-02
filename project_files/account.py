@@ -9,9 +9,9 @@ from .form import UserCreator, UserLogin, RemindPassword, NewPassword
 
 from .database import User, Blocked
 
-from .functions import check_user, check_admin, max_reminders, unblock, save_error
+from .scripts.functions import check_user, check_admin, max_reminders, unblock, save_error
 
-from .actions import  message
+from .scripts.actions import  message
 
 
 

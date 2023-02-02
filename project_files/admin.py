@@ -7,9 +7,9 @@ from flask import render_template, url_for, redirect, request
 
 from .database import User, Blocked, Product
 
-from .functions import not_null, save_error, check_admin, check_user
+from .scripts.functions import not_null, save_error, check_admin, check_user
 
-from .actions import delete_rows, block_user, message, backup
+from .scripts.actions import delete_rows, block_user, message, backup
 
 
 

@@ -8,11 +8,16 @@
 <form method="post" action="">
   <label for="action">Sorting</label>
   <select id="action" name="action">
-  <!-- <option value="descending"> descending</option>
-  <option value="ascending"> ascending</option> -->
   </select>
   <label for="search">Serach:</label>
   <input type="text" id="search" name="search">
+  <br>
+    <p> trending </p>
+    {% for search in recently_searched %}
+        {{search}}
+        <br>
+    {% endfor %}
+  <br>
   <table border="1px">
       <th> name </th>
       <th> category </th>
