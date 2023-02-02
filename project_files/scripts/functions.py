@@ -5,7 +5,7 @@ from flask_login import  current_user
 
 from functools import wraps
 
-from .database import Blocked, User, Product
+from ..database import Blocked, User, Product
 
 import json
 import os
@@ -89,6 +89,8 @@ def user_searched(username, ip, searched):
         # for obj in objects_list:
         #     print(obj)
 
+    searched = str(searched).lower()
+
     objects_list.append({
             "username": f"{username}",
             "ip": f"{ip}",
@@ -150,10 +152,10 @@ def recently_searched():
     with open(path) as fp:
         objects_list = json.load(fp)
 
-    queries = [object['searched'] for object in objects_list]
+    queries = [object['searched'] for object in objects_list if len(object['searched']) > 2]
 
     counter = Counter(queries)
-
+    
     return dict(counter.most_common()[:5])
 
     

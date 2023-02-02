@@ -1,6 +1,6 @@
 from project_files import app
 
-from .functions import save_error
+from .scripts.functions import save_error, recently_searched
 
 
 @app.errorhandler(405)
@@ -8,9 +8,11 @@ def handle_405(e):
     save_error(error=e, site=handle_404.__name__)
     return '405'
 
+
 @app.errorhandler(404)
 def handle_404(e):
     save_error(error=e, site=handle_404.__name__)
+    # print(recently_searched())
     return '404'
 
 

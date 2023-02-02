@@ -1,4 +1,6 @@
 from project_files import db
+from project_files import login_manager
+
 
 from flask_login import UserMixin
 
@@ -16,6 +18,11 @@ class User(UserMixin, db.Model):
 
     def __repr__(self):
         return f'User {self.username}'
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(user_id)
 
 
 class Blocked(db.Model):

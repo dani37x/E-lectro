@@ -9,7 +9,6 @@ from flask_limiter.util import get_remote_address
 
 from flask_mail import Mail, Message
 
-
 import os
 
 
@@ -22,6 +21,8 @@ db = SQLAlchemy(app)
 
 login_manager = LoginManager()
 login_manager.init_app(app)
+
+
 
 limiter = Limiter(
     app,
