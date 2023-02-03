@@ -137,6 +137,7 @@ def new_password():
                 try:
                     db.session.commit()
                     return redirect( url_for('logout'))
+                    
                 except Exception as e:
                   save_error(error=e, site=new_password.__name__)
                   return 'Error with password chaning'

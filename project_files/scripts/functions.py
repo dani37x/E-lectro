@@ -1,4 +1,5 @@
 from project_files import db
+from project_files import BLOCKED, USER, PRODUCT, EVENTS, DATA
 
 from flask import request, abort, session
 from flask_login import  current_user
@@ -80,11 +81,10 @@ def max_reminders():
 
 
 def user_searched(username, ip, searched):
-    path = 'D:\projekty\E-lectro\instance\data.json'
 
     objects_list = []
 
-    with open(path) as fp:
+    with open(DATA) as fp:
         objects_list = json.load(fp)
         # for obj in objects_list:
         #     print(obj)
@@ -97,7 +97,7 @@ def user_searched(username, ip, searched):
             "searched": f"{searched}"
         })
 
-    with open(path, 'w') as json_file:
+    with open(DATA, 'w') as json_file:
         json.dump(objects_list, json_file, indent=4, separators=(',', ': '))
     
 
@@ -105,8 +105,6 @@ def string_to_date(date):
   return datetime.strptime(date, '%d-%m-%Y').date()
 
 
-# todo
-# add data if user was unbaned or error to json
 def unblock(blocked_user):
 
     if date.today() > string_to_date(blocked_user.date):
@@ -125,11 +123,9 @@ def unblock(blocked_user):
 
 def save_error(error, site):
 
-    path = 'D:\projekty\E-lectro\instance\events.json'
-
     objects_list = []
 
-    with open(path) as fp:
+    with open(EVENTS) as fp:
         objects_list = json.load(fp)
 
     durabity = string_to_date(str((datetime.now() - timedelta(days=7)).strftime("%d-%m-%Y")))
@@ -147,16 +143,15 @@ def save_error(error, site):
         if element not in elements:
             elements.append(element)
 
-    with open(path, 'w') as json_file:
+    with open(EVENTS, 'w') as json_file:
         json.dump(elements, json_file, indent=4, separators=(',', ': '))
 
 
 def recently_searched():
-    path = 'D:\projekty\E-lectro\instance\data.json'
 
     objects_list = []
 
-    with open(path) as fp:
+    with open(DATA) as fp:
         objects_list = json.load(fp)
 
     queries = [object['searched'] for object in objects_list if len(object['searched']) > 2]

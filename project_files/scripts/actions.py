@@ -1,5 +1,7 @@
 from project_files import db
 from project_files import mail
+from project_files import BLOCKED, USER, PRODUCT, EVENTS, DATA
+
 
 from ..database import User, Blocked, Product
 
@@ -60,11 +62,11 @@ def message(kind, sender, recipents):
 def backup(model):
 
     if model == User:
-        path = r'D:\projekty\E-lectro\instance\User.json'
+        path = USER
     elif model == Product:
-        path = r'D:\projekty\E-lectro\instance\Product.json'
+        path = PRODUCT
     else:
-        path = r'D:\projekty\E-lectro\instance\Blocked.json'
+        path = BLOCKED
 
 
     data_from_file = []

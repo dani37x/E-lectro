@@ -14,6 +14,7 @@ def handle_405(e):
 
 @app.errorhandler(404)
 def handle_404(e):
+    # save_error(error=e, site=handle_404.__name__)
     return '404'
 
 
