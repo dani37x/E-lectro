@@ -85,3 +85,46 @@ def backup(model):
     if objects_list != data_from_file:
         with open(path, 'w') as json_file:
             json.dump(objects_list, json_file, indent=4, separators=(',', ': '))
+
+
+def restore(model):
+    pass
+    # if model == User:
+    #     path = r'D:\projekty\E-lectro\instance\User.json'
+    # elif model == Product:
+    #     path = r'D:\projekty\E-lectro\instance\Product.json'
+    # else:
+    #     path = r'D:\projekty\E-lectro\instance\Blocked.json'
+
+
+    # data_from_file = []
+    # with open(path) as fp:
+    #     data_from_file = json.load(fp)
+
+    # x = Blocked()
+    # db.session.add(x)
+    # db.session.commit()
+
+    
+    # for data in data_from_file:
+    #     values = [value for value in data.values()]
+        
+    #     values = values[1], values[2], values[3] 
+    #     values = list(values)
+        # row = Blocked(username=values[0], ip=values[1], date=values[2])
+        # db.session.add(row)
+        # db.session.commit()
+
+
+def account_activation(model, data):
+    for number in data:
+        account = model.query.filter_by(id=number).first()
+        account.active = True
+        db.session.commit()
+    
+
+def account_deactivation(model, data):
+    for number in data:
+        account = model.query.filter_by(id=number).first()
+        account.active = False
+        db.session.commit()

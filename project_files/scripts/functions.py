@@ -113,9 +113,11 @@ def unblock(blocked_user):
         try:
             db.session.delete(blocked_user)
             db.session.commit()
+            save_error(error=f'{blocked_user} was unblocked', site='Login Page')
             return True
+
         except Exception as e:
-            print(e)
+            save_error(error=e, site='Login page')
             return False
     else:
         return False
@@ -131,7 +133,7 @@ def save_error(error, site):
         objects_list = json.load(fp)
 
     durabity = string_to_date(str((datetime.now() - timedelta(days=7)).strftime("%d-%m-%Y")))
-    
+
     current_errors = [object for object in objects_list if string_to_date(object['time'][0:10]) > durabity]
 
     current_errors.append({
@@ -140,8 +142,13 @@ def save_error(error, site):
             "site": f"{site}"
         })
 
+    elements = []
+    for element in current_errors:
+        if element not in elements:
+            elements.append(element)
+
     with open(path, 'w') as json_file:
-        json.dump(current_errors, json_file, indent=4, separators=(',', ': '))
+        json.dump(elements, json_file, indent=4, separators=(',', ': '))
 
 
 def recently_searched():

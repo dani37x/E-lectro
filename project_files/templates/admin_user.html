@@ -6,6 +6,8 @@
     <select id="action" name="action">
     <option value="delete user"> delete users</option>
     <option value="block user">block user</option>
+    <option value="account activation">account activation</option>
+    <option value="account deactivation">account deactivate</option>
     <option value="test email">send email</option>
     <option value="backup"> backup</option>
     </select>
@@ -22,6 +24,7 @@
             <td><input type="checkbox" name="id" value="{{ user.id }}"></td>
             <td>{{ user.username }}</td>
             <td>{{ user.account_type }}</td>
+            <td>{{ user.active }}</td>
             <td>
                 <a href="{{ url_for('update_user', id=user.id) }}"> edit </a>
                 <a href="{{ url_for('delete_user', id=user.id) }}"> delete </a>
