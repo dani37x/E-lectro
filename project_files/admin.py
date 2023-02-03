@@ -10,6 +10,7 @@ from .database import User, Blocked, Product
 from .scripts.functions import not_null, save_error, check_admin, check_user
 
 from .scripts.actions import delete_rows, block_user, message, backup
+from .scripts.actions import account_activation, account_deactivation
 
 
 
@@ -55,6 +56,12 @@ def admin_user():
 
       if selected_action == 'block user':
         block_user(data=data)
+
+      if selected_action == 'account activation':
+        account_activation(model=User, data=data)
+      
+      if selected_action == 'account deactivation':
+        account_deactivation(model=User, data=data)
 
       if selected_action == 'test email':
         users_emails = []

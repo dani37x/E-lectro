@@ -1,6 +1,9 @@
 from project_files import app
 
-from .scripts.functions import save_error, recently_searched
+from .scripts.functions import save_error
+from .scripts.actions import restore
+
+from .database import Blocked
 
 
 @app.errorhandler(405)
@@ -11,8 +14,7 @@ def handle_405(e):
 
 @app.errorhandler(404)
 def handle_404(e):
-    save_error(error=e, site=handle_404.__name__)
-    # print(recently_searched())
+    # save_error(error=e, site=handle_404.__name__)
     return '404'
 
 
