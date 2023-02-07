@@ -9,10 +9,10 @@ E-lectro is a web application in Flask. Its destination is online shop, but  cen
 - [x] Protections wrappers:
   - [x] for admin views, check wheter user is admin
   - [x] for common users, check their ip and account details
-- [x] Own Admin managment panel  with basic row operations like
+- [x] Own Admin managment panel with basic operations on row like
   - [x] edit row
   - [x] delete row
-  - [x]  add new row
+  - [x] add new row
   - [x] search rows which contain query
 - [x] Group actions in admin panel (many rows):
   - [x] accounts users's activation
@@ -28,15 +28,29 @@ E-lectro is a web application in Flask. Its destination is online shop, but  cen
   - [x] Register
   - [x] Logout
 - [x] Effective own validators
-  - [x] correct password 
-  - [x] Existing user
-  - [x] Existing e-mail
+  - [x] correct password with website standards
+  - [x] Exists user
+  - [x] Exists e-mail
+- [x] automatic function which take off block from users's accounts after specific date.
 - [x] Error handlers
 - [x] Event system, which gather errors, actions to `events.json` which will be perform
 - [x] Searching input for users which looking for products
 - [x] Trending rank. Rank searches from users. Function gather users queries and create rank with them, then they are going to appeal on searching input area
+- [x] E-mails:
+  - [x] no-reply mail
+  - [ ] reset password  
+  - [ ] register mail
+- [ ] reset password sessions  
+  - [ ] limited duration to 15 minutes
+  - [ ] auto-delete sessions after time
+  - [ ] hash sessions
+  - [ ] key and session generator
 - [ ] Machine Learning algorithm which will adjust the best products for shop's customers.
+- [ ] password change by user on account
+- [ ] shop API
+- [ ] multi account login (max 3)
 
+ 
 
 ### Built With
 * FLASK
@@ -54,7 +68,7 @@ E-lectro is a web application in Flask. Its destination is online shop, but  cen
    ```sh
    git clone https://github.com/dani37x/E-lectro.git
    ```
-3. Install python packages from [requirements.txt](https://github.com/dani37x/E-lectro/blob/master/requirements.txt)
+3. Install python packages from [requirements.txt](https://github.com/dani37x/E-lectro/blob/master/requirements.txt) in `env`
    ```sh
    pip install ...
    ```
