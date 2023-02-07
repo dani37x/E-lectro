@@ -5,14 +5,6 @@ E-lectro is a web application in Flask. Its destination is online shop, but  cen
 
 
 
-### Built With
-* FLASK
-* SQLALCHEMY
-* LIMITER
-* FLASK-MAIL
-* FLASK-LOGIN
-
-
 ## Roadmap
 - [x] Protections wrappers:
   - [x] for admin views, check wheter user is admin
@@ -43,7 +35,15 @@ E-lectro is a web application in Flask. Its destination is online shop, but  cen
 - [x] Event system, which gather errors, actions to `events.json` which will be perform
 - [x] Searching input for users which looking for products
 - [x] Trending rank. Rank searches from users. Function gather users queries and create rank with them, then they are going to appeal on searching input area
-- [ ] Machinge Learning algorithm which will adjust the best products for shop's customers.
+- [ ] Machine Learning algorithm which will adjust the best products for shop's customers.
+
+
+### Built With
+* FLASK
+* SQLALCHEMY
+* LIMITER
+* FLASK-MAIL
+* FLASK-LOGIN
 
 
 ### Installation
