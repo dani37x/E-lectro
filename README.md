@@ -3,9 +3,20 @@
 
 E-lectro is a web application in Flask. Its destination is online shop, but  center on non-visual things. This project focuses on security and curious  solutions. Full backend project, what is more, everything terrific works deeply. Project contains ready solutions like Limiter or SQLAlchemy ORM, but definitely there occur own functions with prevalence.
 
+<br>
+<div align="center">
 
+  [Roadmap](#roadmap) •
+  [Technology stack](#technology_stack) •
+  [Installation](#installation) •
+  [Contact](#contact)
+  
+ </div>
 
 ## Roadmap
+
+<a name="roadmap"></a>
+
 - [x] Protections wrappers:
   - [x] for admin views, check wheter user is admin
   - [x] for common users, check their ip and account details
@@ -48,11 +59,19 @@ E-lectro is a web application in Flask. Its destination is online shop, but  cen
 - [ ] Machine Learning algorithm which will adjust the best products for shop's customers.
 - [ ] password change by user on account
 - [ ] shop API
-- [ ] multi account login (max 3)
+- [ ] multi device login (max 3)
+- [ ] flask bcrypt
+- [ ] account lvl
+- [ ] payments
+- [ ] products list
+- [ ] own hash password algorithm
+- [ ] own authentacion system
+- [ ] Database change - from SQLALCHEMY to SQLITE3
 
  
 
 ### Built With
+<a name="technology_stack"></a>
 * FLASK
 * SQLALCHEMY
 * LIMITER
@@ -61,6 +80,7 @@ E-lectro is a web application in Flask. Its destination is online shop, but  cen
 
 
 ### Installation
+<a name="installation"></a>
 
 1. Get a free Mail API Key at [https://mailtrap.io/](https://mailtrap.io/)
 
@@ -80,6 +100,7 @@ E-lectro is a web application in Flask. Its destination is online shop, but  cen
 
 
 ## Contact
+<a name="contact"></a>
 📫&nbsp;  **dksluzbowe9@gmail.com**
 
 
