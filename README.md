@@ -33,6 +33,7 @@ E-lectro is a web application in Flask. Its destination is online shop, but  cen
   - [x] block accounts
   - [x] backups
   - [ ] restore databases
+- [x] entries limiter 
 - [x] Flask Login
   - [x] Login
   - [x] Authantacion
@@ -44,7 +45,7 @@ E-lectro is a web application in Flask. Its destination is online shop, but  cen
   - [x] Exists e-mail
 - [x] automatic function which take off block from users's accounts after specific date.
 - [x] Error handlers
-- [x] Event system, which gather errors, actions to `events.json` which will be perform
+- [x] Event system, which gather errors, actions to `events.json` which will be perform by users
 - [x] Searching input for users which looking for products
 - [x] Trending rank. Rank searches from users. Function gather users queries and create rank with them, then they are going to appeal on searching input area
 - [x] E-mails:
@@ -55,7 +56,7 @@ E-lectro is a web application in Flask. Its destination is online shop, but  cen
   - [ ] limited duration to 15 minutes
   - [ ] auto-delete sessions after time
   - [ ] hash sessions
-  - [ ] key and session generator
+  - [ ] unique key and session generator
 - [ ] Machine Learning algorithm which will adjust the best products for shop's customers.
 - [ ] password change by user on account
 - [ ] shop API
