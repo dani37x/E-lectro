@@ -35,7 +35,7 @@ def block_user(data):
             db.session.commit()
 
 
-def message(kind, sender, recipents):
+def message(kind, sender, recipents, key):
     if kind == 'register':
         subject = 'Register message'
         body = f'Welcome {recipents}'
@@ -44,10 +44,9 @@ def message(kind, sender, recipents):
         subject = 'no-reply-message'
         body = 'Do not reply for this message. This is only test.'
 
-    if kind == 'password':
-        user = User.query.filter_by(email=recipents).first()
-        subject = 'Password'
-        body = f'This is your password {user.password}. Do not show nobody'
+    if kind == 'code':
+        subject = 'Forgotten password'
+        body = f'This is your key {key}'
 
     # print(recipents)
     msg = Message(
