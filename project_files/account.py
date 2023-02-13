@@ -5,47 +5,22 @@ from project_files import login_manager
 from flask_login import login_user, logout_user, login_required, current_user
 from flask import render_template, url_for, redirect, request, abort, session
 
-from .form import UserCreator, UserLogin, RemindPassword, NewPassword
+from .form import UserCreator, UserLogin, RemindPassword, NewPassword, Key
 
 from .database import User, Blocked
 
-from .scripts.functions import check_user, check_admin, max_reminders, unblock, save_error
+from .scripts.functions import check_user, check_admin, unblock, save_error
+from .scripts.functions import check_session, random_string, string_to_date
 
 from .scripts.actions import  message
 
+import json
+import random
+import datetime
+
+from datetime import datetime, timedelta
 
 
-
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-
-  form = UserLogin()
-
-  if form.validate_on_submit():
-
-    user = User.query.filter_by(
-      email=form.email.data,
-      password=form.password.data,
-      username=form.username.data
-    ).first()
-
-    if user:
-
-      wheter_blocked = Blocked.query.filter_by(username=user.username).first()
-      if wheter_blocked:
-
-        if unblock(blocked_user=wheter_blocked):
-
-          login_user(user, remember=form.remember.data)
-          return redirect( url_for('page'))
-
-        else:
-          return abort(403)
-
-      login_user(user, remember=form.remember.data)
-      return redirect( url_for('page'))
-
-  return render_template('login.html', form=form)
 
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -84,6 +59,38 @@ def register():
   return render_template('register.html', form=form)
 
 
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+
+  form = UserLogin()
+
+  if form.validate_on_submit():
+
+    user = User.query.filter_by(
+      email=form.email.data,
+      password=form.password.data,
+      username=form.username.data
+    ).first()
+
+    if user:
+
+      wheter_blocked = Blocked.query.filter_by(username=user.username).first()
+      if wheter_blocked:
+
+        if unblock(blocked_user=wheter_blocked):
+
+          login_user(user, remember=form.remember.data)
+          return redirect( url_for('page'))
+
+        else:
+          return abort(403)
+
+      login_user(user, remember=form.remember.data)
+      return redirect( url_for('page'))
+
+  return render_template('login.html', form=form)
+
+
 @app.route("/logout")
 # @check_user('logout')
 @login_required
@@ -92,54 +99,97 @@ def logout():
     return redirect('login')
 
 
-@app.route("/remind_password", methods=['GET', 'POST'])
-# @check_user('remind_password')
-def remind_password():
-
-    form = RemindPassword()
+@app.route("/remind", methods=['GET', 'POST'])
+def remind():
+    
+  path = r'D:\projekty\E-lectro\instance\sessions.json'
+  form = RemindPassword()
+  
+  if request.method == 'POST':
 
     if form.validate_on_submit():
-
-      user = User.query.filter_by(username=form.username.data).first()
+        
+      user = User.query.filter_by(
+            username=form.username.data,
+            email=form.email.data
+        ).first()
+        
       if user:
-          user = User.query.filter_by(email=form.email.data).first()
-          if user:
-            if max_reminders():
+    
+        session_list = []
+        with open(path) as fp:
+            session_list = json.load(fp)
+        
+        sess = check_session(session_list=session_list)    
+        key = random_string(size=6)
+        
+        session_list.append({
+                "username": f"{form.username.data}",
+                "time": f"{str(datetime.now().strftime('%d-%m-%Y  %H:%M:%S'))}",
+                "session": f"{sess}",
+                "key": f"{key}"
+            })
+        # message(kind=4, sender='Electro@team.com', recipents=[form.email.data], key=key)
+            
+        with open(path, 'w') as json_file:
+            json.dump(session_list, json_file, indent=4, separators=(',', ': '))
 
-              try:
-                message(kind='password',sender='electro@team.com', recipents=form.email.data)
-                return redirect( url_for('new_password'))
+        return redirect( url_for( 'hash_session', rendered_session=sess))
 
-              except Exception as e:
-                save_error(error=e, site=remind_password.__name__)
-                return 'Error with mail'
-
-            else:
-              abort(403)
-
-    return render_template('remind_password.html', form=form)
+  return render_template('remind_password.html', form=form)
 
 
-@app.route("/new_password", methods=['GET', 'POST'])
-# @check_user('new_password')
-def new_password():
 
-    form = NewPassword()
+@app.route('/password/<rendered_session>', methods=['GET', 'POST'])
+def hash_session(rendered_session):
+    
+  path = r'D:\projekty\E-lectro\instance\sessions.json'
 
+  form = Key()
+  
+  if request.method == 'POST':
+  
     if form.validate_on_submit():
 
-        user = User.query.filter_by(username=form.username.data).first()
-        if user:
-            user = User.query.filter_by(password=form.current_password.data).first()
-            if user:
-                user.password = form.password.data
+      session_list = []
+      with open(path) as fp:
+          session_list = json.load(fp)
+          
+      durabity = datetime.now() - timedelta(minutes=15)   
+      active_sessions = [sess for sess in session_list if string_to_date(sess['time']) > durabity]
 
-                try:
-                    db.session.commit()
-                    return redirect( url_for('logout'))
-                    
-                except Exception as e:
-                  save_error(error=e, site=new_password.__name__)
-                  return 'Error with password chaning'
+      with open(path, 'w') as json_file:
+          json.dump(active_sessions, json_file, indent=4, separators=(',', ': '))
 
+      for sess in active_sessions:
+          if sess['key'] == form.key.data and rendered_session == sess['session']:
+              session['username'] = sess['username']
+              return redirect( url_for('new_password', rendered_session=rendered_session))
+
+  return render_template('hash.html',  form=form)
+
+
+@app.route('/new_password/<rendered_session>', methods=['GET', 'POST'])
+def new_password(rendered_session):
+    
+  form = NewPassword()
+  
+  if session['username']:
+  
+    if request.method == 'POST':
+
+      if form.validate_on_submit():
+      
+          user = User.query.filter_by(username=session['username']).first()
+          user.password = form.password.data
+          db.session.commit()
+          session.pop('username', None)
+          return f"New password has been set :) {session.get('username')}"
+          
     return render_template('new_password.html', form=form)
+
+  else:
+      return redirect('remind')    
+            
+  
+    
