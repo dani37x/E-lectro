@@ -1,16 +1,10 @@
-
-
-
-
 <form method="POST" action="">
     {{ form.csrf_token }}
-    <br>
-    {{ form.password.label}} {{ form.password }}
-    <br>
-    {{ form.password_2.label}} {{ form.password_2 }}
+    {{ form.key.label}} {{ form.key }}
     <br>
     <input type="submit">
 </form>
+
 
 
 {% for field in form.errors %}

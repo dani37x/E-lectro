@@ -8,12 +8,15 @@ from functools import wraps
 
 from ..database import Blocked, User, Product
 
-import json
-import os
-
 from datetime import datetime, date, timedelta
 
 from collections import Counter
+
+import json
+import os
+import string
+import random
+
 
 
 def check_admin(name):
@@ -57,28 +60,6 @@ def not_null(field):
         raise ValueError      
  
 
-def max_reminders():
-    # print(session['remind_one'], session['remind_two'])
-    if session['remind_one'] == 'not set':
-        session['remind_one']  = request.remote_addr
-        return True
-
-    if session['remind_two'] == 'not set':
-        session['remind_two'] = request.remote_addr
-        return True
-
-    else:
-        blocked = Blocked(
-            username='anonymous',
-             ip=request.remote_addr,
-              date=str((datetime.now() + timedelta(days=1)).strftime("%d-%m-%Y")))
-        db.session.add(blocked)
-        db.session.commit()
-        session['remind_one'] == 'not set'
-        session['remind_two'] == 'not set'
-        return False
-
-
 
 def user_searched(username, ip, searched):
 
@@ -102,7 +83,7 @@ def user_searched(username, ip, searched):
     
 
 def string_to_date(date):
-  return datetime.strptime(date, '%d-%m-%Y').date()
+  return datetime.strptime(date, '%d-%m-%Y  %H:%M:%S')
 
 
 def unblock(blocked_user):
@@ -161,4 +142,31 @@ def recently_searched():
     return dict(counter.most_common()[:5])
 
     
+def random_string(size):
+    small = string.ascii_lowercase
+    big = string.ascii_uppercase
+    numbers = string.digits
+    s =  small + big  + numbers
+    
+    random_choices = random.sample(s, size)
+    random.shuffle(random_choices)
+    
+    url = ''
+    for element in random_choices:
+        url += element
+    
+    return url
 
+
+def check_session(session_list):
+
+    new_session = random_string(size=40)
+    wheter_exists = False
+    
+    for sess in session_list:
+        if sess['session'] == new_session:
+            wheter_exists = True
+            return check_session(session_list)
+    
+    if wheter_exists == False:
+        return new_session 
