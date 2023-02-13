@@ -50,14 +50,14 @@ E-lectro is a web application in Flask. Its destination is online shop, but  cen
 - [x] Trending rank. Rank searches from users. Function gather users queries and create rank with them, then they are going to appeal on searching input area
 - [x] E-mails:
   - [x] no-reply mail
-  - [ ] reset password mail
+  - [x] reset password mail
   - [ ] register mail
   - [ ] newsletter mail with recommendation
-- [ ] reset password sessions  
-  - [ ] limited duration to 15 minutes
-  - [ ] auto-delete sessions after time
-  - [ ] hash sessions
-  - [ ] unique key and session generator
+- [x] reset password sessions  
+  - [x] limited duration to 15 minutes
+  - [x] auto-delete sessions after time
+  - [x] hash sessions
+  - [x] unique key and session generator
 - [ ] Machine Learning algorithm which will adjust the best products for shop's customers.
 - [ ] password change by user on account
 - [ ] shop API

@@ -52,7 +52,21 @@ def check_user(name):
     return decorator
 
 
+def open_json(file_path):
+    data = []
+    with open(file_path) as fp:
+        data = json.load(fp)
+    return data
+
+
+def save_json(file_path, data):
+    with open(file_path, 'w') as json_file:
+        json.dump(data, json_file, indent=4, separators=(',', ': '))
+
+
+
 def not_null(field):
+
     if field != '' and field != None:
         return field
 
@@ -60,15 +74,9 @@ def not_null(field):
         raise ValueError      
  
 
-
 def user_searched(username, ip, searched):
 
-    objects_list = []
-
-    with open(DATA) as fp:
-        objects_list = json.load(fp)
-        # for obj in objects_list:
-        #     print(obj)
+    objects_list = open_json(file_path=DATA)
 
     searched = str(searched).lower()
 
@@ -104,14 +112,12 @@ def unblock(blocked_user):
 
 def save_error(error, site):
 
-    objects_list = []
+    objects_list = open_json(file_path=EVENTS)
 
-    with open(EVENTS) as fp:
-        objects_list = json.load(fp)
+    durabity = datetime.now() - timedelta(days=7)
+    # durabity = string_to_date(str(datetime.now() - timedelta(days=7)))
 
-    durabity = string_to_date(str((datetime.now() - timedelta(days=7)).strftime("%d-%m-%Y")))
-
-    current_errors = [object for object in objects_list if string_to_date(object['time'][0:10]) > durabity]
+    current_errors = [object for object in objects_list if string_to_date(object['time']) > durabity]
 
     current_errors.append({
             "error": f"{error}",
@@ -130,10 +136,7 @@ def save_error(error, site):
 
 def recently_searched():
 
-    objects_list = []
-
-    with open(DATA) as fp:
-        objects_list = json.load(fp)
+    objects_list = open_json(file_path=DATA)
 
     queries = [object['searched'] for object in objects_list if len(object['searched']) > 2]
 
@@ -170,3 +173,5 @@ def check_session(session_list):
     
     if wheter_exists == False:
         return new_session 
+
+

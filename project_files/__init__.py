@@ -30,6 +30,7 @@ DATA = r'D:\projekty\E-lectro\instance\data.json'
 BLOCKED = r'D:\projekty\E-lectro\instance\Blocked.json'
 PRODUCT = r'D:\projekty\E-lectro\instance\Product.json'
 USER = r'D:\projekty\E-lectro\instance\User.json'
+SESSIONS = r'D:\projekty\E-lectro\instance\sessions.json'
 
 # database and login
 
