@@ -34,7 +34,7 @@ def register():
       password=form.password.data,
       ip=request.remote_addr,
       account_type='user',
-      active=True
+      active=False
     )
 
     try:
@@ -42,18 +42,57 @@ def register():
       db.session.commit()
       
       try:
-        message(kind='register', sender='electro@team.com', recipents=form.email.data)
-      except Exception as e:
-        print(e)
-        return 'Errow with mail'
+        session_list = open_json(file_path=SESSIONS)
+        sess = check_session(session_list=session_list)    
+        key = random_string(size=6)
 
-      return redirect( url_for('login'))
+        session_list.append({
+                "username": f"{form.username.data}",
+                "time": f"{str(datetime.now().strftime('%d-%m-%Y  %H:%M:%S'))}",
+                "session": f"{sess}",
+                "key": f"{key}"
+            })
+
+        save_json(file_path=SESSIONS, data=session_list)
+        # message(kind='register', key=key, sender='electro@team.com', recipents=form.email.data)
+
+        return redirect( url_for('register_session', rendered_session=sess))
+
+      except Exception as e:
+        return 'Error with mail'
+
+      # return redirect( url_for('login'))
 
     except Exception as e:
       save_error(error=e, site=register.__name__)
       return 'xd'
 
   return render_template('register.html', form=form)
+
+
+@app.route('/register/<rendered_session>', methods=['GET', 'POST'])
+def register_session(rendered_session):
+
+  form = Key()
+
+  if request.method == 'POST':
+
+    if form.validate_on_submit():
+      
+      session_list = open_json(file_path=SESSIONS)
+
+      for sess in session_list:
+        if sess['session'] == rendered_session and sess['key'] == form.key.data:
+
+          user = User.query.filter_by(username=sess['username']).first()
+
+          if user:
+
+            user.active = True
+            db.session.commit()
+            return redirect( url_for('login'))
+ 
+  return render_template('hash.html', form=form)
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -113,7 +152,6 @@ def remind():
       if user:
     
         session_list = open_json(file_path=SESSIONS)
-        
         sess = check_session(session_list=session_list)    
         key = random_string(size=6)
         

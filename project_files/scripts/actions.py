@@ -2,14 +2,15 @@ from project_files import db
 from project_files import mail
 from project_files import BLOCKED, USER, PRODUCT, EVENTS, DATA
 
-
 from ..database import User, Blocked, Product
 
 from flask_mail import Message
 
 from datetime import datetime, date, timedelta
 
-import json
+from ..scripts.functions import open_json, save_json 
+
+
 
 
 def delete_rows(model, data):
@@ -38,7 +39,7 @@ def block_user(data):
 def message(kind, sender, recipents, key):
     if kind == 'register':
         subject = 'Register message'
-        body = f'Welcome {recipents}'
+        body = f'Welcome {recipents}. This is your activation key {key}'
 
     if kind == 'no-reply':
         subject = 'no-reply-message'
@@ -67,10 +68,7 @@ def backup(model):
     else:
         path = BLOCKED
 
-
-    data_from_file = []
-    with open(path) as fp:
-        data_from_file = json.load(fp)
+    data_from_file = open_json(file_path=path)
 
     objects_list = []
     columns = tuple([m.key for m in model.__table__.columns])
@@ -84,8 +82,7 @@ def backup(model):
 
 
     if objects_list != data_from_file:
-        with open(path, 'w') as json_file:
-            json.dump(objects_list, json_file, indent=4, separators=(',', ': '))
+        save_json(file_path=path, data=objects_list)
 
 
 def restore(model):

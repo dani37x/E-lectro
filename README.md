@@ -51,8 +51,11 @@ E-lectro is a web application in Flask. Its destination is online shop, but  cen
 - [x] E-mails:
   - [x] no-reply mail
   - [x] reset password mail
-  - [ ] register mail
+  - [x] register mail
   - [ ] newsletter mail with recommendation
+- [x] user account activation session:
+  - [x] mail with key
+  - [x] sets active action
 - [x] reset password sessions  
   - [x] limited duration to 15 minutes
   - [x] auto-delete sessions after time
