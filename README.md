@@ -62,7 +62,7 @@ E-lectro is a web application in Flask. Its destination is online shop, but  cen
   - [x] hash sessions
   - [x] unique key and session generator
 - [ ] Machine Learning algorithm which will adjust the best products for shop's customers.
-- [ ] password change by user on account
+- [x] password change by user on account
 - [ ] shop API
 - [ ] multi device login (max 3)
 - [ ] flask bcrypt

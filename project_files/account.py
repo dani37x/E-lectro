@@ -20,6 +20,14 @@ from datetime import datetime, timedelta
 
 
 
+@app.route('/account', methods=['GET', 'POST'])
+def account():
+  session['username'] = current_user.username
+  sess = random_string(size=39)
+  return render_template('account.html', sess=sess)
+
+
+
 @app.route('/register', methods=['GET', 'POST'])
 def register():
   form = UserCreator()
@@ -211,7 +219,7 @@ def new_password(rendered_session):
 
   try:
     # essential line*
-    if session['username']:
+    if session['username'] != None and session['username'] != '':
     
       if request.method == 'POST':
 

@@ -61,24 +61,22 @@ def existing_email(form, field):
 
 
 class UserCreator(FlaskForm):
-  username = StringField(
-    description='nickname',
+  username = StringField('nickname',
     validators=[
       DataRequired(),
       Length(max=30),
       existing_user,
     ])
-  first_name = StringField(description='first_name', validators=[DataRequired(), Length(max=20)])
-  surname = StringField(description='surname', validators=[DataRequired(), Length(max=30)])
-  email = EmailField(description='e-mail',
+  first_name = StringField('first_name', validators=[DataRequired(), Length(max=20)])
+  surname = StringField('surname', validators=[DataRequired(), Length(max=30)])
+  email = EmailField('e-mail',
    validators=[
       DataRequired(),
       Length(max=50),
       existing_email
     ])
-  password = PasswordField(description='password', validators=[DataRequired(), password_checking])
-  password_2 = PasswordField(
-    description='repeat password',
+  password = PasswordField('password', validators=[DataRequired(), password_checking])
+  password_2 = PasswordField('repeat password', 
     validators=[
       DataRequired(),
       Length(max=50),
@@ -87,19 +85,19 @@ class UserCreator(FlaskForm):
 
 
 class UserLogin(FlaskForm):
-  username = StringField(description='username', validators=[DataRequired(), Length(max=30)])
-  email = EmailField(description='e-mail', validators=[DataRequired(), Length(max=50)])
-  password = PasswordField(description='password', validators=[DataRequired(), Length(max=50)])
-  remember = BooleanField(description='remember me')
+  username = StringField('username', validators=[DataRequired(), Length(max=30)])
+  email = EmailField('e-mail', validators=[DataRequired(), Length(max=50)])
+  password = PasswordField('password', validators=[DataRequired(), Length(max=50)])
+  remember = BooleanField('remember me')
 
 
 class Key(FlaskForm):
-  key = StringField(description='Enter the key', validators=[DataRequired(), Length(max=6)])
+  key = StringField('Enter the key', validators=[DataRequired(), Length(max=6)])
 
 
 class NewPassword(FlaskForm):
-  password = PasswordField(description='password', validators=[DataRequired()])
-  password_2 = PasswordField(description='repeat password', validators=[
+  password = PasswordField('password', validators=[DataRequired()])
+  password_2 = PasswordField('repeat password', validators=[
     DataRequired(),
     EqualTo('password'),
     password_checking
@@ -107,5 +105,5 @@ class NewPassword(FlaskForm):
     
 
 class RemindPassword(FlaskForm):
-  username = StringField(description='username', validators=[DataRequired(), Length(max=30)])
-  email = EmailField(description='e-mail', validators=[DataRequired(), Length(max=50)])
+  username = StringField('username', validators=[DataRequired(), Length(max=30)])
+  email = EmailField('e-mail', validators=[DataRequired(), Length(max=50)])
