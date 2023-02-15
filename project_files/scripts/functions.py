@@ -98,17 +98,17 @@ def unblock(blocked_user):
         try:
             db.session.delete(blocked_user)
             db.session.commit()
-            save_error(error=f'{blocked_user} was unblocked', site='Login Page')
+            save_event(event=f'{blocked_user} was unblocked', site='Login Page')
             return True
 
         except Exception as e:
-            save_error(error=e, site='Login page')
+            save_event(event=e, site='Login page')
             return False
     else:
         return False
 
 
-def save_error(error, site):
+def save_event(error, site):
 
     objects_list = open_json(file_path=EVENTS)
 
@@ -117,7 +117,7 @@ def save_error(error, site):
     current_errors = [object for object in objects_list if string_to_date(object['time']) > durabity]
 
     current_errors.append({
-            "error": f"{error}",
+            "event": f"{error}",
             "time": f"{str(datetime.now().strftime('%d-%m-%Y  %H:%M:%S'))}",
             "site": f"{site}"
         })

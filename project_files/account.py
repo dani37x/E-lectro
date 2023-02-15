@@ -10,7 +10,7 @@ from .form import UserCreator, UserLogin, RemindPassword, NewPassword, Key
 
 from .database import User, Blocked
 
-from .scripts.functions import check_user, check_admin, unblock, save_error
+from .scripts.functions import check_user, check_admin, unblock, save_event
 from .scripts.functions import check_session, random_string, string_to_date
 from .scripts.functions import open_json, save_json
 
@@ -72,7 +72,7 @@ def register():
       # return redirect( url_for('login'))
 
     except Exception as e:
-      save_error(error=e, site=register.__name__)
+      save_event(event=e, site=register.__name__)
       return 'xd'
 
   return render_template('register.html', form=form)
@@ -175,7 +175,7 @@ def remind():
           # message(kind='code', sender='Electro@team.com', recipents=[form.email.data], key=key)
 
         except Exception as e:
-          save_error(error=e, site=remind.__name__)
+          save_event(event=e, site=remind.__name__)
           return 'xd'
 
         save_json(file_path=SESSIONS, data=session_list)
@@ -236,7 +236,7 @@ def new_password(rendered_session):
         return redirect('remind')    
 
   except Exception as e:
-    save_error(error=e, site=new_password.__name__)
+    save_event(event=e, site=new_password.__name__)
     return 'nice try :)'
   
     
