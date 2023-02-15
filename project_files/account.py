@@ -12,7 +12,7 @@ from .database import User, Blocked
 
 from .scripts.functions import check_user, check_admin, unblock, save_event
 from .scripts.functions import check_session, random_string, string_to_date
-from .scripts.functions import open_json, save_json
+from .scripts.functions import open_json, save_json, delete_expired_data
 
 from .scripts.actions import  message
 
@@ -196,13 +196,8 @@ def hash_session(rendered_session):
     if form.validate_on_submit():
 
       session_list = open_json(file_path=SESSIONS)
-          
-      durabity = datetime.now() - timedelta(minutes=15)   
-      active_sessions = [sess for sess in session_list if string_to_date(sess['time']) > durabity]
 
-      save_json(file_path=SESSIONS, data=active_sessions)
-
-      for sess in active_sessions:
+      for sess in session_list:
           if sess['key'] == form.key.data and rendered_session == sess['session']:
               session['username'] = sess['username']
               return redirect( url_for('new_password', rendered_session=rendered_session))

@@ -68,7 +68,7 @@ def admin_user():
         for id in data:
           user = User.query.filter_by(id=id).first()
           users_emails.append(user.email)
-        message(kind='no-reply', sender=current_user.username, recipents=users_emails)
+        message(kind='no-reply', sender=current_user.username, recipents=users_emails, key='')
       
       if selected_action == 'backup':
         backup(User)

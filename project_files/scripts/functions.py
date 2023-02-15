@@ -108,26 +108,17 @@ def unblock(blocked_user):
         return False
 
 
-def save_event(error, site):
+def save_event(event, site):
 
     objects_list = open_json(file_path=EVENTS)
 
-    durabity = datetime.now() - timedelta(days=7)
-
-    current_errors = [object for object in objects_list if string_to_date(object['time']) > durabity]
-
-    current_errors.append({
-            "event": f"{error}",
+    objects_list.append({
+            "event": f"{event}",
             "time": f"{str(datetime.now().strftime('%d-%m-%Y  %H:%M:%S'))}",
             "site": f"{site}"
         })
 
-    elements = []
-    for element in current_errors:
-        if element not in elements:
-            elements.append(element)
-
-    save_json(file_path=EVENTS, data=elements)
+    save_json(file_path=EVENTS, data=objects_list)
 
 
 def recently_searched():
@@ -171,3 +162,12 @@ def check_session(session_list):
         return new_session 
 
 
+def delete_expired_data(d, h, m, file_path ):
+
+    objects_list = open_json(file_path=file_path)
+
+    durabity = datetime.now() - timedelta(days=d, hours=h, minutes=m)
+
+    current_objects = [object for object in objects_list if string_to_date(object['time']) > durabity]
+
+    save_json(file_path=file_path, data=current_objects)
