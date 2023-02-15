@@ -13,7 +13,6 @@ from datetime import datetime, date, timedelta
 from collections import Counter
 
 import json
-import os
 import string
 import random
 
@@ -86,8 +85,7 @@ def user_searched(username, ip, searched):
             "searched": f"{searched}"
         })
 
-    with open(DATA, 'w') as json_file:
-        json.dump(objects_list, json_file, indent=4, separators=(',', ': '))
+    save_json(file_path=DATA, data=objects_list)
     
 
 def string_to_date(date):
@@ -115,7 +113,6 @@ def save_error(error, site):
     objects_list = open_json(file_path=EVENTS)
 
     durabity = datetime.now() - timedelta(days=7)
-    # durabity = string_to_date(str(datetime.now() - timedelta(days=7)))
 
     current_errors = [object for object in objects_list if string_to_date(object['time']) > durabity]
 
@@ -130,8 +127,7 @@ def save_error(error, site):
         if element not in elements:
             elements.append(element)
 
-    with open(EVENTS, 'w') as json_file:
-        json.dump(elements, json_file, indent=4, separators=(',', ': '))
+    save_json(file_path=EVENTS, data=elements)
 
 
 def recently_searched():
