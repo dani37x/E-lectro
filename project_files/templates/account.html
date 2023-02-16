@@ -1,0 +1,12 @@
+{{ current_user.username }}
+
+
+
+<br>
+<br>
+<br>
+<br>
+<a href="{{ url_for('new_password', rendered_session = sess ) }}"> change password </a>
+<br>
+<br>
+<a href="{{ url_for('logout') }}"> logout </a>

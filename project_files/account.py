@@ -10,13 +10,21 @@ from .form import UserCreator, UserLogin, RemindPassword, NewPassword, Key
 
 from .database import User, Blocked
 
-from .scripts.functions import check_user, check_admin, unblock, save_error
+from .scripts.functions import check_user, check_admin, unblock, save_event
 from .scripts.functions import check_session, random_string, string_to_date
-from .scripts.functions import open_json, save_json
+from .scripts.functions import open_json, save_json, delete_expired_data
 
 from .scripts.actions import  message
 
 from datetime import datetime, timedelta
+
+
+
+@app.route('/account', methods=['GET', 'POST'])
+def account():
+  session['username'] = current_user.username
+  sess = random_string(size=39)
+  return render_template('account.html', sess=sess)
 
 
 
@@ -64,7 +72,7 @@ def register():
       # return redirect( url_for('login'))
 
     except Exception as e:
-      save_error(error=e, site=register.__name__)
+      save_event(event=e, site=register.__name__)
       return 'xd'
 
   return render_template('register.html', form=form)
@@ -167,7 +175,7 @@ def remind():
           # message(kind='code', sender='Electro@team.com', recipents=[form.email.data], key=key)
 
         except Exception as e:
-          save_error(error=e, site=remind.__name__)
+          save_event(event=e, site=remind.__name__)
           return 'xd'
 
         save_json(file_path=SESSIONS, data=session_list)
@@ -188,13 +196,8 @@ def hash_session(rendered_session):
     if form.validate_on_submit():
 
       session_list = open_json(file_path=SESSIONS)
-          
-      durabity = datetime.now() - timedelta(minutes=15)   
-      active_sessions = [sess for sess in session_list if string_to_date(sess['time']) > durabity]
 
-      save_json(file_path=SESSIONS, data=active_sessions)
-
-      for sess in active_sessions:
+      for sess in session_list:
           if sess['key'] == form.key.data and rendered_session == sess['session']:
               session['username'] = sess['username']
               return redirect( url_for('new_password', rendered_session=rendered_session))
@@ -211,7 +214,7 @@ def new_password(rendered_session):
 
   try:
     # essential line*
-    if session['username']:
+    if session['username'] != None and session['username'] != '':
     
       if request.method == 'POST':
 
@@ -228,7 +231,7 @@ def new_password(rendered_session):
         return redirect('remind')    
 
   except Exception as e:
-    save_error(error=e, site=new_password.__name__)
+    save_event(event=e, site=new_password.__name__)
     return 'nice try :)'
   
     

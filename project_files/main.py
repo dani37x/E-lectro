@@ -1,5 +1,6 @@
 from project_files import app
 from project_files import db
+from project_files import SESSIONS, EVENTS
 
 from flask_login import login_required, current_user
 from flask import render_template, url_for, redirect, request, session
@@ -8,6 +9,9 @@ from flask import render_template, url_for, redirect, request, session
 from .database import User, Blocked, Product
 
 from .scripts.functions import check_admin, check_user, user_searched, recently_searched
+from .scripts.functions import delete_expired_data
+
+from datetime import datetime
 
 
 
@@ -16,6 +20,14 @@ def before_first_request():
     # db.create_all()
     session['remind_one'] = 'not set'
     session['remind_two'] = 'not set'
+
+
+@app.before_request
+def before_request():
+  minutes = ['5', '10', '20', '25', '30', '35', '45', '50','55']
+  if str(datetime.now().minute) in minutes:
+    delete_expired_data(d=0, h=0, m=15, file_path=SESSIONS)
+    delete_expired_data(d=7, h=0, m=0, file_path=EVENTS)
 
 
 @app.route('/test', methods=['GET', 'POST'])

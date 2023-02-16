@@ -7,7 +7,7 @@ from flask import render_template, url_for, redirect, request
 
 from .database import User, Blocked, Product
 
-from .scripts.functions import not_null, save_error, check_admin, check_user
+from .scripts.functions import not_null, save_event, check_admin, check_user
 
 from .scripts.actions import delete_rows, block_user, message, backup
 from .scripts.actions import account_activation, account_deactivation
@@ -68,13 +68,13 @@ def admin_user():
         for id in data:
           user = User.query.filter_by(id=id).first()
           users_emails.append(user.email)
-        message(kind='no-reply', sender=current_user.username, recipents=users_emails)
+        message(kind='no-reply', sender=current_user.username, recipents=users_emails, key='')
       
       if selected_action == 'backup':
         backup(User)
 
     except Exception as e:
-      save_error(error=e, site=admin_user.__name__)
+      save_event(event=e, site=admin_user.__name__)
       return 'Error with actions'
   
   return render_template('admin_user.html', users=users)
@@ -110,7 +110,7 @@ def admin_blocked():
         backup(Blocked)
 
     except Exception as e:
-      save_error(error=e, site=admin_blocked.__name__)
+      save_event(event=e, site=admin_blocked.__name__)
       return 'Error with actions'
 
   return render_template('admin_blocked.html', blocked=blocked)
@@ -148,7 +148,7 @@ def admin_product():
         #flash message
 
     except Exception as e:
-      save_error(error=e, site=admin_product.__name__)
+      save_event(event=e, site=admin_product.__name__)
       return 'Error with actions'
 
   return render_template('admin_product.html', products=products)
@@ -180,7 +180,7 @@ def add_user():
       db.session.commit()
 
     except Exception as e:
-      save_error(error=e, site=add_user.__name__)
+      save_event(event=e, site=add_user.__name__)
       return 'xd'
 
     return redirect( url_for('admin_user'))
@@ -212,7 +212,7 @@ def update_user(id):
       return redirect( url_for('admin_user'))
 
     except Exception as e:
-      save_error(error=e, site=update_user.__name__)
+      save_event(event=e, site=update_user.__name__)
       return 'xd'
   
   else:
@@ -233,7 +233,7 @@ def delete_user(id):
     return redirect(url_for('admin_user'))
 
   except Exception as e:
-    save_error(error=e, site=delete_user.__name__)
+    save_event(event=e, site=delete_user.__name__)
     return 'xd'
 
 
@@ -255,7 +255,7 @@ def add_blocked():
       db.session.commit()
 
     except Exception as e:
-      save_error(error=e, site=add_blocked.__name__)
+      save_event(event=e, site=add_blocked.__name__)
       return 'xd'
 
     return redirect( url_for('admin_blocked'))
@@ -281,7 +281,7 @@ def update_blocked(id):
       return redirect(url_for('admin_blocked'))
 
     except Exception as e:
-      save_error(error=e, site=update_blocked.__name__)
+      save_event(event=e, site=update_blocked.__name__)
       return 'xd'
 
   else:
@@ -300,7 +300,7 @@ def delete_blocked(id):
     db.session.commit()
     return redirect(url_for('admin_blocked'))
   except Exception as e:
-    save_error(error=e, site=delete_blocked.__name__)
+    save_event(event=e, site=delete_blocked.__name__)
     return 'xd'    
 
 
@@ -324,7 +324,7 @@ def add_product():
       db.session.commit()
 
     except Exception as e:
-      save_error(error=e, site=add_product.__name__)
+      save_event(event=e, site=add_product.__name__)
       return 'xd'
 
     return redirect( url_for('admin_product'))
@@ -350,7 +350,7 @@ def update_product(id):
       return redirect( url_for('admin_product'))
 
     except Exception as e:
-      save_error(error=e, site=update_product.__name__)
+      save_event(event=e, site=update_product.__name__)
       return 'xd'
 
   else:
@@ -370,6 +370,6 @@ def delete_product(id):
     return redirect(url_for('admin_product'))
 
   except Exception as e:
-    save_error(error=e, site=delete_product.__name__)
+    save_event(event=e, site=delete_product.__name__)
     return 'xd'    
 
