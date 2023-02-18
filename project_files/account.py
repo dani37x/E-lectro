@@ -34,46 +34,33 @@ def register():
 
   if form.validate_on_submit():
 
-    user = User(
-      username=form.username.data,
-      first_name=form.first_name.data,
-      surname=form.surname.data,
-      email=form.email.data,
-      password=form.password.data,
-      ip=request.remote_addr,
-      account_type='user',
-      active=False
-    )
-
     try:
-      db.session.add(user)
-      db.session.commit()
-      
-      try:
-        session_list = open_json(file_path=SESSIONS)
-        sess = check_session(session_list=session_list)    
-        key = random_string(size=6)
 
-        session_list.append({
-                "username": f"{form.username.data}",
-                "time": f"{str(datetime.now().strftime('%d-%m-%Y  %H:%M:%S'))}",
-                "session": f"{sess}",
-                "key": f"{key}"
-            })
+      session_list = open_json(file_path=SESSIONS)
+      sess = check_session(session_list=session_list)    
+      key = random_string(size=6)
 
-        save_json(file_path=SESSIONS, data=session_list)
-        # message(kind='register', key=key, sender='electro@team.com', recipents=form.email.data)
+      session_list.append({
+              "username": f"{form.username.data}",
+              "first_name": f"{form.first_name.data}",
+              "surname": f"{form.surname.data}",
+              "email": f"{form.email.data}",
+              "password": f"{form.password.data}",
+              "ip": f"{request.remote_addr}",
+              "time": f"{str(datetime.now().strftime('%d-%m-%Y  %H:%M:%S'))}",
+              "session": f"{sess}",
+              "key": f"{key}"
+          })
 
-        return redirect( url_for('register_session', rendered_session=sess))
+      save_json(file_path=SESSIONS, data=session_list)
+      # message(kind='register', key=key, sender='electro@team.com', recipents=form.email.data)
 
-      except Exception as e:
-        return 'Error with mail'
-
-      # return redirect( url_for('login'))
+      return redirect( url_for('register_session', rendered_session=sess))
 
     except Exception as e:
+
       save_event(event=e, site=register.__name__)
-      return 'xd'
+      return 'Error with add register sessions'
 
   return render_template('register.html', form=form)
 
@@ -90,16 +77,32 @@ def register_session(rendered_session):
       session_list = open_json(file_path=SESSIONS)
 
       for sess in session_list:
+
         if sess['session'] == rendered_session and sess['key'] == form.key.data:
+          
+          user = User(
+            username=sess['username'],
+            first_name=sess['first_name'],
+            surname=sess['surname'],
+            email=sess['email'],
+            password=sess['password'],
+            ip=sess['ip'],
+            account_type='user',
+            active=True
+          )
+          try:
 
-          user = User.query.filter_by(username=sess['username']).first()
-
-          if user:
-
-            user.active = True
+            db.session.add(user)
             db.session.commit()
             return redirect( url_for('login'))
- 
+
+          except Exception as e:
+
+            save_event(event=e, site=register.__name__)
+            return 'Error with mail' 
+
+      return redirect( url_for('register'))
+
   return render_template('hash.html', form=form)
 
 
@@ -220,13 +223,14 @@ def new_password(rendered_session):
 
         if form.validate_on_submit():
         
-            user = User.query.filter_by(username=session['username']).first()
-            user.password = form.password.data
-            db.session.commit()
-            session.pop('username', None)
-            return redirect( url_for('page'))
+          user = User.query.filter_by(username=session['username']).first()
+          user.password = form.password.data
+          db.session.commit()
+          session.pop('username', None)
+          return redirect( url_for('page'))
             
       return render_template('new_password.html', form=form)
+
     else:
         return redirect('remind')    
 
