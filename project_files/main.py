@@ -24,8 +24,8 @@ def before_first_request():
 
 @app.before_request
 def before_request():
-  minutes = ['5', '10', '20', '25', '30', '35', '45', '50','55']
-  if str(datetime.now().minute) in minutes:
+  # minutes = ['5', '10', '20', '25', '30', '35', '45', '50','55']
+  # if str(datetime.now().minute) in minutes:
     delete_expired_data(d=0, h=0, m=15, file_path=SESSIONS)
     delete_expired_data(d=7, h=0, m=0, file_path=EVENTS)
 

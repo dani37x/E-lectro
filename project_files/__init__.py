@@ -61,6 +61,8 @@ app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USE_SSL'] = False
 
 
+
+
 #    session duration
 
 #    set on when server would start

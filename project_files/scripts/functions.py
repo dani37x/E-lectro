@@ -63,7 +63,6 @@ def save_json(file_path, data):
         json.dump(data, json_file, indent=4, separators=(',', ': '))
 
 
-
 def not_null(field):
 
     if field != '' and field != None:
@@ -162,7 +161,7 @@ def check_session(session_list):
         return new_session 
 
 
-def delete_expired_data(d, h, m, file_path ):
+def delete_expired_data(d, h, m, file_path):
 
     objects_list = open_json(file_path=file_path)
 
