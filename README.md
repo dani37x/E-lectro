@@ -51,7 +51,7 @@ E-lectro is a web application in Flask. Its destination is online shop, but  cen
 - [x] E-mails:
   - [x] no-reply mail
   - [x] reset password mail
-  - [x] register mail
+  - [x] register code mail
   - [ ] newsletter mail with recommendation
 - [x] user account activation session:
   - [x] mail with key
@@ -61,9 +61,13 @@ E-lectro is a web application in Flask. Its destination is online shop, but  cen
   - [x] auto-delete sessions after time
   - [x] hash sessions
   - [x] unique key and session generator
-- [ ] Machine Learning algorithm which will adjust the best products for shop's customers.
+- [x] register session
+  -[x] e-mail with key for conformination
+  -[x] account creates after correct key
+  -[x] after 15 minutes session with registration is deleted and account doesn't create
 - [x] password change by user on account
-- [x] function delete data from json files every specific time 
+- [x] function delete data from json files every specific time   
+- [ ] Machine Learning algorithm which will adjust the best products for shop's customers.
 - [ ] shop API
 - [ ] multi device login (max 3)
 - [ ] flask bcrypt
