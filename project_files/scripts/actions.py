@@ -14,13 +14,14 @@ from ..scripts.functions import open_json, save_json
 
 
 def delete_rows(model, data):
-    print( model, data)
+
     for number in data:
         model.query.filter_by(id=number).delete()
         db.session.commit()
 
 
 def block_user(data):
+
     for id in data:
         user_to_block = User.query.get(id)
 
@@ -37,6 +38,7 @@ def block_user(data):
 
 
 def message(kind, sender, recipents, key):
+
     if kind == 'register':
         subject = 'Register message'
         body = f'Welcome {recipents}. This is your activation key {key}'
@@ -115,6 +117,7 @@ def restore(model):
 
 
 def account_activation(model, data):
+
     for number in data:
         account = model.query.filter_by(id=number).first()
         account.active = True
@@ -122,7 +125,20 @@ def account_activation(model, data):
     
 
 def account_deactivation(model, data):
+
     for number in data:
         account = model.query.filter_by(id=number).first()
         account.active = False
         db.session.commit()
+
+
+def delete_inactive_accounts():
+
+    users = User.query.all()
+
+    for user in users:
+
+        if user.active ==  False:
+
+            db.session.delete(user)
+            db.session.commit()

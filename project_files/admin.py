@@ -11,6 +11,7 @@ from .scripts.functions import not_null, save_event, check_admin, check_user
 
 from .scripts.actions import delete_rows, block_user, message, backup
 from .scripts.actions import account_activation, account_deactivation
+from .scripts.actions import delete_unactive_accounts
 
 
 
@@ -62,6 +63,10 @@ def admin_user():
       
       if selected_action == 'account deactivation':
         account_deactivation(model=User, data=data)
+
+      if selected_action == 'delete unactive accounts':
+        delete_unactive_accounts()
+        
 
       if selected_action == 'test email':
         users_emails = []

@@ -29,6 +29,7 @@ E-lectro is a web application in Flask. Its destination is online shop, but  cen
   - [x] accounts users's activation
   - [x] accounts users's deactivation
   - [x] delete rows
+  - [x] delete inactive accounts
   - [x] send test e-mails
   - [x] block accounts
   - [x] backups
@@ -78,7 +79,6 @@ E-lectro is a web application in Flask. Its destination is online shop, but  cen
 - [ ] own authentacion system
 - [ ] Database change - from SQLALCHEMY to SQLITE3
 - [ ] newsletters defined for every user
-- [ ] delete unactive accounts  
  
 
 ### Built With
