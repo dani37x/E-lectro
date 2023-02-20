@@ -1,7 +1,7 @@
 ## About The Project
 <a name="readme-top"></a>
 
-E-lectro is a web application in Flask. Its destination is online shop, but  center on non-visual things. This project focuses on security and curious  solutions. Full backend project, what is more, everything terrific works deeply. Project contains ready solutions like Limiter or SQLAlchemy ORM, but definitely there occur own functions with prevalence.
+E-lectro is a web application in Flask. Its destination is an online shop but centers on non-visual things. This project focuses on security and curious solutions. Full backend project, and what is more, everything terrific works deeply. The project contains ready solutions like Limiter or SQLAlchemy ORM, but there occur own functions with prevalence.
 
 <br>
 <div align="center">
@@ -17,23 +17,33 @@ E-lectro is a web application in Flask. Its destination is online shop, but  cen
 
 <a name="roadmap"></a>
 
+
+ 
+
+### Built With
+<a name="technology_stack"></a>
+* FLASK
+* SQLALCHEMY
+* LIMITER
+* FLASK-MAIL
+* FLASK-LOGIN
 - [x] Protections wrappers:
-  - [x] for admin views, check wheter user is admin
+  - [x] for admin views, check whether a user is an admin
   - [x] for common users, check their ip and account details
-- [x] Own Admin managment panel with basic operations on row like
+- [x] Own Admin management panel with basic operations on a row like
   - [x] edit row
   - [x] delete row
-  - [x] add new row
-  - [x] search rows which contain query
-- [x] Group actions in admin panel (many rows):
-  - [x] accounts users's activation
-  - [x] accounts users's deactivation
+  - [x] add a new row
+  - [x] search rows that contain query
+- [x] Group actions in the admin panel (many rows):
+  - [x] accounts users' activation
+  - [x] accounts users' deactivation
   - [x] delete rows
   - [x] delete inactive accounts
   - [x] send test e-mails
   - [x] block accounts
   - [x] backups
-  - [ ] restore databases
+  - [x] restore databases
 - [x] entries limiter 
 - [x] Flask Login
   - [x] Login
@@ -44,18 +54,18 @@ E-lectro is a web application in Flask. Its destination is online shop, but  cen
   - [x] correct password with website standards
   - [x] Exists user
   - [x] Exists e-mail
-- [x] automatic function which take off block from users's accounts after specific date.
+- [x] automatic function which takes off a block from users' accounts after a specific date.
 - [x] Error handlers
-- [x] Event system, which gather errors, actions to `events.json` which will be perform by users
+- [x] Event system, which gathers errors, actions to `events.json` which will be performed by users
 - [x] Searching input for users which looking for products
-- [x] Trending rank. Rank searches from users. Function gather users queries and create rank with them, then they are going to appeal on searching input area
+- [x] Trending rank. Rank searches from users. Function gathers users queries and creates rank with them, then they are going to appeal on searching input area
 - [x] E-mails:
   - [x] no-reply mail
   - [x] reset password mail
   - [x] register code mail
-  - [ ] newsletter mail with recommendation
+  - [ ] newsletter mail with a recommendation
 - [x] user account activation session:
-  - [x] mail with key
+  - [x] mail with the key
   - [x] sets active action
 - [x] reset password sessions  
   - [x] limited duration to 15 minutes
@@ -63,32 +73,22 @@ E-lectro is a web application in Flask. Its destination is online shop, but  cen
   - [x] hash sessions
   - [x] unique key and session generator
 - [x] register session
-  -[x] e-mail with key for conformination
-  -[x] account creates after correct key
-  -[x] after 15 minutes session with registration is deleted and account doesn't create
-- [x] password change by user on account
-- [x] function delete data from json files every specific time   
-- [ ] Machine Learning algorithm which will adjust the best products for shop's customers.
+  -[x] e-mail with key for confirmation
+  -[x] account creates after the correct key
+  -[x] after 15 minutes session with registration is deleted and an account doesn't create
+- [x] password change by a user on account
+- [x] function deletes data from json files every specific time   
+- [ ] Machine Learning algorithm which will adjust the best products for the shop's customers.
 - [ ] shop API
-- [ ] multi device login (max 3)
+- [ ] multi-device login (max 3)
 - [ ] flask bcrypt
 - [ ] account lvl
 - [ ] payments
 - [ ] products list
 - [ ] own hash password algorithm
-- [ ] own authentacion system
-- [ ] Database change - from SQLALCHEMY to SQLITE3
+- [ ] own authentication system
+- [ ] Database change - from sqlalchemy to SQLITE3
 - [ ] newsletters defined for every user
- 
-
-### Built With
-<a name="technology_stack"></a>
-* FLASK
-* SQLALCHEMY
-* LIMITER
-* FLASK-MAIL
-* FLASK-LOGIN
-
 
 ### Installation
 <a name="installation"></a>
