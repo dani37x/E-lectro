@@ -89,9 +89,6 @@ def backup(model):
 
 def restore_database(model):
 
-    exist_rows = model.query.all()
-    print(exist_rows)
-
     if model == User:
 
         data_from_file = open_json(file_path=USER)
@@ -109,7 +106,9 @@ def restore_database(model):
                 active=data['active'],
             )
 
-            if data['username'] not in exist_rows:
+            whether_exist = model.query.filter_by(username=data['username']).first()
+            
+            if whether_exist == None:
 
                 db.session.add(user)
                 db.session.commit()
@@ -127,7 +126,9 @@ def restore_database(model):
                 price=data['price'],
             )
             
-            if data['name'] not in exist_rows:
+            whether_exist = model.query.filter_by(name=data['name']).first()
+            
+            if whether_exist == None:
 
                 db.session.add(product)
                 db.session.commit()
@@ -144,7 +145,9 @@ def restore_database(model):
                 date=data['date'],
             )        
             
-            if data['username'] not in exist_rows:
+            whether_exist = model.query.filter_by(username=data['username']).first()
+            
+            if whether_exist == None:
                 
                 db.session.add(blocked)
                 db.session.commit()
