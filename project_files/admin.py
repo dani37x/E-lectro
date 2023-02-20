@@ -11,7 +11,7 @@ from .scripts.functions import not_null, save_event, check_admin, check_user
 
 from .scripts.actions import delete_rows, block_user, message, backup
 from .scripts.actions import account_activation, account_deactivation
-from .scripts.actions import delete_unactive_accounts
+from .scripts.actions import delete_inactive_accounts, restore_database
 
 
 
@@ -65,9 +65,11 @@ def admin_user():
         account_deactivation(model=User, data=data)
 
       if selected_action == 'delete unactive accounts':
-        delete_unactive_accounts()
-        
+        delete_inactive_accounts()
 
+      if selected_action == 'restore database':
+        restore_database(User)
+        
       if selected_action == 'test email':
         users_emails = []
         for id in data:
@@ -106,17 +108,20 @@ def admin_blocked():
     data = request.form.getlist('id')
     selected_action = request.form['action']
 
-    try:
-      if selected_action == 'delete user':
-        delete_rows(Blocked, data)
-        return redirect( url_for('admin_blocked'))
-      
-      if selected_action == 'backup':
-        backup(Blocked)
+    # try:
+    if selected_action == 'delete user':
+      delete_rows(Blocked, data)
+      return redirect( url_for('admin_blocked'))
+    
+    if selected_action == 'backup':
+      backup(Blocked)
 
-    except Exception as e:
-      save_event(event=e, site=admin_blocked.__name__)
-      return 'Error with actions'
+    if selected_action == 'restore database':
+      restore_database(Blocked)
+
+    # except Exception as e:
+    #   save_event(event=e, site=admin_blocked.__name__)
+    #   return 'Error with actions'
 
   return render_template('admin_blocked.html', blocked=blocked)
 
@@ -151,6 +156,9 @@ def admin_product():
       if selected_action == 'backup':
         backup(Product)
         #flash message
+
+      if selected_action == 'restore database':
+        restore_database(Product)
 
     except Exception as e:
       save_event(event=e, site=admin_product.__name__)
@@ -247,6 +255,7 @@ def delete_user(id):
 # @check_admin('add_blocked')
 # @check_user('add_blocked')
 def add_blocked():
+
   if request.method == 'POST':
 
     new_blocked = Blocked(

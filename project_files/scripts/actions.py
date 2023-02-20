@@ -87,33 +87,68 @@ def backup(model):
         save_json(file_path=path, data=objects_list)
 
 
-def restore(model):
-    pass
-    # if model == User:
-    #     path = r'D:\projekty\E-lectro\instance\User.json'
-    # elif model == Product:
-    #     path = r'D:\projekty\E-lectro\instance\Product.json'
-    # else:
-    #     path = r'D:\projekty\E-lectro\instance\Blocked.json'
+def restore_database(model):
 
+    exist_rows = model.query.all()
+    print(exist_rows)
 
-    # data_from_file = []
-    # with open(path) as fp:
-    #     data_from_file = json.load(fp)
+    if model == User:
 
-    # x = Blocked()
-    # db.session.add(x)
-    # db.session.commit()
+        data_from_file = open_json(file_path=USER)
 
-    
-    # for data in data_from_file:
-    #     values = [value for value in data.values()]
-        
-    #     values = values[1], values[2], values[3] 
-    #     values = list(values)
-        # row = Blocked(username=values[0], ip=values[1], date=values[2])
-        # db.session.add(row)
-        # db.session.commit()
+        for data in data_from_file:
+
+            user = model(
+                username=data['username'],
+                first_name=data['first_name'],
+                surname=data['surname'],
+                email=data['email'],
+                password=data['password'],
+                ip=data['ip'],
+                account_type=data['account_type'],
+                active=data['active'],
+            )
+
+            if data['username'] not in exist_rows:
+
+                db.session.add(user)
+                db.session.commit()
+
+    elif model == Product:
+
+        data_from_file = open_json(file_path=PRODUCT)
+
+        for data in data_from_file:
+
+            product = model(
+                name=data['name'],
+                category=data['category'],
+                company=data['company'],
+                price=data['price'],
+            )
+            
+            if data['name'] not in exist_rows:
+
+                db.session.add(product)
+                db.session.commit()
+
+    elif model == Blocked:
+
+        data_from_file = open_json(file_path=BLOCKED)
+
+        for data in data_from_file:
+
+            blocked = model(
+                username=data['username'],
+                ip=data['ip'],
+                date=data['date'],
+            )        
+            
+            if data['username'] not in exist_rows:
+                
+                db.session.add(blocked)
+                db.session.commit()
+
 
 
 def account_activation(model, data):
