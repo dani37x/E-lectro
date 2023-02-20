@@ -1,9 +1,6 @@
 from project_files import app
 
 from .scripts.functions import save_event
-from .scripts.actions import restore
-
-from .database import Blocked
 
 
 @app.errorhandler(405)
