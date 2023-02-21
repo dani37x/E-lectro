@@ -1,6 +1,6 @@
 from project_files import app
 from project_files import db
-from project_files import SESSIONS, EVENTS
+from project_files import SESSIONS, EVENTS, DATA
 
 from flask_login import login_required, current_user
 from flask import render_template, url_for, redirect, request, session
@@ -9,7 +9,7 @@ from flask import render_template, url_for, redirect, request, session
 from .database import User, Blocked, Product
 
 from .scripts.functions import check_admin, check_user, user_searched, recently_searched
-from .scripts.functions import delete_expired_data
+from .scripts.functions import delete_expired_data, similar_products_to_queries
 
 from datetime import datetime
 
@@ -24,10 +24,13 @@ def before_first_request():
 
 @app.before_request
 def before_request():
+
   minutes = ['5', '10', '20', '25', '30', '35', '45', '50','55']
+
   if str(datetime.now().minute) in minutes:
     delete_expired_data(d=0, h=0, m=15, file_path=SESSIONS)
     delete_expired_data(d=7, h=0, m=0, file_path=EVENTS)
+    delete_expired_data(d=7, h=0, m=0, file_path=DATA)
 
 
 @app.route('/test', methods=['GET', 'POST'])
@@ -60,6 +63,8 @@ def test():
 def page():
   products = Product.query.all()
 
+  print(similar_products_to_queries(current_user.username))
+
   if request.method == 'POST':
     queryset = request.form['search']
 
@@ -69,7 +74,8 @@ def page():
         | (Product.company.contains(queryset))).all()
     )
 
-    if len(queryset) > 1:
+    if len(queryset) > 3:
+
       user_searched(
         username=current_user.username,
         ip=request.remote_addr,

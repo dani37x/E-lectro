@@ -81,7 +81,8 @@ def user_searched(username, ip, searched):
     objects_list.append({
             "username": f"{username}",
             "ip": f"{ip}",
-            "searched": f"{searched}"
+            "searched": f"{searched}",
+            "time": f"{str(datetime.now().strftime('%d-%m-%Y  %H:%M:%S'))}"
         })
 
     save_json(file_path=DATA, data=objects_list)
@@ -140,11 +141,11 @@ def random_string(size):
     random_choices = random.sample(s, size)
     random.shuffle(random_choices)
     
-    url = ''
+    string_to_return = ''
     for element in random_choices:
-        url += element
+        string_to_return += element
     
-    return url
+    return string_to_return
 
 
 def check_session(session_list):
@@ -170,3 +171,40 @@ def delete_expired_data(d, h, m, file_path):
     current_objects = [object for object in objects_list if string_to_date(object['time']) > durabity]
 
     save_json(file_path=file_path, data=current_objects)
+
+
+def similar_products_to_queries(username):
+    
+    queries = open_json(file_path=DATA)
+
+    user_queries = [query for query in queries if query['username'] == username]
+
+    products = Product.query.all()
+    possible_products = []
+
+    for product in products:
+
+        for query in user_queries:
+
+            print(query['searched'], product.name)
+            print(type(query['searched']), type(product.name))
+            
+            if str(query['searched']).lower() in str(product.name).lower() or query['searched'] == product.name:
+
+                if product not in possible_products:
+                    possible_products.append(product)
+
+            if str(query['searched']).lower() in str(product.category).lower() or query['searched'] == product.name:
+
+                if product not in possible_products:
+                    possible_products.append(product)
+
+    return possible_products
+
+
+
+
+
+
+
+
