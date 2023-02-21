@@ -178,10 +178,22 @@ def similar_products_to_queries(username):
     queries = open_json(file_path=DATA)
 
     user_queries = [query for query in queries if query['username'] == username]
-
     products = Product.query.all()
-    possible_products = []
 
+    if len(user_queries) == 0:
+
+        random_products = []
+        for number in range(6):
+
+            product_to_add = random.choice(products)
+
+            if product_to_add not in random_products:
+                random_products.append(product_to_add)
+
+        return random_products
+
+
+    possible_products = []
     for product in products:
 
         for query in user_queries:
@@ -199,7 +211,7 @@ def similar_products_to_queries(username):
                 if product not in possible_products:
                     possible_products.append(product)
 
-    return possible_products
+    return possible_products[0:7]
 
 
 
