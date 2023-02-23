@@ -103,10 +103,18 @@ def category():
 
 
 @app.route('/shop/<category>/products', methods=['GET', 'POST'])
-def product(category):
+def products(category):
 
   products = Product.query.filter_by(category=category)
 
   return render_template('products.html', products=products)
+
+
+@app.route('/shop/products/<product_id>', methods=['GET', 'POST'])
+def product_info(product_id):
+
+  product = Product.query.filter_by(id=product_id).first()
+  
+  return render_template('product_info.html', product=product)
 
 

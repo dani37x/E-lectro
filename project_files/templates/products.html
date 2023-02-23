@@ -5,6 +5,8 @@
 
 
 {% for product in products %}
-    <p> {{product.name}} </p>
-    <br>
+<a href="{{ url_for('product_info', product_id = product.id ) }}">
+     {{product.name}} 
+    </a>
+<br>
 {% endfor %}
