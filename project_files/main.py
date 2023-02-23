@@ -90,10 +90,23 @@ def page():
   )
 
 
-@app.route('/info', methods=['GET', 'POST'])
-@login_required
-def second_page():
-  return session.get('current', 'not set')
+@app.route('/shop/category', methods=['GET', 'POST'])
+def category():
 
+  products = Product.query.all()
+  categories = []
+  for product in products:
+    if product.category not in categories:
+      categories.append(product.category)
+
+  return render_template('category.html', categories=categories)
+
+
+@app.route('/shop/<category>/products', methods=['GET', 'POST'])
+def product(category):
+
+  products = Product.query.filter_by(category=category)
+
+  return render_template('products.html', products=products)
 
 
