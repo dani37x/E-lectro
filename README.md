@@ -44,7 +44,13 @@ E-lectro is a web application in Flask. Its destination is an online shop but ce
   - [x] block accounts
   - [x] backups
   - [x] restore databases
-- [x] entries limiter 
+- [x] entries limiter
+- [x] Forms
+  -[x] Register form
+  -[x] Login form 
+  -[x] Key form
+  -[x] New Password form
+  -[x] Remind Password form
 - [x] Flask Login
   - [x] Login
   - [x] Authantacion
@@ -89,6 +95,8 @@ E-lectro is a web application in Flask. Its destination is an online shop but ce
 - [ ] own authentication system
 - [ ] Database change - from sqlalchemy to SQLITE3
 - [ ] newsletters defined for every user
+
+
 
 ### Installation
 <a name="installation"></a>

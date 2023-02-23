@@ -61,9 +61,8 @@ def test():
 @login_required
 # @check_user('page')
 def page():
-  products = Product.query.all()
 
-  print(similar_products_to_queries(current_user.username))
+  products = Product.query.all()
 
   if request.method == 'POST':
     queryset = request.form['search']
@@ -87,6 +86,7 @@ def page():
     products=products,
     user=current_user.username,
     recently_searched=recently_searched(),
+    similar_products_to_queries=similar_products_to_queries(username=current_user.username),
   )
 
 
