@@ -3,7 +3,7 @@ from project_files import db
 from project_files import SESSIONS, EVENTS, DATA
 
 from flask_login import login_required, current_user
-from flask import render_template, url_for, redirect, request, session
+from flask import render_template, url_for, redirect, request, session, make_response
 
 
 from .database import User, Blocked, Product
@@ -114,7 +114,11 @@ def products(category):
 def product_info(product_id):
 
   product = Product.query.filter_by(id=product_id).first()
-  
-  return render_template('product_info.html', product=product)
+
+  resp = make_response(render_template('product_info.html', product=product))
+  resp.set_cookie(f'{product.name}', f'{product.price}')
+  print(request.cookies.get(f'{product.name}'))
+  return resp
+
 
 
