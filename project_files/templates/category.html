@@ -4,6 +4,6 @@
 
 
 {% for category in categories %}
-    <a href="{{ url_for('product', category = category ) }}"> {{category}} </a>
+    <a href="{{ url_for('products', category = category ) }}"> {{category}} </a>
     <br>
 {% endfor %}
