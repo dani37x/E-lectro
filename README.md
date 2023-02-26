@@ -79,7 +79,7 @@ E-lectro is a web application in Flask. Its destination is an online shop but ce
 - [x] password change by a user on account
 - [x] function deletes data from json files every specific time
 - [x] ML algorithm implement   
-- [] Machine Learning algorithm which will adjust the best products for the shop's customers.
+- [ ] Machine Learning algorithm which will adjust the best products for the shop's customers.
 - [ ] shop API
 - [ ] multi-device login (max 3)
 - [ ] flask bcrypt
