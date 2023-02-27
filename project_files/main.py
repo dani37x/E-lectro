@@ -10,6 +10,7 @@ from .database import User, Blocked, Product
 
 from .scripts.functions import check_admin, check_user, user_searched, recently_searched
 from .scripts.functions import delete_expired_data, similar_products_to_queries
+from .scripts.functions import classification
 
 from datetime import datetime
 
@@ -107,6 +108,14 @@ def products(category):
 
   products = Product.query.filter_by(category=category)
 
+  # ML
+
+  type_of_user = ''
+
+  sorted_products_for_user = []
+
+  
+
   return render_template('products.html', products=products)
 
 
@@ -116,8 +125,11 @@ def product_info(product_id):
   product = Product.query.filter_by(id=product_id).first()
 
   resp = make_response(render_template('product_info.html', product=product))
-  resp.set_cookie(f'{product.name}', f'{product.price}')
-  print(request.cookies.get(f'{product.name}'))
+
+  resp.set_cookie(f'{product.category}', f'{product.price}')
+  
+  print(request.cookies.get(f'{product.category}'))
+
   return resp
 
 

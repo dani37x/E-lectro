@@ -3,6 +3,7 @@ import pandas as pd
 import sklearn
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestClassifier
+import pickle
 
 
 df = pd.read_excel('D:\projekty\E-lectro\electro.xlsx')
@@ -17,11 +18,13 @@ X_train, X_test, y_train, y_test = train_test_split(
     X,
     y,
     test_size = 0.3,
-    random_state=1,
+    random_state=20,
     shuffle=True
 )
 
 classifier = RandomForestClassifier()
 classifier.fit(X_train.values, y_train)
 
-print(classifier.predict([[1,1800]]))
+# print(classifier.predict([[1,1800]]))
+
+pickle.dump(classifier, open("classifier.pkl", "wb"))
