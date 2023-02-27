@@ -103,7 +103,7 @@ def admin_blocked():
         Blocked.query.filter(User.username.contains(searching)
           | (Blocked.ip.contains(searching))).all()
       )
-      return render_template('admin_user.html', blocked=blocked)
+      return render_template('admin_product.html', blocked=blocked)
       
     data = request.form.getlist('id')
     selected_action = request.form['action']
@@ -143,7 +143,7 @@ def admin_product():
           | (Product.category.contains(searching))
           | (Product.company.contains(searching))).all()
       )
-      return render_template('admin_user.html', products=products)
+      return render_template('admin_product.html', products=products)
       
     data = request.form.getlist('id')
     selected_action = request.form['action']

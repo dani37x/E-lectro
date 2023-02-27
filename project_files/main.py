@@ -14,6 +14,7 @@ from .scripts.functions import classification
 
 from datetime import datetime
 
+import random
 
 
 @app.before_first_request
@@ -108,14 +109,28 @@ def products(category):
 
   products = Product.query.filter_by(category=category)
 
-  # ML
+  if category in request.cookies:
 
-  type_of_user = ''
+    money = request.cookies.get(category)
+    type_of_user = classification(category=category, money=money)
 
-  sorted_products_for_user = []
+    products_for_user = []
+    the_others = []
 
+    for product in products:
+
+      if classification(category=product.category, money=product.price) == type_of_user:
+        products_for_user.append(product)
+        
+      else:
+        the_others.append(product)
+
+    random.shuffle(the_others)
+
+    products_for_user.extend(the_others)
+    
+    return render_template('products.html', products=products_for_user)
   
-
   return render_template('products.html', products=products)
 
 
@@ -128,7 +143,7 @@ def product_info(product_id):
 
   resp.set_cookie(f'{product.category}', f'{product.price}')
   
-  print(request.cookies.get(f'{product.category}'))
+  # print(request.cookies.get(f'{product.category}'))
 
   return resp
 
