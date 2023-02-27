@@ -1,5 +1,5 @@
 from project_files import db
-from project_files import BLOCKED, USER, PRODUCT, EVENTS, DATA
+from project_files import BLOCKED, USER, PRODUCT, EVENTS, DATA, CLASSIFIER
 
 from flask import request, abort, session
 from flask_login import  current_user
@@ -15,6 +15,7 @@ from collections import Counter
 import json
 import string
 import random
+import pickle
 
 
 
@@ -176,8 +177,8 @@ def delete_expired_data(d, h, m, file_path):
 def similar_products_to_queries(username):
     
     queries = open_json(file_path=DATA)
-
     user_queries = [query for query in queries if query['username'] == username]
+
     products = Product.query.all()
 
     if len(user_queries) == 0:
@@ -213,6 +214,25 @@ def similar_products_to_queries(username):
 
     return possible_products[0:7]
 
+
+#more to add
+list_of_categories = [
+    {"AGD": 1},
+    {"TOYS": 2},
+]
+
+def classification(category, money):
+
+    for cat in list_of_categories:
+        if category in cat:
+            category = cat[category]
+
+
+    model = pickle.load(open(CLASSIFIER, "rb"))
+
+    prediction = model.predict([[category, money]])
+
+    return prediction
 
 
 

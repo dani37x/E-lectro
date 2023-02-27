@@ -11,6 +11,7 @@ from flask_mail import Mail, Message
 
 import os
 
+
 # config
 
 app = Flask(__name__)
@@ -23,7 +24,8 @@ DATETIME_FORMAT = ''
 FLASK_ENV = 'env'
 SERVER_NAME = ''
 
-# json files paths
+
+#  files paths
 
 EVENTS = r'D:\projekty\E-lectro\instance\events.json'
 DATA = r'D:\projekty\E-lectro\instance\data.json'
@@ -31,6 +33,8 @@ BLOCKED = r'D:\projekty\E-lectro\instance\Blocked.json'
 PRODUCT = r'D:\projekty\E-lectro\instance\Product.json'
 USER = r'D:\projekty\E-lectro\instance\User.json'
 SESSIONS = r'D:\projekty\E-lectro\instance\sessions.json'
+CLASSIFIER = r'D:\projekty\E-lectro\project_files\classifier.pkl'
+
 
 # database and login
 
@@ -39,6 +43,7 @@ db = SQLAlchemy(app)
 
 login_manager = LoginManager()
 login_manager.init_app(app)
+
 
 # limiter
 
@@ -59,7 +64,6 @@ app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME', 'not set')
 app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD', 'not set')
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USE_SSL'] = False
-
 
 
 
