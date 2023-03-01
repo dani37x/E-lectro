@@ -9,6 +9,8 @@ from flask_limiter.util import get_remote_address
 
 from flask_mail import Mail, Message
 
+from flask_bcrypt import Bcrypt
+
 import os
 
 
@@ -73,3 +75,10 @@ app.config['MAIL_USE_SSL'] = False
 
 # session.permanent = True
 # app.permanent_session_lifetime = timedelta(hours=24)
+
+
+# Flask bcrypt
+
+bcrypt = Bcrypt(app)
+
+

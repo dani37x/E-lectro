@@ -1,7 +1,6 @@
 from project_files import db
 from project_files import login_manager
 
-
 from flask_login import UserMixin
 
 
@@ -11,18 +10,13 @@ class User(UserMixin, db.Model):
     first_name = db.Column(db.String(30),unique=False, nullable=False)
     surname = db.Column(db.String(30), unique=False, nullable=False)
     email = db.Column(db.String(50), unique=True, nullable=False)
-    password = db.Column(db.String(20), unique=False, nullable=False)
+    password = db.Column(db.String(100), unique=False, nullable=False)
     ip = db.Column(db.String(20), unique=False, nullable=False)
     account_type = db.Column(db.String(30), unique=False, nullable=False)
     active = db.Column(db.Boolean, default=True, nullable=False)
 
     def __repr__(self):
         return f'User {self.username}'
-
-
-@login_manager.user_loader
-def load_user(user_id):
-    return User.query.get(user_id)
 
 
 class Blocked(db.Model):

@@ -18,7 +18,6 @@ import random
 import pickle
 
 
-
 def check_admin(name):
     def decorator(f):
         @wraps(f)
@@ -181,38 +180,40 @@ def similar_products_to_queries(username):
 
     products = Product.query.all()
 
-    if len(user_queries) == 0:
+    if products:
 
-        random_products = []
-        for number in range(6):
+        if len(user_queries) == 0:
 
-            product_to_add = random.choice(products)
+            random_products = []
+            for number in range(6):
 
-            if product_to_add not in random_products:
-                random_products.append(product_to_add)
+                product_to_add = random.choice(products)
 
-        return random_products
+                if product_to_add not in random_products:
+                    random_products.append(product_to_add)
+
+            return random_products
 
 
-    possible_products = []
-    for product in products:
+        possible_products = []
+        for product in products:
 
-        for query in user_queries:
+            for query in user_queries:
 
-            print(query['searched'], product.name)
-            print(type(query['searched']), type(product.name))
-            
-            if str(query['searched']).lower() in str(product.name).lower() or query['searched'] == product.name:
+                print(query['searched'], product.name)
+                print(type(query['searched']), type(product.name))
+                
+                if str(query['searched']).lower() in str(product.name).lower() or query['searched'] == product.name:
 
-                if product not in possible_products:
-                    possible_products.append(product)
+                    if product not in possible_products:
+                        possible_products.append(product)
 
-            if str(query['searched']).lower() in str(product.category).lower() or query['searched'] == product.name:
+                if str(query['searched']).lower() in str(product.category).lower() or query['searched'] == product.name:
 
-                if product not in possible_products:
-                    possible_products.append(product)
+                    if product not in possible_products:
+                        possible_products.append(product)
 
-    return possible_products[0:7]
+        return possible_products[0:7]
 
 
 #more to add

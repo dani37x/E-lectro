@@ -1,27 +1,33 @@
 from project_files import app
 from project_files import db
+from project_files import login_manager
 from project_files import SESSIONS, EVENTS, DATA
 
 from flask_login import login_required, current_user
 from flask import render_template, url_for, redirect, request, session, make_response
 
-
 from .database import User, Blocked, Product
 
 from .scripts.functions import check_admin, check_user, user_searched, recently_searched
 from .scripts.functions import delete_expired_data, similar_products_to_queries
-from .scripts.functions import classification
+from .scripts.functions import classification, save_event
 
 from datetime import datetime
 
 import random
 
 
+@login_manager.user_loader
+def load_user(user_id):
+    try:
+        return User.query.get(user_id)
+    except Exception as e:
+        save_event(event=e, site='login manager')
+
+
 @app.before_first_request
 def before_first_request():
-    # db.create_all()
-    session['remind_one'] = 'not set'
-    session['remind_two'] = 'not set'
+  db.create_all()
 
 
 @app.before_request
