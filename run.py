@@ -5,6 +5,5 @@ from project_files import admin
 from project_files import account
 
 
-
 if __name__ =="__main__":
     app.run(debug=True)

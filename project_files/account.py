@@ -2,6 +2,7 @@ from project_files import app
 from project_files import db
 from project_files import login_manager
 from project_files import SESSIONS
+from project_files import bcrypt
 
 from flask_login import login_user, logout_user, login_required, current_user
 from flask import render_template, url_for, redirect, request, abort, session
@@ -45,7 +46,7 @@ def register():
               "first_name": f"{form.first_name.data}",
               "surname": f"{form.surname.data}",
               "email": f"{form.email.data}",
-              "password": f"{form.password.data}",
+              "password": f"{bcrypt.generate_password_hash(form.password.data).decode('utf-8')}",
               "ip": f"{request.remote_addr}",
               "time": f"{str(datetime.now().strftime('%d-%m-%Y  %H:%M:%S'))}",
               "session": f"{sess}",
@@ -99,7 +100,7 @@ def register_session(rendered_session):
           except Exception as e:
 
             save_event(event=e, site=register.__name__)
-            return 'Error with mail' 
+            return 'Error with register' 
 
       return redirect( url_for('register'))
 
@@ -115,11 +116,10 @@ def login():
 
     user = User.query.filter_by(
       email=form.email.data,
-      password=form.password.data,
       username=form.username.data
     ).first()
 
-    if user:
+    if user and (bcrypt.check_password_hash(user.password, form.password.data)):
 
       wheter_blocked = Blocked.query.filter_by(username=user.username).first()
       if wheter_blocked:
