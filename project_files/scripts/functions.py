@@ -52,9 +52,11 @@ def check_user(name):
 
 
 def open_json(file_path):
+
     data = []
     with open(file_path) as fp:
         data = json.load(fp)
+        
     return data
 
 
@@ -124,11 +126,12 @@ def save_event(event, site):
 def recently_searched():
 
     objects_list = open_json(file_path=DATA)
+    # if len(objects_list) > 0:
 
     queries = [object['searched'] for object in objects_list if len(object['searched']) > 2]
 
     counter = Counter(queries)
-    
+
     return dict(counter.most_common()[:5])
 
     
@@ -165,12 +168,13 @@ def check_session(session_list):
 def delete_expired_data(d, h, m, file_path):
 
     objects_list = open_json(file_path=file_path)
+    if len(objects_list) > 0:
 
-    durabity = datetime.now() - timedelta(days=d, hours=h, minutes=m)
+        durabity = datetime.now() - timedelta(days=d, hours=h, minutes=m)
 
-    current_objects = [object for object in objects_list if string_to_date(object['time']) > durabity]
+        current_objects = [object for object in objects_list if string_to_date(object['time']) > durabity]
 
-    save_json(file_path=file_path, data=current_objects)
+        save_json(file_path=file_path, data=current_objects)
 
 
 def similar_products_to_queries(username):

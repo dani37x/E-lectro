@@ -89,7 +89,9 @@ def register_session(rendered_session):
             password=sess['password'],
             ip=sess['ip'],
             account_type='user',
-            active=True
+            active=True,
+            # points=0,
+            # newsletter=False,
           )
           try:
 

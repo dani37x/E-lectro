@@ -1,5 +1,4 @@
 from project_files import db
-from project_files import login_manager
 
 from flask_login import UserMixin
 
@@ -14,6 +13,8 @@ class User(UserMixin, db.Model):
     ip = db.Column(db.String(20), unique=False, nullable=False)
     account_type = db.Column(db.String(30), unique=False, nullable=False)
     active = db.Column(db.Boolean, default=True, nullable=False)
+    points = db.Column(db.Integer, default=0)
+    newsletter = db.Column(db.Boolean, default=True, nullable=False)
 
     def __repr__(self):
         return f'User {self.username}'
