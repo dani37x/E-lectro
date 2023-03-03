@@ -56,7 +56,9 @@ def test():
   #       password='kekw!2@Kopyto',
   #       ip=f'192.15.24{i}',
   #       account_type='admin',
-  #       active=True
+  #       active=True,
+  #       points=1000,
+  #       newsletter=True,
   #     )
   #     db.session.add(user)
   #     db.session.commit()

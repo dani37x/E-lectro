@@ -37,25 +37,27 @@ def block_user(data):
             db.session.commit()
 
 
-def message(kind, sender, recipents, key):
+def message(*args):
 
-    if kind == 'register':
+    if args[0] == 'register':
         subject = 'Register message'
-        body = f'Welcome {recipents}. This is your activation key {key}'
+        body = f'Welcome {args[2]}. This is your activation key {args[3]}'
 
-    if kind == 'no-reply':
+    if args[0] == 'no-reply':
         subject = 'no-reply-message'
         body = 'Do not reply for this message. This is only test.'
 
-    if kind == 'code':
+    if args[0] == 'code':
         subject = 'Forgotten password'
-        body = f'This is your key {key}'
+        body = f'This is your key {args[3]}'
 
-    # print(recipents)
+    if args[0] == 'newsletter':
+        pass
+
     msg = Message(
         subject=subject,
-        sender=sender,
-        recipients=recipents
+        sender=args[1],
+        recipients=args[2]
     )
     msg.body = body
     mail.send(msg)
@@ -104,6 +106,8 @@ def restore_database(model):
                 ip=data['ip'],
                 account_type=data['account_type'],
                 active=data['active'],
+                # points=data['points'],
+                # newsletter=data['newsletter']
             )
 
             whether_exist = model.query.filter_by(username=data['username']).first()

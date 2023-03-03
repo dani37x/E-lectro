@@ -183,9 +183,11 @@ def add_user():
       surname=not_null(request.form['surname']),
       email=not_null(request.form['email']),
       password=not_null(request.form['password']),
-      ip='127.0.0.1',
+      ip=not_null(request.form['ip']),
       account_type=not_null(request.form['account_type']),
-      active=True
+      active=True,
+      # points=not_null(request.form['points']),
+      # newsletter=False,
     )
 
     try:
@@ -218,7 +220,11 @@ def update_user(id):
     user.password = not_null(request.form['password'])
     user.account_type = not_null(request.form['account_type'])
     active = not_null(request.form['active'])
+    # points = not_null(request.form['points'])
+    # newsletter = not_null(request.form['newsletter'])
+    
     user.active = True if 'True' in active else False
+    # user.newsletter = True if 'True' in newsletter else False
 
     try:
       db.session.commit()
