@@ -12,6 +12,7 @@ from .scripts.functions import not_null, save_event, check_admin, check_user
 from .scripts.actions import delete_rows, block_user, message, backup
 from .scripts.actions import account_activation, account_deactivation
 from .scripts.actions import delete_inactive_accounts, restore_database
+from .scripts.actions import send_newsletter
 
 from datetime import datetime
 
@@ -69,7 +70,10 @@ def admin_user():
 
       if selected_action == 'restore database':
         restore_database(User)
-        
+
+      if selected_action == 'send newsletter':
+        send_newsletter()  
+
       if selected_action == 'test email':
         users_emails = []
         for id in data:

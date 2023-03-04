@@ -8,7 +8,7 @@ from flask_mail import Message
 
 from datetime import datetime, date, timedelta
 
-from ..scripts.functions import open_json, save_json 
+from ..scripts.functions import open_json, save_json , string_to_date
 
 
 
@@ -52,8 +52,14 @@ def message(*args):
 
     if args[0] == 'newsletter':
         subject = 'Special Offer for you'
-        body = f'Our products {args[3]}'
-
+        a_0 = f'<a href="/shop/products/{args[3][0].id} "> {args[3][0].name} </a> \n'
+        a_1 = f'<a href="/shop/products/{args[3][1].id} "> {args[3][1].name} </a> \n'
+        a_2 = f'<a href="/shop/products/{args[3][2].id} "> {args[3][2].name} </a> \n'
+        a_3 = f'<a href="/shop/products/{args[3][3].id} "> {args[3][3].name} </a> \n'
+        a_4 = f'<a href="/shop/products/{args[3][4].id} "> {args[3][4].name} </a> \n'
+        body = a_0 + a_1  + a_2 + a_3 + a_4
+        print(body)
+        
     msg = Message(
         subject=subject,
         sender=args[1],
@@ -187,18 +193,12 @@ def delete_inactive_accounts():
 
 
 def send_newsletter():
-   
-    if users :=  User.query.filter_by(newsletter=True):
-        
+
+    if users :=  User.query.filter_by(newsletter=True).all():
+
         if products := Product.query.all():
 
-            new_products = ''
+            products = products[-5:]
 
-            print(products)
-            print(users)
-            
-
-            # for user in users:
-                
-        
-            #     message('newsletter', 'electro@team.com', user.email, 'products')
+            for user in users:
+                message('newsletter', 'electro@team.com', user.email, products)

@@ -27,7 +27,8 @@ def load_user(user_id):
 
 @app.before_first_request
 def before_first_request():
-  db.create_all()
+  pass
+  # db.create_all()
 
 
 @app.before_request
@@ -40,7 +41,7 @@ def before_request():
     delete_expired_data(d=7, h=0, m=0, file_path=EVENTS)
     delete_expired_data(d=7, h=0, m=0, file_path=DATA)
 
-
+from .scripts.actions import send_newsletter
 @app.route('/test', methods=['GET', 'POST'])
 def test():
   # try:
@@ -64,7 +65,8 @@ def test():
   #     db.session.commit()
   # except Exception as e:
   #   print(e)
-  return 'test'
+  # print(send_newsletter())
+  return 'x'
 
 
 @app.route('/', methods=['GET', 'POST'])
