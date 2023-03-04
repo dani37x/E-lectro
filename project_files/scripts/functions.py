@@ -71,7 +71,7 @@ def not_null(field):
         return field
 
     else:
-        raise ValueError      
+        return ValueError    
  
 
 def user_searched(username, ip, searched):

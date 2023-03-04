@@ -13,7 +13,7 @@ from .scripts.actions import delete_rows, block_user, message, backup
 from .scripts.actions import account_activation, account_deactivation
 from .scripts.actions import delete_inactive_accounts, restore_database
 
-
+from datetime import datetime
 
 
 @app.route('/admin', methods=['GET', 'POST'])
@@ -75,7 +75,7 @@ def admin_user():
         for id in data:
           user = User.query.filter_by(id=id).first()
           users_emails.append(user.email)
-        message(kind='no-reply', sender=current_user.username, recipents=users_emails, key='')
+        message('no-reply', current_user.username, users_emails,)
       
       if selected_action == 'backup':
         backup(User)
@@ -186,8 +186,9 @@ def add_user():
       ip=not_null(request.form['ip']),
       account_type=not_null(request.form['account_type']),
       active=True,
-      # points=not_null(request.form['points']),
-      # newsletter=False,
+      points=not_null(request.form['points']),
+      newsletter=False,
+      date = f"{str(datetime.now().strftime('%d-%m-%Y  %H:%M:%S'))}",
     )
 
     try:
@@ -219,12 +220,14 @@ def update_user(id):
     user.email = not_null(request.form['email'])
     user.password = not_null(request.form['password'])
     user.account_type = not_null(request.form['account_type'])
+    user.points = not_null(request.form['points'])
+    user.date = not_null(request.form['date'])
+    newsletter = not_null(request.form['newsletter'])
     active = not_null(request.form['active'])
-    # points = not_null(request.form['points'])
-    # newsletter = not_null(request.form['newsletter'])
     
-    user.active = True if 'True' in active else False
-    # user.newsletter = True if 'True' in newsletter else False
+    
+    user.active = True if 'True' in active or 'true' in active else False
+    user.newsletter = True if 'True' in newsletter or 'true' in newsletter else False
 
     try:
       db.session.commit()
@@ -267,7 +270,7 @@ def add_blocked():
     new_blocked = Blocked(
       username=not_null(request.form['username']),
       ip=not_null(request.form['ip']),
-      date=not_null(request.form['date']),
+      date=f"{str(datetime.now().strftime('%d-%m-%Y  %H:%M:%S'))}",
     )
 
     try:
@@ -337,6 +340,7 @@ def add_product():
       category=not_null(request.form['category']),
       company=not_null(request.form['company']),
       price=not_null(request.form['price']),
+      date=f"{str(datetime.now().strftime('%d-%m-%Y  %H:%M:%S'))}"
     )
 
     try:
@@ -364,6 +368,7 @@ def update_product(id):
     product.category = not_null(request.form['category'])
     product.company = not_null(request.form['company'])
     product.price = not_null(request.form['price'])
+    product.date = not_null(request.form['date'])
 
     try:
       db.session.commit()

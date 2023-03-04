@@ -14,7 +14,9 @@ class User(UserMixin, db.Model):
     account_type = db.Column(db.String(30), unique=False, nullable=False)
     active = db.Column(db.Boolean, default=True, nullable=False)
     points = db.Column(db.Integer, default=0)
-    newsletter = db.Column(db.Boolean, default=True, nullable=False)
+    newsletter = db.Column(db.Boolean, nullable=False)
+    date = db.Column(db.String(30), unique=False, nullable=False)
+
 
     def __repr__(self):
         return f'User {self.username}'
@@ -36,6 +38,8 @@ class Product(db.Model):
     category = db.Column(db.String(30), unique=False, nullable=False)
     company = db.Column(db.String(30), unique=False, nullable=False)
     price = db.Column(db.Integer(), unique=False, nullable=False)
+    date = db.Column(db.String(30), unique=False, nullable=False)
+
 
     def __repr__(self):
         return f'Product {self.name}'

@@ -2,9 +2,16 @@
 
  <form action="/update-blocked/{{blocked.id}}" method='post'>
 
-    <input type="text" name="username" value="{{blocked.username}}"/>
-    <input type="text" name="ip" value="{{blocked.ip}}"/>
-    <input type="text" name="date" value="{{blocked.date}}"/>
-    <input type="submit" value="send data">
+   <label for="username">username:</label>
+      <input type="text" name="username" value="{{blocked.username}}"/>
+      <br>
+   <label for="ip">ip:</label>
+      <input type="text" name="ip" value="{{blocked.ip}}"/>
+      <br>
+   <label for="date">date:</label>
+      <input type="text" name="date" value="{{blocked.date}}"/>
+      <br>
+
+   <input type="submit" value="send data">
     
  </form>

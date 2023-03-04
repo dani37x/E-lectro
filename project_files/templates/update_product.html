@@ -2,10 +2,22 @@
 
  <form action="/update-product/{{product.id}}" method='post'>
 
-    <input type="text" name="name" value="{{product.name}}"/>
-    <input type="text" name="category" value="{{product.category}}"/>
-    <input type="text" name="company" value="{{product.company}}"/>
-    <input type="number" name="price" value="{{product.price}}"/>
-    <input type="submit" value="send data">
+   <label for="name">name</label>
+      <input type="text" name="name" value="{{product.name}}"/>
+      <br>
+   <label for="category">category</label>
+      <input type="text" name="category" value="{{product.category}}"/>
+      <br>
+   <label for="company">company</label>
+      <input type="text" name="company" value="{{product.company}}"/>
+      <br>
+   <label for="price">price</label>
+      <input type="number" name="price" value="{{product.price}}"/>
+      <br>
+   <label for="date">date:</label>
+      <input type="text" name="date" value="{{product.date}}"/>
+      <br>
+
+   <input type="submit" value="send data">
     
  </form>
