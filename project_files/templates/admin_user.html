@@ -21,6 +21,8 @@
         <th> username</th>
         <th> account_type</th>
         <th> activate</th>
+        <th> newsletter</th>
+        <th> date</th>
         <th> actions</th>
         {% for user in users %}
         <tr>
@@ -28,6 +30,8 @@
             <td>{{ user.username }}</td>
             <td>{{ user.account_type }}</td>
             <td>{{ user.active }}</td>
+            <td>{{ user.newsletter }}</td>
+            <td>{{ user.date }}</td>
             <td>
                 <a href="{{ url_for('update_user', id=user.id) }}"> edit </a>
                 <a href="{{ url_for('delete_user', id=user.id) }}"> delete </a>

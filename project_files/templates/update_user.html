@@ -2,15 +2,37 @@
 
  <form action="/update-user/{{user.id}}" method='post'>
 
-    <input type="text" name="username" value="{{user.username}}"/>
-    <input type="text" name="first_name" value="{{user.first_name}}"/>
-    <input type="text" name="surname" value="{{user.surname}}"/>
-    <input type="text" name="email" value="{{user.email}}"/>
-    <input type="text" name="password" value="{{user.password}}"/>
-    <input type="text" name="active" value="{{user.active}}"/>
-    <input type="text" name="account_type" value="{{user.account_type}}"/>
-    <input type="number" name="points" value="{{user.points}}"/>
-    <input type="checkbox" name="newsletter" value="{{user.newsletter}}"/>
-    <input type="submit" value="send data">
+   <label for="username">username</label>
+      <input type="text" name="username" value="{{user.username}}"/>
+      <br>
+   <label for="first_name">first_name</label>
+      <input type="text" name="first_name" value="{{user.first_name}}"/>
+      <br>
+   <label for="surname">surname</label>
+      <input type="text" name="surname" value="{{user.surname}}"/>
+      <br>
+   <label for="email">email</label>
+      <input type="text" name="email" value="{{user.email}}"/>
+      <br>
+   <label for="password">password</label>
+      <input type="text" name="password" value="{{user.password}}"/>
+      <br>
+   <label for="account_type">account_type</label>
+      <input type="text" name="account_type" value="{{user.account_type}}"/>
+      <br>
+   <label for="active">active</label>
+      <input type="text" name="active" value="{{user.active}}"/>
+      <br>
+   <label for="points">points</label>
+      <input type="number" name="points" value="{{user.points}}"/>
+      <br>
+   <label for="newsletter">newsletter</label>
+      <input type="text" name="newsletter" value="{{user.newsletter}}"/>
+      <br>
+   <label for="date">date</label>
+      <input type="text" name="date" value="{{user.date}}"/>
+      <br>
+
+   <input type="submit" value="send data">
     
  </form>

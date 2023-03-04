@@ -17,6 +17,7 @@
         <th> category </th>
         <th> company </th>
         <th> price </th>
+        <th> date </th>
         <th> actions</th>
         {% for product in products %}
         <tr>
@@ -25,6 +26,7 @@
             <td>{{ product.category }}</td>
             <td>{{ product.company }}</td>
             <td>{{ product.price }}</td>
+            <td>{{ product.date }}</td>
             <td>
                 <a href="{{ url_for('update_product', id=product.id) }}"> edit </a>
                 <a href="{{ url_for('delete_product', id=product.id) }}"> delete </a>

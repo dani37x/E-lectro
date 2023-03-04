@@ -54,7 +54,7 @@ def register():
           })
 
       save_json(file_path=SESSIONS, data=session_list)
-      # message(kind='register', key=key, sender='electro@team.com', recipents=form.email.data)
+      # message('register', 'electro@team.com', form.email.data, key)
 
       return redirect( url_for('register_session', rendered_session=sess))
 
@@ -90,8 +90,9 @@ def register_session(rendered_session):
             ip=sess['ip'],
             account_type='user',
             active=True,
-            # points=0,
-            # newsletter=False,
+            points=0,
+            newsletter=False,
+            date=f"{str(datetime.now().strftime('%d-%m-%Y  %H:%M:%S'))}",
           )
           try:
 
@@ -177,7 +178,7 @@ def remind():
 
         try:
           pass
-          # message(kind='code', sender='Electro@team.com', recipents=[form.email.data], key=key)
+          # message('code', 'Electro@team.com', form.email.data, key)
 
         except Exception as e:
           save_event(event=e, site=remind.__name__)

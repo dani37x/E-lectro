@@ -12,7 +12,6 @@ from ..scripts.functions import open_json, save_json
 
 
 
-
 def delete_rows(model, data):
 
     for number in data:
@@ -52,7 +51,8 @@ def message(*args):
         body = f'This is your key {args[3]}'
 
     if args[0] == 'newsletter':
-        pass
+        subject = 'Special Offer for you'
+        body = f'Our products {args[3]}'
 
     msg = Message(
         subject=subject,
@@ -106,8 +106,8 @@ def restore_database(model):
                 ip=data['ip'],
                 account_type=data['account_type'],
                 active=data['active'],
-                # points=data['points'],
-                # newsletter=data['newsletter']
+                points=data['points'],
+                newsletter=data['newsletter']
             )
 
             whether_exist = model.query.filter_by(username=data['username']).first()
@@ -184,3 +184,21 @@ def delete_inactive_accounts():
 
             db.session.delete(user)
             db.session.commit()
+
+
+def send_newsletter():
+   
+    if users :=  User.query.filter_by(newsletter=True):
+        
+        if products := Product.query.all():
+
+            new_products = ''
+
+            print(products)
+            print(users)
+            
+
+            # for user in users:
+                
+        
+            #     message('newsletter', 'electro@team.com', user.email, 'products')
