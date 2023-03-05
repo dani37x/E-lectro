@@ -12,8 +12,8 @@ from .form import UserCreator, UserLogin, RemindPassword, NewPassword, Key
 from .database import User, Blocked
 
 from .scripts.functions import check_user, check_admin, unblock, save_event
-from .scripts.functions import check_session, random_string, string_to_date
-from .scripts.functions import open_json, save_json, delete_expired_data
+from .scripts.functions import check_session, random_string, open_json, save_json
+from .scripts.functions import newsletter_activation, newsletter_deactivation
 
 from .scripts.actions import  message
 
@@ -23,10 +23,27 @@ from datetime import datetime, timedelta
 
 @app.route('/account', methods=['GET', 'POST'])
 def account():
+
   session['username'] = current_user.username
   sess = random_string(size=39)
+  
   return render_template('account.html', sess=sess)
 
+
+@app.route('/account/newsletter/register', methods=['GET', 'POST'])
+def register_newsletter():
+
+  newsletter_activation(username=current_user.username)
+
+  return redirect( url_for('account'))
+
+
+@app.route('/account/newsletter/unregister', methods=['GET', 'POST'])
+def unregister_newsletter():
+
+  newsletter_deactivation(username=current_user.username)
+
+  return redirect( url_for('account'))
 
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -241,4 +258,3 @@ def new_password(rendered_session):
     save_event(event=e, site=new_password.__name__)
     return 'nice try :)'
   
-    

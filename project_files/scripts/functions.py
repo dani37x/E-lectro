@@ -232,13 +232,26 @@ def classification(category, money):
         if category in cat:
             category = cat[category]
 
-
     model = pickle.load(open(CLASSIFIER, "rb"))
 
     prediction = model.predict([[category, money]])
 
     return prediction
 
+def newsletter_activation(username):
+
+    if user := User.query.filter_by(username=username).first():
+        
+        user.newsletter = True
+        db.session.commit()
+
+
+def newsletter_deactivation(username):
+
+    if user := User.query.filter_by(username=username).first():
+
+        user.newsletter = False
+        db.session.commit()
 
 
 
