@@ -22,15 +22,21 @@ from datetime import datetime, timedelta
 
 
 @app.route('/account', methods=['GET', 'POST'])
+# @check_user('logout')
+@login_required
 def account():
 
   session['username'] = current_user.username
   sess = random_string(size=39)
   
-  return render_template('account.html', sess=sess)
+  user = User.query.filter_by(username=current_user.username).first()
+
+  return render_template('account.html', sess=sess, newsletter=user.newsletter)
 
 
 @app.route('/account/newsletter/register', methods=['GET', 'POST'])
+# @check_user('logout')
+@login_required
 def register_newsletter():
 
   newsletter_activation(username=current_user.username)
@@ -39,6 +45,8 @@ def register_newsletter():
 
 
 @app.route('/account/newsletter/unregister', methods=['GET', 'POST'])
+# @check_user('logout')
+@login_required
 def unregister_newsletter():
 
   newsletter_deactivation(username=current_user.username)

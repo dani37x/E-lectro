@@ -56,9 +56,10 @@ def message(*args):
         a_1 = f'<a href="/shop/products/{args[3][1].id} "> {args[3][1].name} </a> \n'
         a_2 = f'<a href="/shop/products/{args[3][2].id} "> {args[3][2].name} </a> \n'
         a_3 = f'<a href="/shop/products/{args[3][3].id} "> {args[3][3].name} </a> \n'
-        a_4 = f'<a href="/shop/products/{args[3][4].id} "> {args[3][4].name} </a> \n'
-        body = a_0 + a_1  + a_2 + a_3 + a_4
-        print(body)
+        a_4 = f'<a href="/shop/products/{args[3][4].id} "> {args[3][4].name} </a> \n\n'
+        disclaimer = f'if you do not want receive our the latest products click here \n'
+        unsign = f'<a href="/account/newsletter/unregister"> unsign newsletter </a> \n'
+        body = a_0 + a_1  + a_2 + a_3 + a_4 + disclaimer + unsign
         
     msg = Message(
         subject=subject,
