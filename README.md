@@ -59,7 +59,7 @@ E-lectro is a web application in Flask. Its destination is an online shop but ce
   - [x] no-reply mail
   - [x] reset password mail
   - [x] register code mail
-  - [ ] newsletter mail with a recommendation
+  - [x] newsletter mail with the latest products
 - [x] user account activation session:
   - [x] mail with the key
   - [x] sets active action
@@ -79,19 +79,22 @@ E-lectro is a web application in Flask. Its destination is an online shop but ce
 - [x] password change by a user on account
 - [x] cookies with category of product with price from the searched product by the user
 - [x] function deletes data from json files every specific time
+- [x] Newsletter
+  - [x] an e-mail for registered users with five of the latest products with links
+  - [x] register for the newsletter
+  - [x] unregister for  the newsletter
 - [x] ML algorithm implement   
 - [x] Machine Learning algorithm which will adjust the best products for the shop's customers.
 - [ ] upgrade ML algorithm
 - [ ] shop API
 - [ ] multi-device login (max 3)
 - [x] flask bcrypt
-- [ ] account lvl
+- [ ] account lvl and points system with discounts.
 - [ ] payments
 - [ ] list of products
 - [ ] own hash password algorithm
 - [ ] own authentication system
 - [ ] Database change - from sqlalchemy to SQLITE3
-- [ ] newsletters defined for every user
 
 
 ### Built With
