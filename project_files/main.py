@@ -158,4 +158,22 @@ def product_info(product_id):
   return resp
 
 
+@app.route('/shop/api', methods=['GET', 'POST'])
+@login_required
+def shop_api():
 
+  list_of_products = []
+
+  products = Product.query.all()
+
+  for product in products:
+
+    data = {}
+    data['name'] = product.name
+    data['category'] = product.category
+    data['company'] = product.company
+    data['price'] = product.price
+
+    list_of_products.append(data)
+
+  return list_of_products

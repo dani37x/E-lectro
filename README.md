@@ -1,7 +1,7 @@
 ## About The Project
 <a name="readme-top"></a>
 
-E-lectro is a web application in Flask. Its destination is an online shop but centers on non-visual things. This project focuses on security and curious solutions. Full backend project, and what is more, everything terrific works deeply. The project contains ready solutions like Limiter or SQLAlchemy ORM, but there occur own functions with prevalence.
+E-lectro is a web application in Flask. Its destination is an online shop but centers on non-visual things. This project focuses on security and curious solutions such as Random Forest Classifier, which classify users and adequate products for them. Full backend project, and what is more, everything terrific works deeply. The project contains ready solutions like Limiter or SQLAlchemy ORM, but there occur own functions with prevalence. 
 
 <br>
 <div align="center">
@@ -34,6 +34,7 @@ E-lectro is a web application in Flask. Its destination is an online shop but ce
   - [x] block accounts
   - [x] backups
   - [x] restore databases
+  - [x] newsletter for registered users
 - [x] entries limiter
 - [x] Forms
   - [x] Register form
@@ -86,7 +87,7 @@ E-lectro is a web application in Flask. Its destination is an online shop but ce
 - [x] ML algorithm implement   
 - [x] Machine Learning algorithm which will adjust the best products for the shop's customers.
 - [ ] upgrade ML algorithm
-- [ ] shop API
+- [x] shop API
 - [ ] multi-device login (max 3)
 - [x] flask bcrypt
 - [ ] account lvl and points system with discounts.
@@ -100,10 +101,12 @@ E-lectro is a web application in Flask. Its destination is an online shop but ce
 ### Built With
 <a name="technology_stack"></a>
 * FLASK
+* SKLEARN
 * SQLALCHEMY
 * LIMITER
 * FLASK-MAIL
 * FLASK-LOGIN
+* FLASK BCRYPT
 
 
 ### Installation
