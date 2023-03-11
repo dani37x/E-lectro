@@ -2,8 +2,7 @@ from project_files import app
 from project_files import db
 
 from flask_login import login_required, current_user
-from flask import render_template, url_for, redirect, request
-
+from flask import render_template, url_for, redirect, request, jsonify
 
 from .database import User, Blocked, Product
 
