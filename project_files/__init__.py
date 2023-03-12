@@ -11,6 +11,9 @@ from flask_mail import Mail, Message
 
 from flask_bcrypt import Bcrypt
 
+from redis import Redis
+from rq import Queue
+
 import os
 
 
@@ -69,9 +72,9 @@ app.config['MAIL_USE_SSL'] = False
 
 
 
-#    session duration
+# session duration
 
-#    set on when server would start
+# set on when server would start
 
 # session.permanent = True
 # app.permanent_session_lifetime = timedelta(hours=24)
@@ -82,3 +85,23 @@ app.config['MAIL_USE_SSL'] = False
 bcrypt = Bcrypt(app)
 
 
+# redis
+
+redis = Redis(
+    host='127.0.0.1',
+    port=6379
+    )
+
+queue = Queue(connection=Redis())
+
+
+# r.set('foo', 'bar')
+# value = r.get('foo')
+# print(value)
+
+
+
+
+
+
+    
