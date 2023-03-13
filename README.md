@@ -84,17 +84,23 @@ E-lectro is a web application in Flask. Its destination is an online shop but ce
   - [x] an e-mail for registered users with five of the latest products with links
   - [x] register for the newsletter
   - [x] unregister for  the newsletter
-- [x] ML algorithm implement   
-- [x] Machine Learning algorithm which will adjust the best products for the shop's customers.
-- [ ] upgrade ML algorithm
+- [x] ML algorithm - *RandomForestClassifier*
+  - [x] Machine Learning algorithm which adjust the best products for the shop's customers in every category of products.
+  - [x] upgrade ML algorithm with many indicators
 - [x] shop API
-- [ ] multi-device login (max 3)
 - [x] flask bcrypt
+- [x] Redis implement
+- [ ] Redis queue and workers
+- [ ] Redis queue tasks
+- [ ] better Readme section of installation which depict the correct process with Redis and Redis queue
+- [ ] multi-device login (max 3)
 - [ ] account lvl and points system with discounts.
-- [ ] payments
+- [ ] payments for products
+- [ ] boughted products by users
 - [ ] list of products
 - [ ] own hash password algorithm
 - [ ] own authentication system
+- [ ] user can change his nickname and own personal data
 - [ ] Database change - from sqlalchemy to SQLITE3
 
 
