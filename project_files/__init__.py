@@ -11,13 +11,13 @@ from flask_mail import Mail, Message
 
 from flask_bcrypt import Bcrypt
 
-from redis import Redis
+import redis
 from rq import Queue
 
 import os
 
 
-# config
+# main config
 
 app = Flask(__name__)
 
@@ -30,15 +30,19 @@ FLASK_ENV = 'env'
 SERVER_NAME = ''
 
 
-#  files paths
+#  files' paths
 
-EVENTS = r'D:\projekty\E-lectro\instance\events.json'
-DATA = r'D:\projekty\E-lectro\instance\data.json'
 BLOCKED = r'D:\projekty\E-lectro\instance\Blocked.json'
 PRODUCT = r'D:\projekty\E-lectro\instance\Product.json'
 USER = r'D:\projekty\E-lectro\instance\User.json'
-SESSIONS = r'D:\projekty\E-lectro\instance\sessions.json'
 CLASSIFIER = r'D:\projekty\E-lectro\project_files\classifier.pkl'
+
+
+# paths for Redis queue workers (must be linux slash)
+
+EVENTS = './instance/events.json'
+DATA = './instance/data.json'
+SESSIONS = './instance/sessions.json'
 
 
 # database and login
@@ -87,18 +91,12 @@ bcrypt = Bcrypt(app)
 
 # redis
 
-redis = Redis(
+redis_instance = redis.Redis(
     host='127.0.0.1',
     port=6379
     )
 
-queue = Queue(connection=Redis())
-
-
-# r.set('foo', 'bar')
-# value = r.get('foo')
-# print(value)
-
+queue = Queue(connection=redis_instance)
 
 
 

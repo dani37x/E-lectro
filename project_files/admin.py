@@ -1,5 +1,7 @@
 from project_files import app
 from project_files import db
+from project_files import queue
+from project_files import redis_instance
 
 from flask_login import login_required, current_user
 from flask import render_template, url_for, redirect, request, jsonify
@@ -13,7 +15,14 @@ from .scripts.actions import account_activation, account_deactivation
 from .scripts.actions import delete_inactive_accounts, restore_database
 from .scripts.actions import send_newsletter
 
+from .scripts.rq_tasks import rq_add_row_to_db, rq_delete_db_row
+
+from redis import Redis
+from rq.job import Job, cancel_job
+
+
 from datetime import datetime
+
 
 
 @app.route('/admin', methods=['GET', 'POST'])
@@ -22,6 +31,31 @@ from datetime import datetime
 # @check_admin('admin')
 def admin():
   return render_template('admin.html')
+
+
+@app.route('/cancel/<task_id>', methods=['GET', 'POST'])
+@login_required
+# @check_user('admin')
+# @check_admin('admin')
+def cancel_task(task_id):
+
+  # try:
+
+  job = Job.fetch(task_id, connection=Redis())
+  # print(job.get_status())
+  # job.cancel()
+  # job.delete()
+
+  # except Exception as e:
+  #   save_event(event=e, site=cancel_job.__name__)
+ 
+  return f'{job.get_status()}'
+
+  # if url_for(session['site']):
+  #   return redirect( url_for(session['site']))
+  
+  # else:
+  #   return redirect( url_for('admin'))
 
 
 @app.route('/admin/users', methods=['GET', 'POST'])
@@ -111,20 +145,21 @@ def admin_blocked():
     data = request.form.getlist('id')
     selected_action = request.form['action']
 
-    # try:
-    if selected_action == 'delete user':
-      delete_rows(Blocked, data)
-      return redirect( url_for('admin_blocked'))
-    
-    if selected_action == 'backup':
-      backup(Blocked)
+    try:
 
-    if selected_action == 'restore database':
-      restore_database(Blocked)
+      if selected_action == 'delete user':
+        delete_rows(Blocked, data)
+        return redirect( url_for('admin_blocked'))
+      
+      if selected_action == 'backup':
+        backup(Blocked)
 
-    # except Exception as e:
-    #   save_event(event=e, site=admin_blocked.__name__)
-    #   return 'Error with actions'
+      if selected_action == 'restore database':
+        restore_database(Blocked)
+
+    except Exception as e:
+      save_event(event=e, site=admin_blocked.__name__)
+      return 'Error with actions'
 
   return render_template('admin_blocked.html', blocked=blocked)
 
@@ -195,8 +230,7 @@ def add_user():
     )
 
     try:
-      db.session.add(new_user)
-      db.session.commit()
+      queue.enqueue(rq_add_row_to_db, object=new_user)
 
     except Exception as e:
       save_event(event=e, site=add_user.__name__)
@@ -253,8 +287,8 @@ def delete_user(id):
   name_to_delete = User.query.get_or_404(id)
 
   try:
-    db.session.delete(name_to_delete)
-    db.session.commit()
+    queue.enqueue(rq_delete_db_row, object=name_to_delete)
+
     return redirect(url_for('admin_user'))
 
   except Exception as e:
@@ -277,8 +311,7 @@ def add_blocked():
     )
 
     try:
-      db.session.add(new_blocked)
-      db.session.commit()
+      queue.enqueue(rq_add_row_to_db, object=new_blocked)
 
     except Exception as e:
       save_event(event=e, site=add_blocked.__name__)
@@ -321,10 +354,13 @@ def update_blocked(id):
 def delete_blocked(id):
 
   name_to_delete = Blocked.query.get_or_404(id)
+
   try:
-    db.session.delete(name_to_delete)
-    db.session.commit()
+    
+    queue.enqueue(rq_delete_db_row, object=name_to_delete)
+
     return redirect(url_for('admin_blocked'))
+  
   except Exception as e:
     save_event(event=e, site=delete_blocked.__name__)
     return 'xd'    
@@ -347,8 +383,7 @@ def add_product():
     )
 
     try:
-      db.session.add(new_product)
-      db.session.commit()
+      queue.enqueue(rq_add_row_to_db, object=new_product)
 
     except Exception as e:
       save_event(event=e, site=add_product.__name__)
@@ -392,12 +427,14 @@ def update_product(id):
 def delete_product(id):
 
   name_to_delete = Product.query.get_or_404(id)
+
   try:
-    db.session.delete(name_to_delete)
-    db.session.commit()
+    queue.enqueue(rq_delete_db_row, object=name_to_delete)
+
     return redirect(url_for('admin_product'))
 
   except Exception as e:
     save_event(event=e, site=delete_product.__name__)
+
     return 'xd'    
 
