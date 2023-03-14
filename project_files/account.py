@@ -1,5 +1,6 @@
 from project_files import app
 from project_files import db
+from project_files import queue
 from project_files import login_manager
 from project_files import SESSIONS
 from project_files import bcrypt
@@ -79,7 +80,7 @@ def register():
           })
 
       save_json(file_path=SESSIONS, data=session_list)
-      # message('register', 'electro@team.com', form.email.data, key)
+      # queue.enqueue(message, 'register', 'electro@team.com', form.email.data, key)
 
       return redirect( url_for('register_session', rendered_session=sess))
 
@@ -151,8 +152,8 @@ def login():
 
       wheter_blocked = Blocked.query.filter_by(username=user.username).first()
       if wheter_blocked:
-
-        if unblock(blocked_user=wheter_blocked):
+            
+        if queue.enqueue(unblock, blocked_user=wheter_blocked):
 
           login_user(user, remember=form.remember.data)
           return redirect( url_for('page'))
@@ -203,7 +204,7 @@ def remind():
 
         try:
           pass
-          # message('code', 'Electro@team.com', form.email.data, key)
+          # queue.enqueue(message, 'code', 'Electro@team.com', form.email.data, key)
 
         except Exception as e:
           save_event(event=e, site=remind.__name__)
