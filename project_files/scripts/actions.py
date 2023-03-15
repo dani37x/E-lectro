@@ -1,5 +1,7 @@
 from project_files import db
+from project_files import app
 from project_files import mail
+from project_files import queue
 from project_files import BLOCKED, USER, PRODUCT, EVENTS, DATA
 
 from ..database import User, Blocked, Product
@@ -30,13 +32,15 @@ def block_user(data):
             new_row = Blocked(
                 username=user_to_block.username,
                 ip=user_to_block.ip,
-                date=str((datetime.now() + timedelta(days=7)).strftime("%d-%m-%Y"))
+                date=str((datetime.now() + timedelta(days=7)).strftime("%d-%m-%Y  %H:%M:%S"))
             )
             db.session.add(new_row)
             db.session.commit()
 
 
 def message(*args):
+
+    app.app_context().push()  
 
     if args[0] == 'register':
         subject = 'Register message'
@@ -61,7 +65,7 @@ def message(*args):
         unsign = f'<a href="/account/newsletter/unregister"> unsign newsletter </a> \n'
         
         body = a_0 + a_1  + a_2 + a_3 + a_4 + disclaimer + unsign
-        
+ 
     msg = Message(
         subject=subject,
         sender=args[1],
@@ -87,9 +91,11 @@ def backup(model):
 
     model_data = model.query.all()
     for row in model_data:
+
         data = {}
         for column_name in columns:
             data[column_name] = getattr(row, column_name)
+            
         objects_list.append(data)
 
 
@@ -168,7 +174,10 @@ def restore_database(model):
 
 def account_activation(model, data):
 
+    app.app_context().push()
+
     for number in data:
+
         account = model.query.filter_by(id=number).first()
         account.active = True
         db.session.commit()
@@ -176,31 +185,36 @@ def account_activation(model, data):
 
 def account_deactivation(model, data):
 
+    app.app_context().push()
+
     for number in data:
+
         account = model.query.filter_by(id=number).first()
         account.active = False
         db.session.commit()
 
 
 def delete_inactive_accounts():
-
+    
+    app.app_context().push()
     users = User.query.all()
 
     for user in users:
 
         if user.active ==  False:
-
             db.session.delete(user)
             db.session.commit()
 
 
 def send_newsletter():
 
+    app.app_context().push()
+
     if users :=  User.query.filter_by(newsletter=True).all():
 
         if products := Product.query.all():
 
-            products = products[-5:]
+            products = products[-5:]            
+            mails = [user.email for user in users]
 
-            for user in users:
-                message('newsletter', 'electro@team.com', user.email, products)
+            queue.enqueue(message, 'newsletter', 'electro@team.com', mails, products)

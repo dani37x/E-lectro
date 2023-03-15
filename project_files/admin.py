@@ -9,17 +9,15 @@ from flask import render_template, url_for, redirect, request, jsonify
 from .database import User, Blocked, Product
 
 from .scripts.functions import not_null, save_event, check_admin, check_user
+from .scripts.functions import rq_add_row_to_db, rq_delete_db_row
+
+from redis import Redis
+from rq.job import Job, cancel_job
 
 from .scripts.actions import delete_rows, block_user, message, backup
 from .scripts.actions import account_activation, account_deactivation
 from .scripts.actions import delete_inactive_accounts, restore_database
 from .scripts.actions import send_newsletter
-
-from .scripts.rq_tasks import rq_add_row_to_db, rq_delete_db_row
-
-from redis import Redis
-from rq.job import Job, cancel_job
-
 
 from datetime import datetime
 
@@ -93,13 +91,16 @@ def admin_user():
         block_user(data=data)
 
       if selected_action == 'account activation':
-        account_activation(model=User, data=data)
+        # account_activation(model=User, data=data)
+        queue.enqueue(account_activation, model=User, data=data)
       
       if selected_action == 'account deactivation':
-        account_deactivation(model=User, data=data)
+        # account_deactivation(model=User, data=data)
+        queue.enqueue(account_deactivation, model=User, data=data)
 
       if selected_action == 'delete unactive accounts':
-        delete_inactive_accounts()
+        # delete_inactive_accounts()
+        queue.enqueue(delete_inactive_accounts)
 
       if selected_action == 'restore database':
         restore_database(User)
@@ -112,7 +113,8 @@ def admin_user():
         for id in data:
           user = User.query.filter_by(id=id).first()
           users_emails.append(user.email)
-        message('no-reply', current_user.username, users_emails,)
+
+        queue.enqueue(message, 'no-reply', current_user.username, users_emails)
       
       if selected_action == 'backup':
         backup(User)

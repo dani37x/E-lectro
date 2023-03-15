@@ -1,4 +1,5 @@
 from project_files import db
+from project_files import app
 from project_files import BLOCKED, USER, PRODUCT, EVENTS, DATA, CLASSIFIER
 
 from flask import request, abort, session
@@ -22,8 +23,10 @@ def check_admin(name):
     def decorator(f):
         @wraps(f)
         def wrapped(*args, **kwargs):
+
             if current_user.username != 'Admin' or current_user.username != 'admin':
                 abort(403)
+                
             return f(*args, **kwargs)
         return wrapped
     return decorator
@@ -96,7 +99,10 @@ def string_to_date(date):
 
 def unblock(blocked_user):
 
-    if date.today() > string_to_date(blocked_user.date):
+    app.app_context().push()
+
+    if (datetime.now() > string_to_date(blocked_user.date)):
+
         try:
             db.session.delete(blocked_user)
             db.session.commit()
@@ -254,7 +260,16 @@ def newsletter_deactivation(username):
         db.session.commit()
 
 
+def rq_add_row_to_db(object):
+    
+    app.app_context().push()
+    db.session.add(object)
+    db.session.commit()
 
 
+def rq_delete_db_row(object):
 
+    app.app_context().push()
+    db.session.delete(object)
+    db.session.commit()
 
