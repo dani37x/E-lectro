@@ -90,8 +90,10 @@ E-lectro is a web application in Flask. Its destination is an online shop but ce
 - [x] shop API
 - [x] flask bcrypt
 - [x] Redis implement
-- [ ] Redis queue and workers
-- [ ] Redis queue tasks
+- [x] Redis queue and workers
+- [x] Redis queue tasks
+- [x] cancel task from rq queue
+- [ ] more task with rq with cancel ability
 - [ ] better Readme section of installation which depict the correct process with Redis and Redis queue
 - [ ] multi-device login (max 3)
 - [ ] account lvl and points system with discounts.

@@ -12,7 +12,7 @@ from datetime import datetime, date, timedelta
 
 from ..scripts.functions import open_json, save_json , string_to_date
 
-
+import time
 
 def delete_rows(model, data):
 
@@ -184,6 +184,8 @@ def account_activation(model, data):
     
 
 def account_deactivation(model, data):
+
+    time.sleep(20)
 
     app.app_context().push()
 

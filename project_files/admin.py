@@ -1,6 +1,8 @@
 from project_files import app
 from project_files import db
 from project_files import queue
+from project_files import job_registry
+from project_files import session
 from project_files import redis_instance
 
 from flask_login import login_required, current_user
@@ -13,6 +15,7 @@ from .scripts.functions import rq_add_row_to_db, rq_delete_db_row
 
 from redis import Redis
 from rq.job import Job, cancel_job
+from rq.command import send_stop_job_command
 
 from .scripts.actions import delete_rows, block_user, message, backup
 from .scripts.actions import account_activation, account_deactivation
@@ -36,25 +39,24 @@ def admin():
 # @check_user('admin')
 # @check_admin('admin')
 def cancel_task(task_id):
-
   # try:
+    # job = Job.fetch(task_id, Redis())
+    send_stop_job_command(Redis(), task_id)
 
-  job = Job.fetch(task_id, connection=Redis())
-  # print(job.get_status())
-  # job.cancel()
-  # job.delete()
+    for job_id in job_registry.get_job_ids():
+        job_registry.remove(job_id)
+
+    if session['previous_site'] != 'nothing':
+      return redirect( url_for(session.get('previous_site','nothing')))
+  
+    else:
+      return redirect( url_for('admin'))
 
   # except Exception as e:
+
   #   save_event(event=e, site=cancel_job.__name__)
+  #   return 'error with cancel job'
  
-  return f'{job.get_status()}'
-
-  # if url_for(session['site']):
-  #   return redirect( url_for(session['site']))
-  
-  # else:
-  #   return redirect( url_for('admin'))
-
 
 @app.route('/admin/users', methods=['GET', 'POST'])
 @login_required
@@ -91,22 +93,25 @@ def admin_user():
         block_user(data=data)
 
       if selected_action == 'account activation':
-        # account_activation(model=User, data=data)
-        queue.enqueue(account_activation, model=User, data=data)
+
+        task = queue.enqueue(account_activation, model=User, data=data)
+        session['previous_site'] = admin_user.__name__
+        return render_template('admin_user.html', users=users, task=task)
       
       if selected_action == 'account deactivation':
-        # account_deactivation(model=User, data=data)
-        queue.enqueue(account_deactivation, model=User, data=data)
+
+        task = queue.enqueue(account_deactivation, model=User, data=data)
+        session['previous_site'] = admin_user.__name__
+        return render_template('admin_user.html', users=users, task=task)
 
       if selected_action == 'delete unactive accounts':
-        # delete_inactive_accounts()
         queue.enqueue(delete_inactive_accounts)
 
       if selected_action == 'restore database':
         restore_database(User)
 
       if selected_action == 'send newsletter':
-        send_newsletter()  
+        send_newsletter()
 
       if selected_action == 'test email':
         users_emails = []
