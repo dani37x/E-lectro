@@ -13,6 +13,7 @@ from flask_bcrypt import Bcrypt
 
 import redis
 from rq import Queue
+from rq.registry import FailedJobRegistry
 
 import os
 
@@ -98,7 +99,7 @@ redis_instance = redis.Redis(
 
 queue = Queue(connection=redis_instance)
 
-
+job_registry = FailedJobRegistry(queue=queue)
 
 
 
