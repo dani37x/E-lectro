@@ -16,8 +16,9 @@ from .scripts.functions import rq_add_row_to_db, rq_delete_db_row
 from redis import Redis
 from rq.job import Job, cancel_job
 from rq.command import send_stop_job_command
+from rq import Retry
 
-from .scripts.actions import delete_rows, block_user, message, backup
+from .scripts.actions import delete_rows, block_users, message, backup
 from .scripts.actions import account_activation, account_deactivation
 from .scripts.actions import delete_inactive_accounts, restore_database
 from .scripts.actions import send_newsletter
@@ -39,12 +40,18 @@ def admin():
 # @check_user('admin')
 # @check_admin('admin')
 def cancel_task(task_id):
-  # try:
+  
+  try:
     # job = Job.fetch(task_id, Redis())
     send_stop_job_command(Redis(), task_id)
+    save_event(event=f'task {task_id} was canceled', site=cancel_task.__name__)
 
     for job_id in job_registry.get_job_ids():
         job_registry.remove(job_id)
+        save_event(
+          event=f'task {task_id} was deleted from registry',
+          site=cancel_task.__name__
+        )
 
     if session['previous_site'] != 'nothing':
       return redirect( url_for(session.get('previous_site','nothing')))
@@ -52,10 +59,10 @@ def cancel_task(task_id):
     else:
       return redirect( url_for('admin'))
 
-  # except Exception as e:
+  except Exception as e:
 
-  #   save_event(event=e, site=cancel_job.__name__)
-  #   return 'error with cancel job'
+    save_event(event=e, site=cancel_job.__name__)
+    return 'error with cancel job'
  
 
 @app.route('/admin/users', methods=['GET', 'POST'])
@@ -68,6 +75,7 @@ def admin_user():
 
   if request.method == 'POST':
 
+    session['previous_site'] = admin_user.__name__
     searching = request.form['search']
 
     if searching != None and searching != '':
@@ -86,41 +94,82 @@ def admin_user():
 
     try:
       if selected_action == 'delete user':
-        delete_rows(User, data)
-        return redirect( url_for('admin_user'))
 
-      if selected_action == 'block user':
-        block_user(data=data)
+        task = queue.enqueue(
+          delete_rows,
+          model=User,
+          data=data,
+          retry=Retry(max=3, interval=[10, 30, 60])
+        )
+        return render_template('admin_user.html', users=users, task=task)
+
+
+      if selected_action == 'block users':
+        
+        task = queue.enqueue(
+          block_users,
+          data=data,
+          retry=Retry(max=3, interval=[10, 30, 60])
+        )
+        return render_template('admin_user.html', users=users, task=task)
+
 
       if selected_action == 'account activation':
 
-        task = queue.enqueue(account_activation, model=User, data=data)
-        session['previous_site'] = admin_user.__name__
+        task = queue.enqueue(
+          account_activation,
+            model=User,
+            data=data,
+            retry=Retry(max=3, interval=[10, 30, 60])
+          )
+        
         return render_template('admin_user.html', users=users, task=task)
       
       if selected_action == 'account deactivation':
 
-        task = queue.enqueue(account_deactivation, model=User, data=data)
-        session['previous_site'] = admin_user.__name__
+        task = queue.enqueue(
+          account_deactivation,
+          model=User,
+          data=data,
+          retry=Retry(max=3, interval=[10, 30, 60])
+        )
         return render_template('admin_user.html', users=users, task=task)
 
       if selected_action == 'delete unactive accounts':
-        queue.enqueue(delete_inactive_accounts)
+
+        task = queue.enqueue(
+          delete_inactive_accounts,
+          retry=Retry(max=3, interval=[10, 30, 60])  
+        )
+        return render_template('admin_user.html', users=users, task=task)
 
       if selected_action == 'restore database':
         restore_database(User)
 
-      if selected_action == 'send newsletter':
-        send_newsletter()
+      if selected_action == 'send newsletter':        
+        
+        task = queue.enqueue(
+          send_newsletter,
+          retry=Retry(max=3, interval=[10, 30, 60])
+        )
+        return render_template('admin_user.html', users=users, task=task)
 
       if selected_action == 'test email':
+
         users_emails = []
         for id in data:
           user = User.query.filter_by(id=id).first()
           users_emails.append(user.email)
 
-        queue.enqueue(message, 'no-reply', current_user.username, users_emails)
-      
+        task = queue.enqueue(
+          message,
+          'no-reply', 
+          current_user.username, 
+          users_emails,
+          retry=Retry(max=3, interval=[50, 100, 200])
+        )
+        return render_template('admin_user.html', users=users, task=task)
+
       if selected_action == 'backup':
         backup(User)
 

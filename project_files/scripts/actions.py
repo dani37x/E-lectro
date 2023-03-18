@@ -12,16 +12,25 @@ from datetime import datetime, date, timedelta
 
 from ..scripts.functions import open_json, save_json , string_to_date
 
+from rq import Retry
+
 import time
 
+
 def delete_rows(model, data):
+
+    time.sleep(10)
+    app.app_context().push()
 
     for number in data:
         model.query.filter_by(id=number).delete()
         db.session.commit()
 
 
-def block_user(data):
+def block_users(data):
+
+    time.sleep(10)
+    app.app_context().push()
 
     for id in data:
         user_to_block = User.query.get(id)
@@ -47,6 +56,9 @@ def message(*args):
         body = f'Welcome {args[2]}. This is your activation key {args[3]}'
 
     if args[0] == 'no-reply':
+
+        time.sleep(30)
+
         subject = 'no-reply-message'
         body = 'Do not reply for this message. This is only test.'
 
@@ -174,6 +186,8 @@ def restore_database(model):
 
 def account_activation(model, data):
 
+    time.sleep(60)
+
     app.app_context().push()
 
     for number in data:
@@ -185,7 +199,7 @@ def account_activation(model, data):
 
 def account_deactivation(model, data):
 
-    time.sleep(20)
+    time.sleep(60)
 
     app.app_context().push()
 
@@ -210,6 +224,8 @@ def delete_inactive_accounts():
 
 def send_newsletter():
 
+    time.sleep(60)
+
     app.app_context().push()
 
     if users :=  User.query.filter_by(newsletter=True).all():
@@ -219,4 +235,11 @@ def send_newsletter():
             products = products[-5:]            
             mails = [user.email for user in users]
 
-            queue.enqueue(message, 'newsletter', 'electro@team.com', mails, products)
+            queue.enqueue(
+                message, 
+                'newsletter', 
+                'electro@team.com', 
+                mails, 
+                products,
+                retry=Retry(max=3, interval=[10, 30, 60])
+                )

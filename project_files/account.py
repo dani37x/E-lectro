@@ -80,7 +80,7 @@ def register():
           })
 
       save_json(file_path=SESSIONS, data=session_list)
-      # queue.enqueue(message, 'register', 'electro@team.com', form.email.data, key)
+      message('register', 'electro@team.com', form.email.data, key)
 
       return redirect( url_for('register_session', rendered_session=sess))
 
@@ -204,7 +204,7 @@ def remind():
 
         try:
           pass
-          # queue.enqueue(message, 'code', 'Electro@team.com', form.email.data, key)
+          # message('code', 'Electro@team.com', form.email.data, key)
 
         except Exception as e:
           save_event(event=e, site=remind.__name__)
