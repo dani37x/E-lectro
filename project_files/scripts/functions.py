@@ -1,6 +1,8 @@
 from project_files import db
 from project_files import app
-from project_files import BLOCKED, USER, PRODUCT, EVENTS, DATA, CLASSIFIER
+from project_files import queue
+from project_files import BLOCKED, USER, PRODUCT
+from project_files import EVENTS, DATA, CLASSIFIER, SESSIONS
 
 from flask import request, abort, session
 from flask_login import  current_user
@@ -12,6 +14,8 @@ from ..database import Blocked, User, Product
 from datetime import datetime, date, timedelta
 
 from collections import Counter
+
+from rq import Retry
 
 import json
 import string
@@ -226,13 +230,13 @@ def similar_products_to_queries(username):
         return possible_products[0:7]
 
 
-#more to add
-list_of_categories = [
-    {"AGD": 1},
-    {"TOYS": 2},
-]
-
 def classification(category, money):
+
+    #more to add
+    list_of_categories = [
+        {"AGD": 1},
+        {"TOYS": 2},
+    ]
 
     for cat in list_of_categories:
         if category in cat:
@@ -260,16 +264,4 @@ def newsletter_deactivation(username):
         db.session.commit()
 
 
-def rq_add_row_to_db(object):
-    
-    app.app_context().push()
-    db.session.add(object)
-    db.session.commit()
-
-
-def rq_delete_db_row(object):
-
-    app.app_context().push()
-    db.session.delete(object)
-    db.session.commit()
 

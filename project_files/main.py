@@ -154,22 +154,6 @@ def shop_api():
   return list_of_products
 
 
-
-import time
-
-def xd(lol):
-  time.sleep(15)
-  print(f'{lol}')
-
-
-  # print('przed')
-  # result = queue.enqueue(xd, 'lol')
-  # print('po')
-  # print(result.id)
-  # print(result.get_status())
-  # print(result.get_ttl())
-
-
 @app.route('/test', methods=['GET', 'POST'])
 def test():
   # try:

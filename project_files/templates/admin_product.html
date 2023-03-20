@@ -37,4 +37,8 @@
     </table>
 </form>
 <br>
+    {% if task %}
+        <a href="{{ url_for('cancel_task', task_id=task.id) }}"> cancel task </a>
+    {% endif %}
+<br>
     <a href="{{ url_for('admin') }}"> admin panel</a>
