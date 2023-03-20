@@ -243,3 +243,19 @@ def send_newsletter():
                 products,
                 retry=Retry(max=3, interval=[10, 30, 60])
                 )
+
+
+def rq_add_row_to_db(object):
+    
+    app.app_context().push()
+
+    db.session.add(object)
+    db.session.commit()
+
+
+def rq_delete_db_row(object):
+
+    app.app_context().push()
+
+    db.session.delete(object)
+    db.session.commit()

@@ -11,7 +11,6 @@ from flask import render_template, url_for, redirect, request, jsonify
 from .database import User, Blocked, Product
 
 from .scripts.functions import not_null, save_event, check_admin, check_user
-from .scripts.functions import rq_add_row_to_db, rq_delete_db_row
 
 from redis import Redis
 from rq.job import Job, cancel_job
@@ -22,9 +21,9 @@ from .scripts.actions import delete_rows, block_users, message, backup
 from .scripts.actions import account_activation, account_deactivation
 from .scripts.actions import delete_inactive_accounts, restore_database
 from .scripts.actions import send_newsletter
+from .scripts.actions import rq_add_row_to_db, rq_delete_db_row
 
 from datetime import datetime
-
 
 
 @app.route('/admin', methods=['GET', 'POST'])
@@ -44,7 +43,11 @@ def cancel_task(task_id):
   try:
     # job = Job.fetch(task_id, Redis())
     send_stop_job_command(Redis(), task_id)
-    save_event(event=f'task {task_id} was canceled', site=cancel_task.__name__)
+
+    save_event(
+      event=f'task {task_id} was canceled',
+      site=cancel_task.__name__
+    )
 
     for job_id in job_registry.get_job_ids():
         job_registry.remove(job_id)
@@ -185,13 +188,16 @@ def admin_user():
 # @check_admin('admin_blocked')
 # @check_user('admin_blocked')
 def admin_blocked():
-
+ 
   blocked = Blocked.query.all() 
 
   if request.method == 'POST':
 
+    session['previous_site'] = admin_user.__name__ 
     searching = request.form['search']
+
     if searching != None and searching != '':
+
       blocked = (
         Blocked.query.filter(User.username.contains(searching)
           | (Blocked.ip.contains(searching))).all()
@@ -202,10 +208,15 @@ def admin_blocked():
     selected_action = request.form['action']
 
     try:
-
       if selected_action == 'delete user':
-        delete_rows(Blocked, data)
-        return redirect( url_for('admin_blocked'))
+
+        task = queue.enqueue(
+          delete_rows,
+          model=Blocked,
+          data=data,
+          retry=Retry(max=3, interval=[10, 30, 60])
+        )
+        return render_template('admin_blocked.html', blocked=blocked, task=task)
       
       if selected_action == 'backup':
         backup(Blocked)
@@ -230,8 +241,11 @@ def admin_product():
 
   if request.method == 'POST':
 
+    session['previous_site'] = admin_user.__name__ 
     searching = request.form['search']
+
     if searching != None and searching != '':
+
       products = (
         Product.query.filter(Product.name.contains(searching)
           | (Product.category.contains(searching))
@@ -244,8 +258,15 @@ def admin_product():
 
     try:
       if selected_action == 'delete products':
-        delete_rows(Product, data)
-        return redirect( url_for('admin_product'))
+
+        task = queue.enqueue(
+          delete_rows,
+          model=Product,
+          data=data,
+          retry=Retry(max=3, interval=[10, 30, 60])
+        )
+
+        return render_template('admin_blocked.html', products=products, task=task)
       
       if selected_action == 'backup':
         backup(Product)
@@ -263,6 +284,7 @@ def admin_product():
 
 # admin operations like add, update, delete
 
+
 @app.route('/add-user', methods=['GET', 'POST'])
 @login_required
 # @check_admin('add_user')
@@ -271,8 +293,10 @@ def add_user():
 
   if request.method == 'POST':
 
+    username = not_null(request.form['username'])
+
     new_user = User(
-      username=not_null(request.form['username']),
+      username=username,
       first_name=not_null(request.form['first_name']),
       surname=not_null(request.form['surname']),
       email=not_null(request.form['email']),
@@ -286,7 +310,16 @@ def add_user():
     )
 
     try:
-      queue.enqueue(rq_add_row_to_db, object=new_user)
+      queue.enqueue(
+        rq_add_row_to_db, 
+        object=new_user,
+        retry=Retry(max=3, interval=[10, 30, 60])
+      )
+
+      save_event(
+        event=f'{username} was added by {current_user.username}',
+        site=add_user.__name__  
+      )
 
     except Exception as e:
       save_event(event=e, site=add_user.__name__)
@@ -343,7 +376,11 @@ def delete_user(id):
   name_to_delete = User.query.get_or_404(id)
 
   try:
-    queue.enqueue(rq_delete_db_row, object=name_to_delete)
+    queue.enqueue(
+      rq_delete_db_row, 
+      object=name_to_delete,
+      retry=Retry(max=3, interval=[10, 30, 60])
+    )
 
     return redirect(url_for('admin_user'))
 
@@ -360,14 +397,21 @@ def add_blocked():
 
   if request.method == 'POST':
 
+    username = not_null(request.form['username'])
+
     new_blocked = Blocked(
-      username=not_null(request.form['username']),
+      username=username,
       ip=not_null(request.form['ip']),
       date=f"{str(datetime.now().strftime('%d-%m-%Y  %H:%M:%S'))}",
     )
 
     try:
-      queue.enqueue(rq_add_row_to_db, object=new_blocked)
+      queue.enqueue(
+        rq_add_row_to_db, 
+        object=new_blocked,
+        retry=Retry(max=3, interval=[10, 30, 60])
+      )
+      save_event(event=f'{username} was added', site=add_blocked.__name__)
 
     except Exception as e:
       save_event(event=e, site=add_blocked.__name__)
@@ -412,8 +456,11 @@ def delete_blocked(id):
   name_to_delete = Blocked.query.get_or_404(id)
 
   try:
-    
-    queue.enqueue(rq_delete_db_row, object=name_to_delete)
+    queue.enqueue(
+      rq_delete_db_row,
+      object=name_to_delete,
+      retry=Retry(max=3, interval=[10, 30, 60])
+    )
 
     return redirect(url_for('admin_blocked'))
   
@@ -430,8 +477,10 @@ def add_product():
 
   if request.method == 'POST':
 
+    product = not_null(request.form['name'])
+
     new_product = Product(
-      name=not_null(request.form['name']),
+      name=product,
       category=not_null(request.form['category']),
       company=not_null(request.form['company']),
       price=not_null(request.form['price']),
@@ -439,7 +488,16 @@ def add_product():
     )
 
     try:
-      queue.enqueue(rq_add_row_to_db, object=new_product)
+      queue.enqueue(
+        rq_add_row_to_db, 
+        object=new_product,
+        retry=Retry(max=3, interval=[10, 30, 60])
+      )
+
+      save_event(
+        event=f'{product} was added by {current_user.username}', 
+        site=add_product.__name__
+      )
 
     except Exception as e:
       save_event(event=e, site=add_product.__name__)
@@ -457,6 +515,7 @@ def add_product():
 def update_product(id):
 
   product = Product.query.get_or_404(id)
+
   if request.method == 'POST':
     product.name = not_null(request.form['name'])
     product.category = not_null(request.form['category'])
@@ -485,7 +544,11 @@ def delete_product(id):
   name_to_delete = Product.query.get_or_404(id)
 
   try:
-    queue.enqueue(rq_delete_db_row, object=name_to_delete)
+    queue.enqueue(
+      rq_delete_db_row, 
+      object=name_to_delete,
+      retry=Retry(max=3, interval=[10, 30, 60])
+    )
 
     return redirect(url_for('admin_product'))
 
