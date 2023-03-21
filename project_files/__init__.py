@@ -17,8 +17,11 @@ from rq.registry import FailedJobRegistry
 
 import os
 
+from apscheduler.schedulers.background import BackgroundScheduler
+
 
 # main config
+
 
 app = Flask(__name__)
 
@@ -33,6 +36,7 @@ SERVER_NAME = ''
 
 #  files' paths
 
+
 BLOCKED = r'D:\projekty\E-lectro\instance\Blocked.json'
 PRODUCT = r'D:\projekty\E-lectro\instance\Product.json'
 USER = r'D:\projekty\E-lectro\instance\User.json'
@@ -41,12 +45,14 @@ CLASSIFIER = r'D:\projekty\E-lectro\project_files\classifier.pkl'
 
 # paths for Redis queue workers (must be linux slash)
 
+
 EVENTS = './instance/events.json'
 DATA = './instance/data.json'
 SESSIONS = './instance/sessions.json'
 
 
 # database and login
+
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///user.db'
 db = SQLAlchemy(app)
@@ -57,6 +63,7 @@ login_manager.init_app(app)
 
 # limiter
 
+
 limiter = Limiter(
     app,
     key_func=get_remote_address,
@@ -65,6 +72,7 @@ limiter = Limiter(
 )
 
 # mail
+
 
 mail = Mail(app)
 
@@ -87,10 +95,12 @@ app.config['MAIL_USE_SSL'] = False
 
 # Flask bcrypt
 
+
 bcrypt = Bcrypt(app)
 
 
 # redis
+
 
 redis_instance = redis.Redis(
     host='127.0.0.1',
@@ -102,5 +112,6 @@ queue = Queue(connection=redis_instance)
 job_registry = FailedJobRegistry(queue=queue)
 
 
+# scheduler
 
-    
+scheduler = BackgroundScheduler(timezone="Europe/Warsaw")
