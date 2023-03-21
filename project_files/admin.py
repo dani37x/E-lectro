@@ -411,7 +411,11 @@ def add_blocked():
         object=new_blocked,
         retry=Retry(max=3, interval=[10, 30, 60])
       )
-      save_event(event=f'{username} was added', site=add_blocked.__name__)
+
+      save_event(
+        event=f'{username} was added by {current_user.username}', 
+        site=add_blocked.__name__
+      )
 
     except Exception as e:
       save_event(event=e, site=add_blocked.__name__)

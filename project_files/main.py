@@ -1,8 +1,6 @@
 from project_files import app
 from project_files import db
 from project_files import login_manager
-from project_files import SESSIONS, EVENTS, DATA
-from project_files import queue
 
 from flask_login import login_required, current_user
 from flask import render_template, url_for, redirect, request, session, make_response
@@ -36,13 +34,13 @@ def before_first_request():
 
 @app.before_request
 def before_request():
+  pass
+  # minutes = ['5', '20', '30','45', '50']
 
-  minutes = ['5', '20', '30','45', '50']
-
-  if str(datetime.now().minute) in minutes:
-    queue.enqueue(delete_expired_data, d=0, h=0, m=15, file_path=SESSIONS)
-    queue.enqueue(delete_expired_data, d=7, h=0, m=0, file_path=EVENTS)
-    queue.enqueue(delete_expired_data, d=7, h=0, m=0, file_path=DATA)
+  # if str(datetime.now().minute) in minutes:
+  #   queue.enqueue(delete_expired_data, d=0, h=0, m=15, file_path=SESSIONS)
+  #   queue.enqueue(delete_expired_data, d=7, h=0, m=0, file_path=EVENTS)
+  #   queue.enqueue(delete_expired_data, d=7, h=0, m=0, file_path=DATA)
 
 
 @app.route('/', methods=['GET', 'POST'])
