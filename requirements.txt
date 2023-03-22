@@ -12,6 +12,8 @@ click-plugins==1.1.1
 click-repl==0.2.0
 colorama==0.4.6
 commonmark==0.9.1
+contourpy==1.0.7
+cycler==0.11.0
 Deprecated==1.2.13
 et-xmlfile==1.1.0
 Flask==2.2.2
@@ -23,6 +25,7 @@ Flask-Mail==0.9.1
 Flask-Session==0.4.0
 Flask-SQLAlchemy==3.0.2
 Flask-WTF==1.0.1
+fonttools==4.39.2
 greenlet==2.0.1
 itsdangerous==2.1.2
 Jinja2==3.1.2
@@ -30,15 +33,19 @@ joblib==1.2.0
 JsonForm==0.0.2
 jsonschema==4.17.3
 JsonSir==0.0.2
+kiwisolver==1.4.4
 kombu==5.2.4
 limits==2.7.2
 MarkupSafe==2.1.1
+matplotlib==3.7.1
 numpy==1.24.2
 openpyxl==3.1.1
 packaging==22.0
 pandas==1.5.3
+Pillow==9.4.0
 prompt-toolkit==3.0.36
 Pygments==2.13.0
+pyparsing==3.0.9
 pyrsistent==0.19.3
 python-dateutil==2.8.2
 Python-EasyConfig==0.1.7
@@ -52,6 +59,7 @@ rich==12.6.0
 rq==1.13.0
 scikit-learn==1.2.1
 scipy==1.10.1
+seaborn==0.12.2
 six==1.16.0
 SQLAlchemy==1.4.45
 threadpoolctl==3.1.0
