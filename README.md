@@ -1,7 +1,7 @@
 ## About The Project
 <a name="readme-top"></a>
 
-E-lectro is a web application in Flask. Its destination is an online shop but centers on non-visual things. This project focuses on security and curious solutions such as Random Forest Classifier, which classify users and adequate products for them. Full backend project, and what is more, everything terrific works deeply. The project contains ready solutions like Limiter or SQLAlchemy ORM, but there occur own functions with prevalence. 
+E-lectro is a web application in Flask. Its destination is an online shop but centers on non-visual things. This project focuses on security and curious solutions for specific problems such as Random Forest Classifier, which classifies users and adequate products for them, or Redis queue, which his aim is async task queue. Full backend project, and what is more, everything terrific works deeply. The project contains ready solutions like entries Limiter or SQLAlchemy ORM, but there occur own functions with prevalence. 
 
 <br>
 <div align="center">
@@ -35,7 +35,12 @@ E-lectro is a web application in Flask. Its destination is an online shop but ce
   - [x] backups
   - [x] restore databases
   - [x] newsletter for registered users
-- [x] entries limiter
+- [x] Redis and Redis queue
+  - [x] Redis queue and workers
+  - [x] old functions with async queue usage
+  - [x] time to cancel task from queue
+  - [x] delete cancelled task from rq history
+  - [ ] more functions with redis task queue
 - [x] Forms
   - [x] Register form
   - [x] Login form 
@@ -53,6 +58,7 @@ E-lectro is a web application in Flask. Its destination is an online shop but ce
   - [x] Exists e-mail
 - [x] automatic function which takes off a block from users' accounts after a specific date.
 - [x] Error handlers
+- [x] entries limiter
 - [x] Event system, which gathers errors, actions to `events.json` which will be performed by users
 - [x] Searching input for users which looking for products
 - [x] Trending rank. Rank searches from users. Function gathers users queries and creates rank with them, then they are going to appeal on searching input area
@@ -79,7 +85,8 @@ E-lectro is a web application in Flask. Its destination is an online shop but ce
   - [x] dynamic single page for every product
 - [x] password change by a user on account
 - [x] cookies with category of product with price from the searched product by the user
-- [x] function deletes data from json files every specific time
+- [x] APScheduler
+  - [x] deletes expired data from json files every specific time
 - [x] Newsletter
   - [x] an e-mail for registered users with five of the latest products with links
   - [x] register for the newsletter
@@ -89,12 +96,6 @@ E-lectro is a web application in Flask. Its destination is an online shop but ce
   - [x] upgrade ML algorithm with many indicators
 - [x] shop API
 - [x] flask bcrypt
-- [x] Redis implement
-- [x] Redis queue and workers
-- [x] Redis queue tasks
-- [x] cancel task from rq queue
-- [x] delete cancelled task from rq history
-- [ ] more task with rq with cancel ability
 - [ ] better Readme section of installation which depict the correct process with Redis and Redis queue
 - [ ] multi-device login (max 3)
 - [ ] account lvl and points system with discounts.
@@ -114,6 +115,7 @@ E-lectro is a web application in Flask. Its destination is an online shop but ce
 * SQLALCHEMY
 * REDIS
 * REDIS QUEUE
+* APSCHEDULER
 * LIMITER
 * FLASK-MAIL
 * FLASK-LOGIN
@@ -131,11 +133,12 @@ E-lectro is a web application in Flask. Its destination is an online shop but ce
    ```
 3. Install python packages from [requirements.txt](https://github.com/dani37x/E-lectro/blob/master/requirements.txt) in `env`
    ```sh
-   pip install ...
+   pip install -r requirements.txt
    ```
 4. Enter your API in `env.py` variables
    ```python
-   os.environ['API_KEY'] = 'ENTER YOUR API KEY';
+   os.environ['MAIL_USERNAME'] = '';
+   os.environ['MAIL_PASSWORD'] = '';
    ```
 
 
