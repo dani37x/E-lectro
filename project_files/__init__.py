@@ -40,7 +40,7 @@ SERVER_NAME = ''
 BLOCKED = r'D:\projekty\E-lectro\instance\Blocked.json'
 PRODUCT = r'D:\projekty\E-lectro\instance\Product.json'
 USER = r'D:\projekty\E-lectro\instance\User.json'
-CLASSIFIER = r'D:\projekty\E-lectro\project_files\classifier.pkl'
+CLASSIFIER = r'D:\projekty\E-lectro\project_files\machine_learning\classifier.pkl'
 
 
 # paths for Redis queue workers (must be linux slash)
