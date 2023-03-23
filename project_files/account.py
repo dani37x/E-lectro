@@ -12,7 +12,7 @@ from .form import UserCreator, UserLogin, RemindPassword, NewPassword, Key
 
 from .database import User, Blocked
 
-from .scripts.functions import check_user, check_admin, unblock, save_event
+from .scripts.functions import check_user, not_null, unblock, save_event
 from .scripts.functions import check_session, random_string, open_json, save_json
 from .scripts.functions import newsletter_activation, newsletter_deactivation
 
@@ -55,7 +55,7 @@ def unregister_newsletter():
   return redirect( url_for('account'))
 
 
-@app.route('/register', methods=['GET', 'POST'])
+@app.route('/account/register', methods=['GET', 'POST'])
 def register():
   form = UserCreator()
 
@@ -136,7 +136,7 @@ def register_session(rendered_session):
   return render_template('hash.html', form=form)
 
 
-@app.route('/login', methods=['GET', 'POST'])
+@app.route('/account/login', methods=['GET', 'POST'])
 def login():
 
   form = UserLogin()
@@ -167,7 +167,7 @@ def login():
   return render_template('login.html', form=form)
 
 
-@app.route("/logout")
+@app.route("/account/logout")
 # @check_user('logout')
 @login_required
 def logout():
@@ -175,7 +175,7 @@ def logout():
     return redirect('login')
 
 
-@app.route("/remind", methods=['GET', 'POST'])
+@app.route("/account/remind", methods=['GET', 'POST'])
 def remind():
     
   form = RemindPassword()
@@ -185,15 +185,15 @@ def remind():
     if form.validate_on_submit():
         
       user = User.query.filter_by(
-            username=form.username.data,
-            email=form.email.data
+          username=form.username.data,
+          email=form.email.data
         ).first()
         
       if user:
     
         session_list = open_json(file_path=SESSIONS)
         sess = check_session(session_list=session_list)    
-        key = random_string(size=6)
+        key = random_string(size=9)
         
         session_list.append({
                 "username": f"{form.username.data}",
@@ -218,7 +218,7 @@ def remind():
 
 
 
-@app.route('/password/<rendered_session>', methods=['GET', 'POST'])
+@app.route('/account/password/<rendered_session>', methods=['GET', 'POST'])
 def hash_session(rendered_session):
 
   form = Key()
@@ -239,7 +239,7 @@ def hash_session(rendered_session):
   return render_template('hash.html',  form=form)
 
 
-@app.route('/new_password/<rendered_session>', methods=['GET', 'POST'])
+@app.route('/account/new_password/<rendered_session>', methods=['GET', 'POST'])
 def new_password(rendered_session):
     
   form = NewPassword()
@@ -267,3 +267,51 @@ def new_password(rendered_session):
     save_event(event=e, site=new_password.__name__)
     return 'nice try :)'
   
+
+@app.route('/account/details', methods=['GET', 'POST'])
+@login_required
+# @check_user('account_details')
+def account_details():
+  
+  user = User.query.get_or_404(current_user.id)
+
+  if request.method == 'POST':
+    
+    username = not_null(request.form['username'])
+    user.first_name = not_null(request.form['first_name'])
+    user.surname = not_null(request.form['surname'])
+    email = not_null(request.form['email'])
+
+    if username != user.username:
+
+      if User.query.filter_by(username=username).first():
+        #flash this username already exists
+        return redirect( url_for('account_details'))
+      
+      else:
+        user.username = username
+
+
+      if email != user.email:
+
+        if User.query.filter_by(email=email).first():
+          #flash this email already exists
+          return redirect( url_for('account_details'))
+        
+        else:
+          user.email = email 
+
+    try:
+      db.session.commit()
+      save_event(
+        event=f'User {current_user.username} updated account details',
+        site=account_details.__name__  
+      )
+      return redirect( url_for('account'))
+      
+    except Exception as e:
+      save_event(event=e, site=account_details.__name__)
+      return redirect( url_for('account'))
+  
+  else:
+    return render_template('details.html', user=user)

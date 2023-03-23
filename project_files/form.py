@@ -49,7 +49,7 @@ def existing_user(form, field):
       raise ValidationError('this username already exist')
   for word in not_allowed:
     if word in field.data or word.upper() in field.data:
-      raise ValidationError('set different value')
+      raise ValidationError('element contains not allowed word')
     
 
 def existing_email(form, field):
@@ -57,7 +57,7 @@ def existing_email(form, field):
       raise ValidationError('this email already exist')
   for word in not_allowed:
     if word in field.data or word.upper() in field.data:
-      raise ValidationError('set different value')
+      raise ValidationError('element contains not allowed word')
 
 
 class UserCreator(FlaskForm):
@@ -107,3 +107,4 @@ class NewPassword(FlaskForm):
 class RemindPassword(FlaskForm):
   username = StringField('username', validators=[DataRequired(), Length(max=30)])
   email = EmailField('e-mail', validators=[DataRequired(), Length(max=50)])
+

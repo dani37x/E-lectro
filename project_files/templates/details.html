@@ -1,0 +1,24 @@
+
+
+
+ <form action="/account/details" method='post'>
+
+   <label for="username">username</label>
+      <input type="text" name="username" value="{{user.username}}"/>
+      <br>
+   <label for="first_name">first_name</label>
+      <input type="text" name="first_name" value="{{user.first_name}}"/>
+      <br>
+   <label for="surname">surname</label>
+      <input type="text" name="surname" value="{{user.surname}}"/>
+      <br>
+   <label for="email">email</label>
+      <input type="text" name="email" value="{{user.email}}"/>
+      <br>
+      
+   <input type="submit" value="send data">
+    
+ </form>
+
+<br>
+   <a href="{{ url_for('account') }}">back</a> 
