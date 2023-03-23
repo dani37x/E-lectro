@@ -97,6 +97,7 @@ E-lectro is a web application in Flask. Its destination is an online shop but ce
 - [x] shop API
 - [x] flask bcrypt
 - [ ] better Readme section of installation which depict the correct process with Redis and Redis queue
+- [ ] subpage where user can edit personal data
 - [ ] multi-device login (max 3)
 - [ ] account lvl and points system with discounts.
 - [ ] payments for products

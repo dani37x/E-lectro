@@ -35,12 +35,6 @@ def before_first_request():
 @app.before_request
 def before_request():
   pass
-  # minutes = ['5', '20', '30','45', '50']
-
-  # if str(datetime.now().minute) in minutes:
-  #   queue.enqueue(delete_expired_data, d=0, h=0, m=15, file_path=SESSIONS)
-  #   queue.enqueue(delete_expired_data, d=7, h=0, m=0, file_path=EVENTS)
-  #   queue.enqueue(delete_expired_data, d=7, h=0, m=0, file_path=DATA)
 
 
 @app.route('/', methods=['GET', 'POST'])
