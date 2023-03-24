@@ -80,7 +80,7 @@ def register():
           })
 
       save_json(file_path=SESSIONS, data=session_list)
-      message('register', 'electro@team.com', form.email.data, key)
+      # message('register', 'electro@team.com', form.email.data, key)
 
       return redirect( url_for('register_session', rendered_session=sess))
 
@@ -218,7 +218,7 @@ def remind():
 
 
 
-@app.route('/account/password/<rendered_session>', methods=['GET', 'POST'])
+@app.route('/account/change/<rendered_session>', methods=['GET', 'POST'])
 def hash_session(rendered_session):
 
   form = Key()
@@ -232,7 +232,10 @@ def hash_session(rendered_session):
       for sess in session_list:
           if sess['key'] == form.key.data and rendered_session == sess['session']:
               session['username'] = sess['username']
-              return redirect( url_for('new_password', rendered_session=rendered_session))
+              if len(sess['key']) == 9: 
+                return redirect( url_for('new_password', rendered_session=rendered_session))
+              elif len(sess['key']) == 6:
+                return redirect( url_for('new_email', rendered_session=rendered_session))
 
       return redirect( url_for('remind'))
 
@@ -256,7 +259,7 @@ def new_password(rendered_session):
           user.password = form.password.data
           db.session.commit()
           session.pop('username', None)
-          return redirect( url_for('page'))
+          return redirect( url_for('account'))
             
       return render_template('new_password.html', form=form)
 
@@ -278,28 +281,9 @@ def account_details():
   if request.method == 'POST':
     
     username = not_null(request.form['username'])
+    email = not_null(request.form['email'])
     user.first_name = not_null(request.form['first_name'])
     user.surname = not_null(request.form['surname'])
-    email = not_null(request.form['email'])
-
-    if username != user.username:
-
-      if User.query.filter_by(username=username).first():
-        #flash this username already exists
-        return redirect( url_for('account_details'))
-      
-      else:
-        user.username = username
-
-
-      if email != user.email:
-
-        if User.query.filter_by(email=email).first():
-          #flash this email already exists
-          return redirect( url_for('account_details'))
-        
-        else:
-          user.email = email 
 
     try:
       db.session.commit()
@@ -307,11 +291,92 @@ def account_details():
         event=f'User {current_user.username} updated account details',
         site=account_details.__name__  
       )
-      return redirect( url_for('account'))
-      
+
     except Exception as e:
       save_event(event=e, site=account_details.__name__)
-      return redirect( url_for('account'))
-  
+      return redirect( url_for('account_details'))
+
+    try:
+      if username != user.username:
+
+        if User.query.filter_by(username=username).first():
+          #flash this username already exists
+          return redirect( url_for('account_details'))
+        
+        else:
+          user.username = username
+          db.session.commit()
+          save_event(
+            event=f'User {current_user.username} updated username to {username}',
+            site=account_details.__name__  
+          )
+
+    except Exception as e:
+      save_event(event=e, site=account_details.__name__)
+      return redirect( url_for('account_details'))
+
+    try:
+      if email != user.email:
+
+        if User.query.filter_by(email=email).first():
+          #flash this email already exists
+          return redirect( url_for('account_details'))
+        
+        else:
+          session_list = open_json(file_path=SESSIONS)
+          sess = check_session(session_list=session_list)    
+          key = random_string(size=6)
+          session['new_email'] = email
+
+          session_list.append({
+            "username": f"{current_user.username}",
+            "time": f"{str(datetime.now().strftime('%d-%m-%Y  %H:%M:%S'))}",
+            "session": f"{sess}",
+            "key": f"{key}"
+          })
+          
+          # message('code', 'Electro@team.com', form.email.data, key)
+          save_json(file_path=SESSIONS, data=session_list)
+          
+          return redirect( url_for('hash_session', rendered_session=sess))
+          # user.email = email 
+          # db.session.commit()
+
+    except Exception as e:
+      save_event(event=e, site=account_details.__name__)
+      return redirect( url_for('account_details'))
+    
+    return redirect( url_for('account_details'))
+        
   else:
     return render_template('details.html', user=user)
+  
+
+
+@app.route('/account/new_email/<rendered_session>', methods=['GET', 'POST'])
+def new_email(rendered_session):
+    
+  try:
+    if session['username'] != None and session['username'] != '':
+      
+      if user := User.query.filter_by(username=session['username']).first():
+
+        old_email = user.email
+        user.email = session.get('new_email')
+        db.session.commit()
+
+        session.pop('username', None)
+        session.pop('new_email', None)
+        save_event(
+          event=f'User {current_user.username} updated email from {old_email} to {user.email}',
+          site=account_details.__name__  
+        )
+        #flash email was updated
+        return redirect( url_for('account_details'))
+
+    else:
+      return redirect('account') 
+    
+  except Exception as e:
+    save_event(event=e, site=new_email.__name__)
+    return redirect('account') 

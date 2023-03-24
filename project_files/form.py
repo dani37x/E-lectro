@@ -92,7 +92,7 @@ class UserLogin(FlaskForm):
 
 
 class Key(FlaskForm):
-  key = StringField('Enter the key', validators=[DataRequired(), Length(max=6)])
+  key = StringField('Enter the key', validators=[DataRequired(), Length(max=10)])
 
 
 class NewPassword(FlaskForm):
