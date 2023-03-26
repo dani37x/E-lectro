@@ -186,7 +186,7 @@ def restore_database(model):
 
 def account_activation(model, data):
 
-    time.sleep(60)
+    time.sleep(15)
 
     app.app_context().push()
 
@@ -199,7 +199,7 @@ def account_activation(model, data):
 
 def account_deactivation(model, data):
 
-    time.sleep(60)
+    time.sleep(15)
 
     app.app_context().push()
 
@@ -212,6 +212,8 @@ def account_deactivation(model, data):
 
 def delete_inactive_accounts():
     
+    time.sleep(60)
+
     app.app_context().push()
     users = User.query.all()
 
@@ -224,7 +226,7 @@ def delete_inactive_accounts():
 
 def send_newsletter():
 
-    time.sleep(60)
+    time.sleep(15)
 
     app.app_context().push()
 
@@ -245,6 +247,22 @@ def send_newsletter():
                 )
 
 
+def newsletter_activation(username):
+
+    if user := User.query.filter_by(username=username).first():
+        
+        user.newsletter = True
+        db.session.commit()
+
+
+def newsletter_deactivation(username):
+
+    if user := User.query.filter_by(username=username).first():
+
+        user.newsletter = False
+        db.session.commit()
+
+
 def rq_add_row_to_db(object):
     
     app.app_context().push()
@@ -259,3 +277,5 @@ def rq_delete_db_row(object):
 
     db.session.delete(object)
     db.session.commit()
+
+

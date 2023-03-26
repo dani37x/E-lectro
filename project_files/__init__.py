@@ -41,16 +41,9 @@ BLOCKED = r'D:\projekty\E-lectro\instance\Blocked.json'
 PRODUCT = r'D:\projekty\E-lectro\instance\Product.json'
 USER = r'D:\projekty\E-lectro\instance\User.json'
 CLASSIFIER = r'D:\projekty\E-lectro\project_files\machine_learning\classifier.pkl'
-EVENTS = r'D:\projekty\E-lectro\instance\events.json'
-DATA = r'D:\projekty\E-lectro\instance\data.json'
-SESSIONS = r'D:\projekty\E-lectro\instance\sessions.json'
-
-# paths for Redis queue workers (must be linux slash)
-
-
-EVENTS_RQ = './instance/events.json'
-DATA_RQ = './instance/data.json'
-SESSIONS_RQ = './instance/sessions.json'
+EVENTS = r'D:.\instance\events.json'
+DATA = r'.\instance\data.json'
+SESSIONS = r'.\instance\sessions.json'
 
 
 # database and login

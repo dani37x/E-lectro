@@ -3,6 +3,7 @@ from project_files import db
 from project_files import queue
 from project_files import job_registry
 from project_files import session
+from project_files import bcrypt
 from project_files import redis_instance
 
 from flask_login import login_required, current_user
@@ -41,7 +42,6 @@ def admin():
 def cancel_task(task_id):
   
   try:
-    # job = Job.fetch(task_id, Redis())
     send_stop_job_command(Redis(), task_id)
 
     save_event(
@@ -63,7 +63,6 @@ def cancel_task(task_id):
       return redirect( url_for('admin'))
 
   except Exception as e:
-
     save_event(event=e, site=cancel_job.__name__)
     return 'error with cancel job'
  
@@ -293,14 +292,15 @@ def add_user():
 
   if request.method == 'POST':
 
-    username = not_null(request.form['username'])
+    password = not_null(request.form['password'])
+    password = bcrypt.generate_password_hash(password).decode('utf-8')
 
     new_user = User(
-      username=username,
+      username=not_null(request.form['username']),
       first_name=not_null(request.form['first_name']),
       surname=not_null(request.form['surname']),
       email=not_null(request.form['email']),
-      password=not_null(request.form['password']),
+      password=password,
       ip=not_null(request.form['ip']),
       account_type=not_null(request.form['account_type']),
       active=True,
@@ -337,20 +337,22 @@ def add_user():
 def update_user(id):
 
   user = User.query.get_or_404(id)
-
+  
   if request.method == 'POST':
+
+    password = not_null(request.form['password'])
+    password = bcrypt.generate_password_hash(password).decode('utf-8')
 
     user.username = not_null(request.form['username'])
     user.first_name = not_null(request.form['first_name'])
     user.surname = not_null(request.form['surname'])
     user.email = not_null(request.form['email'])
-    user.password = not_null(request.form['password'])
+    user.password = password
     user.account_type = not_null(request.form['account_type'])
     user.points = not_null(request.form['points'])
     user.date = not_null(request.form['date'])
     newsletter = not_null(request.form['newsletter'])
     active = not_null(request.form['active'])
-    
     
     user.active = True if 'True' in active or 'true' in active else False
     user.newsletter = True if 'True' in newsletter or 'true' in newsletter else False
