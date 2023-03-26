@@ -59,7 +59,6 @@ def check_user(name):
 
 
 def open_json(file_path):
-
     data = []
     with open(file_path) as fp:
         data = json.load(fp)
@@ -70,6 +69,10 @@ def open_json(file_path):
 def save_json(file_path, data):
     with open(file_path, 'w') as json_file:
         json.dump(data, json_file, indent=4, separators=(',', ': '))
+
+
+def back_to_slash(path):
+  return path.replace(r" \ ".strip(), '/')
 
 
 def not_null(field):
@@ -122,7 +125,8 @@ def unblock(blocked_user):
 
 def save_event(event, site):
 
-    objects_list = open_json(file_path=EVENTS)
+    file_path = back_to_slash(EVENTS)
+    objects_list = open_json(file_path=file_path)
 
     objects_list.append({
             "event": f"{event}",
@@ -245,23 +249,5 @@ def classification(category, money):
     model = pickle.load(open(CLASSIFIER, "rb"))
 
     prediction = model.predict([[category, money]])
-
     return prediction
-
-def newsletter_activation(username):
-
-    if user := User.query.filter_by(username=username).first():
-        
-        user.newsletter = True
-        db.session.commit()
-
-
-def newsletter_deactivation(username):
-
-    if user := User.query.filter_by(username=username).first():
-
-        user.newsletter = False
-        db.session.commit()
-
-
 

@@ -14,9 +14,9 @@ from .database import User, Blocked
 
 from .scripts.functions import check_user, not_null, unblock, save_event
 from .scripts.functions import check_session, random_string, open_json, save_json
-from .scripts.functions import newsletter_activation, newsletter_deactivation
 
 from .scripts.actions import  message
+from .scripts.actions import newsletter_activation, newsletter_deactivation
 
 from datetime import datetime, timedelta
 
@@ -256,7 +256,7 @@ def new_password(rendered_session):
         if form.validate_on_submit():
         
           user = User.query.filter_by(username=session['username']).first()
-          user.password = form.password.data
+          user.password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
           db.session.commit()
           session.pop('username', None)
           return redirect( url_for('account'))
