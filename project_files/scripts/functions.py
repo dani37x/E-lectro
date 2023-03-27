@@ -263,29 +263,38 @@ def random_char():
 
 
 def generator(answer, obstacle):
-  
   chars = [answer, obstacle]
   size = int(random.choice(string.digits))
-  generated_string = ''
-  answer_count = 0
-  obstacle_count = 0
+  list_of_chars = []
+  
+  data = {
+    'answer_count' : 0,
+    'obstacle_count' : 0,
+    'generated_string': ''
+  }
+  
+  for j in range(0, (size*size)):
+    if data['answer_count'] < 10:
+      char_to_add = random.choice(chars)
+    else:
+      char_to_add = obstacle
 
-  for i in range(0, size):
-    for j in range(0, size):
+    list_of_chars.append(char_to_add)
 
-      if answer_count < 10:
-        char_to_add = random.choice(chars)
-      else:
-        char_to_add = obstacle
+    if char_to_add == answer:
+      data['answer_count'] += 1
+    else:
+      data['obstacle_count'] += 1
 
-      generated_string += char_to_add
+  random.shuffle(list_of_chars)
+  
+  elements_count = 0
+  for element in list_of_chars:
 
-      if char_to_add == answer:
-        answer_count += 1
-      else:
-        obstacle_count += 1
+    if elements_count % size == 0:
+      data['generated_string'] += '\n'
 
-      if j == size - 1:
-        generated_string += '\n'
-
-  return generated_string
+    data['generated_string'] += element
+    elements_count += 1
+    
+  return data

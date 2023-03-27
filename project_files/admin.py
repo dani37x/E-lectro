@@ -294,9 +294,10 @@ def add_user():
 
     password = not_null(request.form['password'])
     password = bcrypt.generate_password_hash(password).decode('utf-8')
+    username = not_null(request.form['username'])
 
     new_user = User(
-      username=not_null(request.form['username']),
+      username=username,
       first_name=not_null(request.form['first_name']),
       surname=not_null(request.form['surname']),
       email=not_null(request.form['email']),
