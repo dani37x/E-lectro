@@ -251,3 +251,41 @@ def classification(category, money):
     prediction = model.predict([[category, money]])
     return prediction
 
+
+def random_char():
+  list_of_chars = []
+  list_of_chars.extend(string.ascii_lowercase)
+  list_of_chars.extend(string.ascii_uppercase)
+  list_of_chars.extend(string.digits)
+  list_of_chars.extend(string.punctuation)
+
+  return random.choice(list_of_chars)
+
+
+def generator(answer, obstacle):
+  
+  chars = [answer, obstacle]
+  size = int(random.choice(string.digits))
+  generated_string = ''
+  answer_count = 0
+  obstacle_count = 0
+
+  for i in range(0, size):
+    for j in range(0, size):
+
+      if answer_count < 10:
+        char_to_add = random.choice(chars)
+      else:
+        char_to_add = obstacle
+
+      generated_string += char_to_add
+
+      if char_to_add == answer:
+        answer_count += 1
+      else:
+        obstacle_count += 1
+
+      if j == size - 1:
+        generated_string += '\n'
+
+  return generated_string
