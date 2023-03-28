@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, EmailField, PasswordField, BooleanField
+from wtforms import StringField, EmailField, PasswordField, BooleanField, IntegerField
 from wtforms.validators import DataRequired, Length, EqualTo, ValidationError
 
 from .database import User
@@ -108,3 +108,6 @@ class RemindPassword(FlaskForm):
   username = StringField('username', validators=[DataRequired(), Length(max=30)])
   email = EmailField('e-mail', validators=[DataRequired(), Length(max=50)])
 
+
+class CharCounter(FlaskForm):
+  chars = IntegerField(validators=[DataRequired()])

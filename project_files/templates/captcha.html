@@ -1,0 +1,16 @@
+
+
+
+<div style="text-align:center;">
+    <form method="POST" action="">
+        <p> how many '{{answer}}' are below? </p>
+        {{ form.csrf_token }}
+        {{ form.chars }}
+        <br>
+        <input type="submit">
+    </form>
+
+    <pre >
+        {{data['generated_string']}}
+    </pre>
+</div>

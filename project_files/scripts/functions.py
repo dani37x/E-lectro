@@ -252,29 +252,38 @@ def classification(category, money):
     return prediction
 
 
-def random_char():
+def random_char(without_char=None, every_char=True):
   list_of_chars = []
   list_of_chars.extend(string.ascii_lowercase)
   list_of_chars.extend(string.ascii_uppercase)
   list_of_chars.extend(string.digits)
   list_of_chars.extend(string.punctuation)
 
+  if every_char == False:
+    list_of_chars.remove('I')
+    list_of_chars.remove('l')
+    list_of_chars.remove('|')
+    list_of_chars.remove('0')
+    list_of_chars.remove('o')
+    list_of_chars.remove('O')
+    list_of_chars.remove('"')
+
+  if without_char != None:
+    list_of_chars.remove(without_char)
+
   return random.choice(list_of_chars)
 
 
 def generator(answer, obstacle):
   chars = [answer, obstacle]
-  size = int(random.choice(string.digits))
+  list_of_numbers = [6, 7, 8, 9, 10, 11, 12, 15, 16]
+  size = random.choice(list_of_numbers)
   list_of_chars = []
-  
-  data = {
-    'answer_count' : 0,
-    'obstacle_count' : 0,
-    'generated_string': ''
-  }
-  
+
+  data = {'answer_count': 0, 'obstacle_count': 0, 'generated_string': ''}
+
   for j in range(0, (size*size)):
-    if data['answer_count'] < 10:
+    if data['answer_count'] < random.choice(list_of_numbers):
       char_to_add = random.choice(chars)
     else:
       char_to_add = obstacle
@@ -287,14 +296,17 @@ def generator(answer, obstacle):
       data['obstacle_count'] += 1
 
   random.shuffle(list_of_chars)
-  
-  elements_count = 0
+
+  element_count = 0
   for element in list_of_chars:
 
-    if elements_count % size == 0:
+    if element_count % size == 0:
       data['generated_string'] += '\n'
 
     data['generated_string'] += element
-    elements_count += 1
-    
+    element_count += 1
+
   return data
+
+# for i, j in x.items():
+#   print(i, j)

@@ -11,7 +11,10 @@ from flask import render_template, url_for, redirect, request, jsonify
 
 from .database import User, Blocked, Product
 
+from .form import CharCounter
+
 from .scripts.functions import not_null, save_event, check_admin, check_user
+from .scripts.functions import generator, random_char
 
 from redis import Redis
 from rq.job import Job, cancel_job
@@ -27,12 +30,26 @@ from .scripts.actions import rq_add_row_to_db, rq_delete_db_row
 from datetime import datetime
 
 
-@app.route('/admin', methods=['GET', 'POST'])
-@login_required
-# @check_user('admin')
-# @check_admin('admin')
-def admin():
-  return render_template('admin.html')
+@app.route('/captcha', methods=['GET', 'POST'])
+def captcha():
+  answer = random_char(every_char=False)
+  obstacle = random_char(without_char=answer, every_char=False)
+  data = generator(answer=answer, obstacle=obstacle)
+
+  form = CharCounter()
+
+  if request.method == 'POST':
+
+    if form.validate_on_submit():
+      pass
+      # return redirect( url_for(session.get('previous_site','nothing')))
+
+  return render_template(
+    'captcha.html', 
+    form=form, 
+    data=data, 
+    answer=answer
+  )
 
 
 @app.route('/cancel/<task_id>', methods=['GET', 'POST'])
@@ -66,6 +83,14 @@ def cancel_task(task_id):
     save_event(event=e, site=cancel_job.__name__)
     return 'error with cancel job'
  
+
+@app.route('/admin', methods=['GET', 'POST'])
+@login_required
+# @check_user('admin')
+# @check_admin('admin')
+def admin():
+  return render_template('admin.html')
+
 
 @app.route('/admin/users', methods=['GET', 'POST'])
 @login_required
