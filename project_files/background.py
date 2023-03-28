@@ -1,5 +1,4 @@
 from project_files import scheduler
-from project_files import queue
 from project_files import SESSIONS, EVENTS, DATA
 
 from .scripts.functions import delete_expired_data
