@@ -17,7 +17,7 @@ from .scripts.functions import not_null, save_event, check_admin, check_user
 from .scripts.functions import generator, random_char
 
 from redis import Redis
-from rq.job import Job, cancel_job
+from rq.job import cancel_job
 from rq.command import send_stop_job_command
 from rq import Retry
 
@@ -31,25 +31,36 @@ from datetime import datetime
 
 
 @app.route('/captcha', methods=['GET', 'POST'])
+@login_required
+# @check_user('captcha')
 def captcha():
+
+  session['chances'] = (session['chances']) - 1
+
+  if session.get('chances') < 1:
+    return redirect( url_for('logout'))
+  
   answer = random_char(every_char=False)
   obstacle = random_char(without_char=answer, every_char=False)
   data = generator(answer=answer, obstacle=obstacle)
 
   form = CharCounter()
-
+  print(data['answer_count'])
   if request.method == 'POST':
 
     if form.validate_on_submit():
-      pass
-      # return redirect( url_for(session.get('previous_site','nothing')))
 
-  return render_template(
-    'captcha.html', 
-    form=form, 
-    data=data, 
-    answer=answer
-  )
+      chars = form.chars.data
+      if chars == data['answer_count']:
+        session['chances'] = '4'
+        session['captcha_completed'] = True
+        return redirect( url_for(session.get('previous_site','nothing')))
+      
+      else:
+        session['chances'] = session['chances'] + 1
+        return redirect( url_for('captcha'))
+
+  return render_template('captcha.html', form=form, data=data, answer=answer)
 
 
 @app.route('/cancel/<task_id>', methods=['GET', 'POST'])
