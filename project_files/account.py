@@ -156,12 +156,14 @@ def login():
         if queue.enqueue(unblock, blocked_user=wheter_blocked):
 
           login_user(user, remember=form.remember.data)
+          session['chances'] = 4
           return redirect( url_for('page'))
 
         else:
           return abort(403)
 
       login_user(user, remember=form.remember.data)
+      session['chances'] = 4
       return redirect( url_for('page'))
 
   return render_template('login.html', form=form)

@@ -3,7 +3,7 @@
 
 <div style="text-align:center;">
     <form method="POST" action="">
-        <p> how many '{{answer}}' are below? </p>
+        <p> how many '{{answer}}' are below?, you have {{ session.get('chances') }} </p>
         {{ form.csrf_token }}
         {{ form.chars }}
         <br>
