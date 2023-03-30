@@ -4,7 +4,7 @@
 
 
 
-{% for product in products %}
+{% for product in list_of_products %}
 <a href="{{ url_for('product_info', product_id = product.id ) }}">
      {{product.name}} 
     </a>

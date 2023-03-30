@@ -53,6 +53,7 @@ def captcha():
         chars = form.chars.data
         if chars == data['answer_count']:
           session['chances'] = '4'
+          session['captcha_completed'] = True
           return redirect( url_for(session.get('previous_site','login')))
         
         else:
