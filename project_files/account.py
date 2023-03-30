@@ -290,7 +290,7 @@ def account_details():
     try:
       db.session.commit()
       save_event(
-        event=f'User {current_user.username} updated account details',
+        event=f'The User {current_user.username} updated account details',
         site=account_details.__name__  
       )
 
@@ -309,7 +309,7 @@ def account_details():
           user.username = username
           db.session.commit()
           save_event(
-            event=f'User {current_user.username} updated username to {username}',
+            event=f'The User {current_user.username} updated username to {username}',
             site=account_details.__name__  
           )
 
@@ -370,7 +370,7 @@ def new_email(rendered_session):
         session.pop('username', None)
         session.pop('new_email', None)
         save_event(
-          event=f'User {current_user.username} updated email from {old_email} to {user.email}',
+          event=f'The User {current_user.username} updated email from {old_email} to {user.email}',
           site=account_details.__name__  
         )
         #flash email was updated

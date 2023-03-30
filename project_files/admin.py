@@ -1,24 +1,16 @@
 from project_files import app
 from project_files import db
 from project_files import queue
-from project_files import job_registry
 from project_files import session
 from project_files import bcrypt
-from project_files import redis_instance
 
 from flask_login import login_required, current_user
-from flask import render_template, url_for, redirect, request, jsonify
+from flask import render_template, url_for, redirect, request
 
 from .database import User, Blocked, Product
 
-from .form import CharCounter
-
 from .scripts.functions import not_null, save_event, check_admin, check_user
-from .scripts.functions import generator, random_char
 
-from redis import Redis
-from rq.job import cancel_job
-from rq.command import send_stop_job_command
 from rq import Retry
 
 from .scripts.actions import delete_rows, block_users, message, backup
@@ -28,71 +20,6 @@ from .scripts.actions import send_newsletter
 from .scripts.actions import rq_add_row_to_db, rq_delete_db_row
 
 from datetime import datetime
-
-
-@app.route('/captcha', methods=['GET', 'POST'])
-@login_required
-# @check_user('captcha')
-def captcha():
-
-  session['chances'] = (session['chances']) - 1
-
-  if session.get('chances') < 1:
-    return redirect( url_for('logout'))
-  
-  answer = random_char(every_char=False)
-  obstacle = random_char(without_char=answer, every_char=False)
-  data = generator(answer=answer, obstacle=obstacle)
-
-  form = CharCounter()
-  print(data['answer_count'])
-  if request.method == 'POST':
-
-    if form.validate_on_submit():
-
-      chars = form.chars.data
-      if chars == data['answer_count']:
-        session['chances'] = '4'
-        session['captcha_completed'] = True
-        return redirect( url_for(session.get('previous_site','nothing')))
-      
-      else:
-        session['chances'] = session['chances'] + 1
-        return redirect( url_for('captcha'))
-
-  return render_template('captcha.html', form=form, data=data, answer=answer)
-
-
-@app.route('/cancel/<task_id>', methods=['GET', 'POST'])
-@login_required
-# @check_user('admin')
-# @check_admin('admin')
-def cancel_task(task_id):
-  
-  try:
-    send_stop_job_command(Redis(), task_id)
-
-    save_event(
-      event=f'task {task_id} was canceled',
-      site=cancel_task.__name__
-    )
-
-    for job_id in job_registry.get_job_ids():
-        job_registry.remove(job_id)
-        save_event(
-          event=f'task {task_id} was deleted from registry',
-          site=cancel_task.__name__
-        )
-
-    if session['previous_site'] != 'nothing':
-      return redirect( url_for(session.get('previous_site','nothing')))
-  
-    else:
-      return redirect( url_for('admin'))
-
-  except Exception as e:
-    save_event(event=e, site=cancel_job.__name__)
-    return 'error with cancel job'
  
 
 @app.route('/admin', methods=['GET', 'POST'])
@@ -354,7 +281,7 @@ def add_user():
       )
 
       save_event(
-        event=f'{username} was added by {current_user.username}',
+        event=f'The {username} was added by {current_user.username}',
         site=add_user.__name__  
       )
 
@@ -538,7 +465,7 @@ def add_product():
       )
 
       save_event(
-        event=f'{product} was added by {current_user.username}', 
+        event=f'The {product} was added by {current_user.username}', 
         site=add_product.__name__
       )
 
