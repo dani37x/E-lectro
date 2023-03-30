@@ -42,6 +42,10 @@ def before_request():
 # @check_user('page')
 def page():
 
+  session['previous_site'] = page.__name__
+  if session.get('captcha_completed', None) == None:
+    return redirect( url_for('captcha'))
+
   products = Product.query.all()
 
   if request.method == 'POST':
@@ -73,6 +77,10 @@ def page():
 @app.route('/shop/category', methods=['GET', 'POST'])
 def category():
 
+  session['previous_site'] = category.__name__
+  if session.get('captcha_completed', None) == None:
+    return redirect( url_for('captcha'))
+
   products = Product.query.all()
   categories = []
   for product in products:
@@ -85,7 +93,11 @@ def category():
 @app.route('/shop/<category>/products', methods=['GET', 'POST'])
 def products(category):
 
-  products = Product.query.filter_by(category=category)
+  session['previous_site'] = products.__name__
+  if session.get('captcha_completed', None) == None:
+    return redirect( url_for('captcha'))
+
+  list_of_products = Product.query.filter_by(category=category)
 
   if category in request.cookies:
 
@@ -95,7 +107,7 @@ def products(category):
     products_for_user = []
     the_others = []
 
-    for product in products:
+    for product in list_of_products:
 
       if classification(category=product.category, money=product.price) == type_of_user:
         products_for_user.append(product)
@@ -109,11 +121,15 @@ def products(category):
     
     return render_template('products.html', products=products_for_user)
   
-  return render_template('products.html', products=products)
+  return render_template('products.html', list_of_products=list_of_products)
 
 
 @app.route('/shop/products/<product_id>', methods=['GET', 'POST'])
 def product_info(product_id):
+
+  session['previous_site'] = product_info.__name__
+  if session.get('captcha_completed', None) == None:
+    return redirect( url_for('captcha'))
 
   product = Product.query.filter_by(id=product_id).first()
 
@@ -128,6 +144,10 @@ def product_info(product_id):
 @app.route('/shop/api', methods=['GET', 'POST'])
 @login_required
 def shop_api():
+
+  session['previous_site'] = shop_api.__name__
+  if session.get('captcha_completed', None) == None:
+    return redirect( url_for('captcha'))
 
   list_of_products = []
 

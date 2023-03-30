@@ -308,5 +308,7 @@ def generator(answer, obstacle):
 
   return data
 
-# for i, j in x.items():
-#   print(i, j)
+
+def random_return():
+    decisions = [True, False]
+    return random.choice(decisions)

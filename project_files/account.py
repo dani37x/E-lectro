@@ -27,6 +27,10 @@ from datetime import datetime, timedelta
 @login_required
 def account():
 
+  session['previous_site'] = account.__name__
+  if session.get('captcha_completed', None) == None:
+    return redirect( url_for('captcha'))
+
   session['username'] = current_user.username
   sess = random_string(size=39)
   
@@ -278,6 +282,10 @@ def new_password(rendered_session):
 # @check_user('account_details')
 def account_details():
   
+  session['previous_site'] = account_details.__name__
+  if session.get('captcha_completed', None) == None:
+    return redirect( url_for('captcha'))
+
   user = User.query.get_or_404(current_user.id)
 
   if request.method == 'POST':
@@ -290,7 +298,7 @@ def account_details():
     try:
       db.session.commit()
       save_event(
-        event=f'User {current_user.username} updated account details',
+        event=f'The User {current_user.username} updated account details',
         site=account_details.__name__  
       )
 
@@ -309,7 +317,7 @@ def account_details():
           user.username = username
           db.session.commit()
           save_event(
-            event=f'User {current_user.username} updated username to {username}',
+            event=f'The User {current_user.username} updated username to {username}',
             site=account_details.__name__  
           )
 
@@ -341,8 +349,6 @@ def account_details():
           save_json(file_path=SESSIONS, data=session_list)
           
           return redirect( url_for('hash_session', rendered_session=sess))
-          # user.email = email 
-          # db.session.commit()
 
     except Exception as e:
       save_event(event=e, site=account_details.__name__)
@@ -370,7 +376,7 @@ def new_email(rendered_session):
         session.pop('username', None)
         session.pop('new_email', None)
         save_event(
-          event=f'User {current_user.username} updated email from {old_email} to {user.email}',
+          event=f'The User {current_user.username} updated email from {old_email} to {user.email}',
           site=account_details.__name__  
         )
         #flash email was updated

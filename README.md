@@ -100,6 +100,7 @@ E-lectro is a web application in Flask. Its destination is an online shop but ce
   - [x] editable
   - [x] when the user wants to change 'the username' the app checks whether the new name is free
   - [x] when the user wants to change the e-mail app sends an e-mail message with a code. After 15 minutes code will expire. Without code, change is not possible
+- [x] own captcha system
 - [ ] better Readme section of installation which depict the correct process with Redis and Redis queue
 - [ ] subpage where user can edit personal data
 - [ ] multi-device login (max 3)
