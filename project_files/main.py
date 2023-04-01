@@ -135,9 +135,11 @@ def product_info(product_id):
 
   resp = make_response(render_template('product_info.html', product=product))
 
-  resp.set_cookie(f'{product.category}', f'{product.price}')
-  
-  # print(request.cookies.get(f'{product.category}'))
+  resp.set_cookie(
+    key=f'{product.category}', 
+    value=f'{product.price}',
+    max_age=10*60*60*24
+  )
   return resp
 
 
