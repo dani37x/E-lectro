@@ -21,8 +21,8 @@ from rq.command import send_stop_job_command
 
 
 scheduler.add_job(delete_expired_data, args=[0, 0, 20, SESSIONS], trigger='interval', minutes=15)
-scheduler.add_job(delete_expired_data, args=[7, 0, 0, EVENTS], trigger='interval', hours=1)
-scheduler.add_job(delete_expired_data, args=[7, 0, 0, DATA], trigger='interval', days=1)
+scheduler.add_job(delete_expired_data, args=[7, 0, 0, EVENTS], trigger='interval', hours=20)
+scheduler.add_job(delete_expired_data, args=[7, 0, 0, DATA], trigger='interval', hours=1)
 scheduler.start()
 
 
@@ -52,7 +52,7 @@ def captcha():
 
         chars = form.chars.data
         if chars == data['answer_count']:
-          session['chances'] = '4'
+          session['chances'] = 4
           session['captcha_completed'] = True
           return redirect( url_for(session.get('previous_site','login')))
         

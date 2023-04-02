@@ -9,15 +9,16 @@ from flask import render_template, url_for, redirect, request
 
 from .database import User, Blocked, Product
 
-from .scripts.functions import not_null, save_event, check_admin, check_user
-
-from rq import Retry
+from .scripts.functions import check_admin, check_user, captcha
+from .scripts.functions import not_null, save_event
 
 from .scripts.actions import delete_rows, block_users, message, backup
 from .scripts.actions import account_activation, account_deactivation
 from .scripts.actions import delete_inactive_accounts, restore_database
 from .scripts.actions import send_newsletter
 from .scripts.actions import rq_add_row_to_db, rq_delete_db_row
+
+from rq import Retry
 
 from datetime import datetime
  
@@ -39,11 +40,8 @@ def admin():
 @login_required
 # @check_admin('admin_user')
 # @check_user('admin_user')
+@captcha('admin_user')
 def admin_user():
-
-  session['previous_site'] = admin_user.__name__
-  if session.get('captcha_completed', None) == None:
-    return redirect( url_for('captcha'))
   
   users = User.query.all() 
 
@@ -157,11 +155,8 @@ def admin_user():
 @login_required
 # @check_admin('admin_blocked')
 # @check_user('admin_blocked')
+@captcha('admin_blocked')
 def admin_blocked():
- 
-  session['previous_site'] = admin_blocked.__name__
-  if session.get('captcha_completed', None) == None:
-    return redirect( url_for('captcha'))
 
   blocked = Blocked.query.all() 
 
@@ -208,11 +203,8 @@ def admin_blocked():
 @login_required
 # @check_admin('admin_product')
 # @check_user('admin_product')
+@captcha('admin_product')
 def admin_product():
-
-  session['previous_site'] = admin_product.__name__
-  if session.get('captcha_completed', None) == None:
-    return redirect( url_for('captcha'))
 
   products = Product.query.all() 
 
@@ -265,11 +257,8 @@ def admin_product():
 @login_required
 # @check_admin('add_user')
 # @check_user('add_user')
+@captcha('add_user')
 def add_user():
-
-  session['previous_site'] = add_user.__name__
-  if session.get('captcha_completed', None) == None:
-    return redirect( url_for('captcha')) 
 
   if request.method == 'POST':
 
@@ -316,12 +305,8 @@ def add_user():
 @login_required
 # @check_admin('update_user')
 # @check_user('update_user')
+@captcha('update_user')
 def update_user(id):
-
-  session['previous_site'] = update_user.__name__
-  if session.get('captcha_completed', None) == None:
-    return redirect( url_for('captcha')) 
-
 
   user = User.query.get_or_404(id)
   
@@ -360,11 +345,8 @@ def update_user(id):
 @login_required
 # @check_admin('delete_user')
 # @check_user('delete_user')
+@captcha('delete_user')
 def delete_user(id):
-
-  session['previous_site'] = delete_user.__name__
-  if session.get('captcha_completed', None) == None:
-    return redirect( url_for('captcha')) 
 
   name_to_delete = User.query.get_or_404(id)
 
@@ -386,11 +368,8 @@ def delete_user(id):
 @login_required
 # @check_admin('add_blocked')
 # @check_user('add_blocked')
+@captcha('add_blocked')
 def add_blocked():
-
-  session['previous_site'] = add_blocked.__name__
-  if session.get('captcha_completed', None) == None:
-    return redirect( url_for('captcha'))
 
   if request.method == 'POST':
 
@@ -426,11 +405,8 @@ def add_blocked():
 @login_required
 # @check_admin('update_blocked')
 # @check_user('update_blocked')
+@captcha('update_blocked')
 def update_blocked(id):
-
-  session['previous_site'] = update_blocked.__name__
-  if session.get('captcha_completed', None) == None:
-    return redirect( url_for('captcha'))
 
   blocked = Blocked.query.get_or_404(id)
 
@@ -456,11 +432,8 @@ def update_blocked(id):
 @login_required
 # @check_admin('delete_blocked')
 # @check_user('delete_blocked')
+@captcha('delete_blocked')
 def delete_blocked(id):
-
-  session['previous_site'] = delete_blocked.__name__
-  if session.get('captcha_completed', None) == None:
-    return redirect( url_for('captcha'))
 
   name_to_delete = Blocked.query.get_or_404(id)
 
@@ -482,11 +455,8 @@ def delete_blocked(id):
 @login_required
 # @check_admin('add_product')
 # @check_user('add_product')
+@captcha('add_product')
 def add_product():
-
-  session['previous_site'] = add_product.__name__
-  if session.get('captcha_completed', None) == None:
-    return redirect( url_for('captcha'))
 
   if request.method == 'POST':
 
@@ -525,11 +495,8 @@ def add_product():
 @login_required
 # @check_admin('update_product')
 # @check_user('update_product')
+@captcha('update_product')
 def update_product(id):
-
-  session['previous_site'] = update_product.__name__
-  if session.get('captcha_completed', None) == None:
-    return redirect( url_for('captcha'))
 
   product = Product.query.get_or_404(id)
 
@@ -556,11 +523,8 @@ def update_product(id):
 @login_required
 # @check_admin('delete_product')
 # @check_user('delete_product')
+@captcha('delete_product')
 def delete_product(id):
-
-  session['previous_site'] = delete_product.__name__
-  if session.get('captcha_completed', None) == None:
-    return redirect( url_for('captcha'))
 
   name_to_delete = Product.query.get_or_404(id)
 

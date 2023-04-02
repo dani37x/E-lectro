@@ -132,7 +132,6 @@ def product_info(product_id):
     return redirect( url_for('captcha'))
 
   product = Product.query.filter_by(id=product_id).first()
-
   resp = make_response(render_template('product_info.html', product=product))
 
   resp.set_cookie(

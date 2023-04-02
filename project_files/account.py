@@ -12,7 +12,7 @@ from .form import UserCreator, UserLogin, RemindPassword, NewPassword, Key
 
 from .database import User, Blocked
 
-from .scripts.functions import check_user, not_null, unblock, save_event
+from .scripts.functions import check_user, not_null, unblock, save_event, captcha
 from .scripts.functions import check_session, random_string, open_json, save_json
 
 from .scripts.actions import  message
@@ -23,13 +23,10 @@ from datetime import datetime, timedelta
 
 
 @app.route('/account', methods=['GET', 'POST'])
-# @check_user('logout')
+# @check_user('account')
+@captcha('account')
 @login_required
 def account():
-
-  session['previous_site'] = account.__name__
-  if session.get('captcha_completed', None) == None:
-    return redirect( url_for('captcha'))
 
   session['username'] = current_user.username
   sess = random_string(size=39)
@@ -40,7 +37,8 @@ def account():
 
 
 @app.route('/account/newsletter/register', methods=['GET', 'POST'])
-# @check_user('logout')
+# @check_user('register_newsletter')
+@captcha('register_newsletter')
 @login_required
 def register_newsletter():
 
@@ -50,7 +48,8 @@ def register_newsletter():
 
 
 @app.route('/account/newsletter/unregister', methods=['GET', 'POST'])
-# @check_user('logout')
+# @check_user('unregister_newsletter')
+@captcha('unregister_newsletter')
 @login_required
 def unregister_newsletter():
 
@@ -280,11 +279,8 @@ def new_password(rendered_session):
 @app.route('/account/details', methods=['GET', 'POST'])
 @login_required
 # @check_user('account_details')
+@captcha('account_details')
 def account_details():
-  
-  session['previous_site'] = account_details.__name__
-  if session.get('captcha_completed', None) == None:
-    return redirect( url_for('captcha'))
 
   user = User.query.get_or_404(current_user.id)
 

@@ -4,7 +4,7 @@ from project_files import queue
 from project_files import BLOCKED, USER, PRODUCT
 from project_files import EVENTS, DATA, CLASSIFIER, SESSIONS
 
-from flask import request, abort, session
+from flask import request, abort, session, redirect, url_for
 from flask_login import  current_user
 
 from functools import wraps
@@ -29,8 +29,8 @@ def check_admin(name):
         def wrapped(*args, **kwargs):
 
             if current_user.username != 'Admin' or current_user.username != 'admin':
-                abort(403)
-                
+                abort(403)    
+
             return f(*args, **kwargs)
         return wrapped
     return decorator
@@ -52,6 +52,20 @@ def check_user(name):
             check = User.query.filter_by(username=current_user.username).first()
             if check.active == False:
                 abort(403)
+
+            return f(*args, **kwargs)
+        return wrapped
+    return decorator
+
+
+def captcha(name):
+    def decorator(f):
+        @wraps(f)
+        def wrapped(*args, **kwargs):
+
+            session['previous_site'] = name
+            if session.get('captcha_completed', None) == None:
+                return redirect( url_for('captcha'))
 
             return f(*args, **kwargs)
         return wrapped
