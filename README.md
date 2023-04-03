@@ -17,14 +17,15 @@ E-lectro is a web application in Flask. Its destination is an online shop but ce
 
 <a name="roadmap"></a>
 
-- [x] Protections wrappers:
-  - [x] for admin views, check whether a user is an admin
-  - [x] for common users, check their ip and account details
 - [x] Own Admin management panel with basic operations on a row like
   - [x] edit row
   - [x] delete row
   - [x] add a new row
   - [x] search rows that contain query
+- [x] Protections wrappers:
+  - [x] wrapper for admin views, check whether a user is an admin
+  - [x] wrapper for common users, check their ip and account details
+  - [x] wrapper that co-works with my captcha system against bots
 - [x] Group actions in the admin panel (many rows):
   - [x] accounts users' activation
   - [x] accounts users' deactivation
@@ -100,7 +101,10 @@ E-lectro is a web application in Flask. Its destination is an online shop but ce
   - [x] editable
   - [x] when the user wants to change 'the username' the app checks whether the new name is free
   - [x] when the user wants to change the e-mail app sends an e-mail message with a code. After 15 minutes code will expire. Without code, change is not possible
-- [x] own captcha system
+- [x] Own captcha system. Every user has only three chances before logout.
+  - [x] random quizzes with random letters and sizes
+  - [x] the captcha wrapper for views.
+  - [ ] registration how many times the user did not pass the captcha. Consequences with it.
 - [ ] better Readme section of installation which depict the correct process with Redis and Redis queue
 - [ ] subpage where user can edit personal data
 - [ ] multi-device login (max 3)
