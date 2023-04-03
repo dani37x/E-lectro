@@ -356,7 +356,6 @@ def delete_user(id):
       object=name_to_delete,
       retry=Retry(max=3, interval=[10, 30, 60])
     )
-
     return redirect(url_for('admin_user'))
 
   except Exception as e:
@@ -443,7 +442,6 @@ def delete_blocked(id):
       object=name_to_delete,
       retry=Retry(max=3, interval=[10, 30, 60])
     )
-
     return redirect(url_for('admin_blocked'))
   
   except Exception as e:
@@ -534,11 +532,9 @@ def delete_product(id):
       object=name_to_delete,
       retry=Retry(max=3, interval=[10, 30, 60])
     )
-
     return redirect(url_for('admin_product'))
 
   except Exception as e:
     save_event(event=e, site=delete_product.__name__)
-
     return 'xd'    
 

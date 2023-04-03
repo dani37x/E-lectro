@@ -62,7 +62,7 @@ def captcha(name):
     def decorator(f):
         @wraps(f)
         def wrapped(*args, **kwargs):
-
+            
             session['previous_site'] = name
             if session.get('captcha_completed', None) == None:
                 return redirect( url_for('captcha'))
@@ -76,7 +76,6 @@ def open_json(file_path):
     data = []
     with open(file_path) as fp:
         data = json.load(fp)
-        
     return data
 
 
@@ -90,16 +89,13 @@ def back_to_slash(path):
 
 
 def not_null(field):
-
     if field != '' and field != None:
         return field
-
     else:
         return ValueError    
  
 
 def user_searched(username, ip, searched):
-
     objects_list = open_json(file_path=DATA)
 
     searched = str(searched).lower()
@@ -119,7 +115,6 @@ def string_to_date(date):
 
 
 def unblock(blocked_user):
-
     app.app_context().push()
 
     if (datetime.now() > string_to_date(blocked_user.date)):
@@ -138,7 +133,6 @@ def unblock(blocked_user):
 
 
 def save_event(event, site):
-
     file_path = back_to_slash(EVENTS)
     objects_list = open_json(file_path=file_path)
 
@@ -157,7 +151,6 @@ def recently_searched():
     # if len(objects_list) > 0:
 
     queries = [object['searched'] for object in objects_list if len(object['searched']) > 2]
-
     counter = Counter(queries)
 
     return dict(counter.most_common()[:5])
@@ -180,7 +173,6 @@ def random_string(size):
 
 
 def check_session(session_list):
-
     new_session = random_string(size=40)
     wheter_exists = False
     
@@ -194,54 +186,42 @@ def check_session(session_list):
 
 
 def delete_expired_data(d, h, m, file_path):
-
     objects_list = open_json(file_path=file_path)
     if len(objects_list) > 0:
 
         durabity = datetime.now() - timedelta(days=d, hours=h, minutes=m)
-
         current_objects = [object for object in objects_list if string_to_date(object['time']) > durabity]
 
         save_json(file_path=file_path, data=current_objects)
 
 
 def similar_products_to_queries(username):
-    
     queries = open_json(file_path=DATA)
     user_queries = [query for query in queries if query['username'] == username]
-
     products = Product.query.all()
 
     if products:
-
+        
         if len(user_queries) == 0:
 
             random_products = []
             for number in range(6):
-
                 product_to_add = random.choice(products)
-
                 if product_to_add not in random_products:
                     random_products.append(product_to_add)
 
             return random_products
 
-
         possible_products = []
         for product in products:
-
             for query in user_queries:
-
-                print(query['searched'], product.name)
-                print(type(query['searched']), type(product.name))
-                
+                # print(query['searched'], product.name)
+                # print(type(query['searched']), type(product.name))
                 if str(query['searched']).lower() in str(product.name).lower() or query['searched'] == product.name:
-
                     if product not in possible_products:
                         possible_products.append(product)
 
                 if str(query['searched']).lower() in str(product.category).lower() or query['searched'] == product.name:
-
                     if product not in possible_products:
                         possible_products.append(product)
 
@@ -249,20 +229,18 @@ def similar_products_to_queries(username):
 
 
 def classification(category, money):
-
     #more to add
     list_of_categories = [
         {"AGD": 1},
         {"TOYS": 2},
     ]
-
     for cat in list_of_categories:
         if category in cat:
             category = cat[category]
 
     model = pickle.load(open(CLASSIFIER, "rb"))
-
     prediction = model.predict([[category, money]])
+    
     return prediction
 
 
@@ -281,6 +259,8 @@ def random_char(without_char=None, every_char=True):
     list_of_chars.remove('o')
     list_of_chars.remove('O')
     list_of_chars.remove('"')
+    list_of_chars.remove('_')
+    list_of_chars.remove('-')
 
   if without_char != None:
     list_of_chars.remove(without_char)
@@ -293,10 +273,14 @@ def generator(answer, obstacle):
   list_of_numbers = [6, 7, 8, 9, 10, 11, 12, 15, 16]
   size = random.choice(list_of_numbers)
   list_of_chars = []
-
-  data = {'answer_count': 0, 'obstacle_count': 0, 'generated_string': ''}
+  data = {
+      'answer_count': 0, 
+      'obstacle_count': 0, 
+      'generated_string': ''
+    }
 
   for j in range(0, (size*size)):
+
     if data['answer_count'] < random.choice(list_of_numbers):
       char_to_add = random.choice(chars)
     else:
@@ -326,3 +310,22 @@ def generator(answer, obstacle):
 def random_return():
     decisions = [True, False]
     return random.choice(decisions)
+
+
+def failed_captcha(username):
+    object_list = open_json(file_path=EVENTS)
+    sentence = f'The user {username}'    
+    counter = 0
+
+    for object in object_list:
+        
+        if object['site'] == 'captcha' and sentence in object['event']:
+            counter += 1
+        
+        if counter == 4:
+            return True
+        
+    return False
+
+
+

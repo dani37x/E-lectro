@@ -42,7 +42,11 @@ def password_checking(form, field):
 
 # more words if it is required :)
 
-not_allowed= ['fuck', 'shit', 'hitler', 'stalin', '666', 'admin', 'mod', 'product', 'blocked', 'user']
+not_allowed = [
+  'fuck', 'shit', 'hitler', 'stalin', '666', 
+  'admin', 'mod', 'product', 'blocked', 'user',
+  'the user', 'captcha'
+]
 
 def existing_user(form, field):
   if field.data in User.query.filter(User.username).all():
@@ -109,5 +113,5 @@ class RemindPassword(FlaskForm):
   email = EmailField('e-mail', validators=[DataRequired(), Length(max=50)])
 
 
-class CharCounter(FlaskForm):
+class CharsCounter(FlaskForm):
   chars = IntegerField(validators=[DataRequired()])

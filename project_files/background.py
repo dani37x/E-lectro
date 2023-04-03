@@ -6,23 +6,39 @@ from project_files import job_registry
 from project_files import session
 from project_files import redis_instance
 
-from .scripts.functions import delete_expired_data, save_event
-
 from flask_login import login_required, current_user
 from flask import render_template, url_for, redirect, request
 
-from .form import CharCounter
+from .form import CharsCounter
 
 from .scripts.functions import save_event, check_user, check_admin
 from .scripts.functions import  generator, random_char
+from .scripts.functions import delete_expired_data, save_event, failed_captcha
+
+from .scripts.actions import block_users
 
 from rq.job import cancel_job
 from rq.command import send_stop_job_command
 
 
-scheduler.add_job(delete_expired_data, args=[0, 0, 20, SESSIONS], trigger='interval', minutes=15)
-scheduler.add_job(delete_expired_data, args=[7, 0, 0, EVENTS], trigger='interval', hours=20)
-scheduler.add_job(delete_expired_data, args=[7, 0, 0, DATA], trigger='interval', hours=1)
+scheduler.add_job(
+  delete_expired_data, 
+  args=[0, 0, 20, SESSIONS], 
+  trigger='interval', 
+  minutes=15
+)
+scheduler.add_job(
+  delete_expired_data, 
+  args=[5, 0, 0, EVENTS], 
+  trigger='interval', 
+  minutes=10
+)
+scheduler.add_job(
+  delete_expired_data, 
+  args=[7, 0, 0, DATA], 
+  trigger='interval', 
+  hours=1
+)
 scheduler.start()
 
 
@@ -32,6 +48,13 @@ scheduler.start()
 def captcha():
 
   try:
+    if session.get('captcha_completed', None) != None:
+      return redirect( url_for('page'))
+
+    if failed_captcha(username=current_user.username):
+        block_users([current_user.id])
+        return redirect( url_for('logout'))
+
     session['chances'] = session['chances'] - 1
 
     if session.get('chances') < 1 or session.get('chances') == None:
@@ -44,7 +67,7 @@ def captcha():
     answer = random_char(every_char=False)
     obstacle = random_char(without_char=answer, every_char=False)
     data = generator(answer=answer, obstacle=obstacle)
-    form = CharCounter()
+    form = CharsCounter()
 
     if request.method == 'POST':
 
@@ -62,7 +85,7 @@ def captcha():
         
   except Exception as e:
     save_event(event=e, site=captcha.__name__)
-    return redirect( url_for(session.get('previous_site','login')))
+    return redirect( url_for('login'))
 
 
   return render_template('captcha.html', form=form, data=data, answer=answer)

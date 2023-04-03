@@ -104,7 +104,7 @@ E-lectro is a web application in Flask. Its destination is an online shop but ce
 - [x] Own captcha system. Every user has only three chances before logout.
   - [x] random quizzes with random letters and sizes
   - [x] the captcha wrapper for views.
-  - [ ] registration how many times the user did not pass the captcha. Consequences with it.
+  - [x] registration how many times the user did not pass the captcha. Consequences with it(block of account).
 - [ ] better Readme section of installation which depict the correct process with Redis and Redis queue
 - [ ] subpage where user can edit personal data
 - [ ] multi-device login (max 3)
@@ -145,7 +145,7 @@ E-lectro is a web application in Flask. Its destination is an online shop but ce
    ```sh
    pip install -r requirements.txt
    ```
-4. Enter your API in `env.py` variables
+4. Enter your API keys in variables in secret file
    ```python
    os.environ['MAIL_USERNAME'] = '';
    os.environ['MAIL_PASSWORD'] = '';
