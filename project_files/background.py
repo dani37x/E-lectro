@@ -48,8 +48,6 @@ scheduler.start()
 def captcha():
 
   try:
-    if session.get('captcha_completed', None) != None:
-      return redirect( url_for('page'))
 
     if failed_captcha(username=current_user.username):
         block_users([current_user.id])

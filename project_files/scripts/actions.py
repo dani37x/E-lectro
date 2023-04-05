@@ -28,9 +28,7 @@ def delete_rows(model, data):
 
 def block_users(data):
     time.sleep(5)
-
-    if len(data) > 1:
-        app.app_context().push()
+    app.app_context().push()
 
     for id in data:
         user_to_block = User.query.get(id)

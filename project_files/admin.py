@@ -152,10 +152,10 @@ def admin_user():
 
 
 @app.route('/admin/blocked', methods=['GET', 'POST'])
-@login_required
+# @login_required
 # @check_admin('admin_blocked')
 # @check_user('admin_blocked')
-@captcha('admin_blocked')
+# @captcha('admin_blocked')
 def admin_blocked():
 
   blocked = Blocked.query.all() 

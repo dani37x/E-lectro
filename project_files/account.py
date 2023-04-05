@@ -262,7 +262,7 @@ def new_password(rendered_session):
           user.password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
           db.session.commit()
           session.pop('username', None)
-          return redirect( url_for('account'))
+          return redirect( url_for('login'))
             
       return render_template('new_password.html', form=form)
 

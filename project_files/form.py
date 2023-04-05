@@ -68,39 +68,39 @@ class UserCreator(FlaskForm):
   username = StringField('nickname',
     validators=[
       DataRequired(),
-      Length(max=30),
+      Length(min=6, max=30),
       existing_user,
     ])
-  first_name = StringField('first_name', validators=[DataRequired(), Length(max=20)])
-  surname = StringField('surname', validators=[DataRequired(), Length(max=30)])
+  first_name = StringField('first_name', validators=[DataRequired(), Length(min=2, max=20)])
+  surname = StringField('surname', validators=[DataRequired(), Length(min=2, max=30)])
   email = EmailField('e-mail',
    validators=[
       DataRequired(),
-      Length(max=50),
+      Length(min=4, max=20),
       existing_email
     ])
   password = PasswordField('password', validators=[DataRequired(), password_checking])
   password_2 = PasswordField('repeat password', 
     validators=[
       DataRequired(),
-      Length(max=50),
+      Length(max=20),
       EqualTo('password'),
     ])
 
 
 class UserLogin(FlaskForm):
-  username = StringField('username', validators=[DataRequired(), Length(max=30)])
-  email = EmailField('e-mail', validators=[DataRequired(), Length(max=50)])
-  password = PasswordField('password', validators=[DataRequired(), Length(max=50)])
+  username = StringField('username', validators=[DataRequired()])
+  email = EmailField('e-mail', validators=[DataRequired()])
+  password = PasswordField('password', validators=[DataRequired()])
   remember = BooleanField('remember me')
 
 
 class Key(FlaskForm):
-  key = StringField('Enter the key', validators=[DataRequired(), Length(max=10)])
+  key = StringField('Enter the key', validators=[DataRequired(), Length(min=2, max=10)])
 
 
 class NewPassword(FlaskForm):
-  password = PasswordField('password', validators=[DataRequired()])
+  password = PasswordField('new password', validators=[DataRequired(), password_checking])
   password_2 = PasswordField('repeat password', validators=[
     DataRequired(),
     EqualTo('password'),
