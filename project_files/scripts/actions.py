@@ -18,7 +18,6 @@ import time
 
 
 def delete_rows(model, data):
-
     time.sleep(10)
     app.app_context().push()
 
@@ -28,8 +27,7 @@ def delete_rows(model, data):
 
 
 def block_users(data):
-
-    time.sleep(10)
+    time.sleep(5)
     app.app_context().push()
 
     for id in data:
@@ -48,7 +46,6 @@ def block_users(data):
 
 
 def message(*args):
-
     app.app_context().push()  
 
     if args[0] == 'register':
@@ -56,7 +53,6 @@ def message(*args):
         body = f'Welcome {args[2]}. This is your activation key {args[3]}'
 
     if args[0] == 'no-reply':
-
         time.sleep(30)
 
         subject = 'no-reply-message'
@@ -118,7 +114,6 @@ def backup(model):
 def restore_database(model):
 
     if model == User:
-
         data_from_file = open_json(file_path=USER)
 
         for data in data_from_file:
@@ -144,11 +139,9 @@ def restore_database(model):
                 db.session.commit()
 
     elif model == Product:
-
         data_from_file = open_json(file_path=PRODUCT)
 
         for data in data_from_file:
-
             product = model(
                 name=data['name'],
                 category=data['category'],
@@ -157,18 +150,15 @@ def restore_database(model):
             )
             
             whether_exist = model.query.filter_by(name=data['name']).first()
-            
-            if whether_exist == None:
 
+            if whether_exist == None:
                 db.session.add(product)
                 db.session.commit()
 
     elif model == Blocked:
-
         data_from_file = open_json(file_path=BLOCKED)
 
         for data in data_from_file:
-
             blocked = model(
                 username=data['username'],
                 ip=data['ip'],
@@ -178,56 +168,44 @@ def restore_database(model):
             whether_exist = model.query.filter_by(username=data['username']).first()
             
             if whether_exist == None:
-                
                 db.session.add(blocked)
                 db.session.commit()
 
 
 
 def account_activation(model, data):
-
     time.sleep(15)
-
     app.app_context().push()
 
     for number in data:
-
         account = model.query.filter_by(id=number).first()
         account.active = True
         db.session.commit()
     
 
 def account_deactivation(model, data):
-
     time.sleep(15)
-
     app.app_context().push()
 
     for number in data:
-
         account = model.query.filter_by(id=number).first()
         account.active = False
         db.session.commit()
 
 
 def delete_inactive_accounts():
-    
     time.sleep(60)
-
     app.app_context().push()
     users = User.query.all()
 
     for user in users:
-
         if user.active ==  False:
             db.session.delete(user)
             db.session.commit()
 
 
 def send_newsletter():
-
     time.sleep(15)
-
     app.app_context().push()
 
     if users :=  User.query.filter_by(newsletter=True).all():
@@ -248,33 +226,25 @@ def send_newsletter():
 
 
 def newsletter_activation(username):
-
-    if user := User.query.filter_by(username=username).first():
-        
+    if user := User.query.filter_by(username=username).first():      
         user.newsletter = True
         db.session.commit()
 
 
 def newsletter_deactivation(username):
-
     if user := User.query.filter_by(username=username).first():
-
         user.newsletter = False
         db.session.commit()
 
 
 def rq_add_row_to_db(object):
-    
     app.app_context().push()
-
     db.session.add(object)
     db.session.commit()
 
 
 def rq_delete_db_row(object):
-
     app.app_context().push()
-
     db.session.delete(object)
     db.session.commit()
 

@@ -30,7 +30,6 @@ def account():
 
   session['username'] = current_user.username
   sess = random_string(size=39)
-  
   user = User.query.filter_by(username=current_user.username).first()
 
   return render_template('account.html', sess=sess, newsletter=user.newsletter)
@@ -156,8 +155,7 @@ def login():
       wheter_blocked = Blocked.query.filter_by(username=user.username).first()
       if wheter_blocked:
             
-        if queue.enqueue(unblock, blocked_user=wheter_blocked):
-
+        if unblock(blocked_user=wheter_blocked):
           login_user(user, remember=form.remember.data)
           session['chances'] = 4
           return redirect( url_for('page'))
@@ -264,7 +262,7 @@ def new_password(rendered_session):
           user.password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
           db.session.commit()
           session.pop('username', None)
-          return redirect( url_for('account'))
+          return redirect( url_for('login'))
             
       return render_template('new_password.html', form=form)
 

@@ -11,4 +11,16 @@
     <input type="submit">
 </form>
 
-<a href="{{ url_for('register') }}">You havent't an account?</a> 
+<a href="{{ url_for('register') }}">I don't have an account?</a>
+<br>
+<a href="{{ url_for('remind') }}">I don't remember my password</a> 
+
+
+
+{% for field in form.errors %}
+{% for error in form.errors[field] %}
+    <div class="alert alert-error">
+        <strong>Error!</strong> {{error}}
+    </div>
+{% endfor %}
+{% endfor %}

@@ -7,9 +7,9 @@ from flask import render_template, url_for, redirect, request, session, make_res
 
 from .database import User, Blocked, Product
 
-from .scripts.functions import check_admin, check_user, user_searched, recently_searched
-from .scripts.functions import delete_expired_data, similar_products_to_queries
-from .scripts.functions import classification, save_event
+from .scripts.functions import check_admin, check_user, captcha
+from .scripts.functions import similar_products_to_queries, recently_searched
+from .scripts.functions import classification, save_event, user_searched
 
 from datetime import datetime
 
@@ -40,11 +40,8 @@ def before_request():
 @app.route('/', methods=['GET', 'POST'])
 @login_required
 # @check_user('page')
+@captcha('page')
 def page():
-
-  session['previous_site'] = page.__name__
-  if session.get('captcha_completed', None) == None:
-    return redirect( url_for('captcha'))
 
   products = Product.query.all()
 
