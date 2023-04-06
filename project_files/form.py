@@ -1,8 +1,8 @@
+from .database import User
+
 from flask_wtf import FlaskForm
 from wtforms import StringField, EmailField, PasswordField, BooleanField, IntegerField
 from wtforms.validators import DataRequired, Length, EqualTo, ValidationError
-
-from .database import User
 
 import string
 

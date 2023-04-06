@@ -2,14 +2,14 @@ from project_files import app
 from project_files import db
 from project_files import login_manager
 
-from flask_login import login_required, current_user
-from flask import render_template, url_for, redirect, request, session, make_response
-
 from .database import User, Blocked, Product
 
 from .scripts.functions import check_admin, check_user, captcha
 from .scripts.functions import similar_products_to_queries, recently_searched
 from .scripts.functions import classification, save_event, user_searched
+
+from flask_login import login_required, current_user
+from flask import render_template, url_for, redirect, request, session, make_response
 
 from datetime import datetime
 
@@ -63,7 +63,7 @@ def page():
       )
 
   return render_template(
-    'page.html',
+    'auth/page.html',
     products=products,
     user=current_user.username,
     recently_searched=recently_searched(),
@@ -84,7 +84,7 @@ def category():
     if product.category not in categories:
       categories.append(product.category)
 
-  return render_template('category.html', categories=categories)
+  return render_template('shop/category.html', categories=categories)
 
 
 @app.route('/shop/<category>/products', methods=['GET', 'POST'])
@@ -116,9 +116,9 @@ def products(category):
 
     products_for_user.extend(the_others)
     
-    return render_template('products.html', products=products_for_user)
+    return render_template('shop/products.html', products=products_for_user)
   
-  return render_template('products.html', list_of_products=list_of_products)
+  return render_template('shop/products.html', list_of_products=list_of_products)
 
 
 @app.route('/shop/products/<product_id>', methods=['GET', 'POST'])
@@ -129,7 +129,7 @@ def product_info(product_id):
     return redirect( url_for('captcha'))
 
   product = Product.query.filter_by(id=product_id).first()
-  resp = make_response(render_template('product_info.html', product=product))
+  resp = make_response(render_template('shop/product_info.html', product=product))
 
   resp.set_cookie(
     key=f'{product.category}', 

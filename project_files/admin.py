@@ -33,7 +33,7 @@ def admin():
   if session.get('captcha_completed', None) == None:
     return redirect( url_for('captcha'))
 
-  return render_template('admin.html')
+  return render_template('admin/admin.html')
 
 
 @app.route('/admin/users', methods=['GET', 'POST'])
@@ -72,7 +72,7 @@ def admin_user():
           data=data,
           retry=Retry(max=3, interval=[10, 30, 60])
         )
-        return render_template('admin_user.html', users=users, task=task)
+        return render_template('admin/admin_user.html', users=users, task=task)
 
 
       if selected_action == 'block users':
@@ -82,7 +82,7 @@ def admin_user():
           data=data,
           retry=Retry(max=3, interval=[10, 30, 60])
         )
-        return render_template('admin_user.html', users=users, task=task)
+        return render_template('admin/admin_user.html', users=users, task=task)
 
 
       if selected_action == 'account activation':
@@ -94,7 +94,7 @@ def admin_user():
             retry=Retry(max=3, interval=[10, 30, 60])
           )
         
-        return render_template('admin_user.html', users=users, task=task)
+        return render_template('admin/admin_user.html', users=users, task=task)
       
       if selected_action == 'account deactivation':
 
@@ -104,7 +104,7 @@ def admin_user():
           data=data,
           retry=Retry(max=3, interval=[10, 30, 60])
         )
-        return render_template('admin_user.html', users=users, task=task)
+        return render_template('admin/admin_user.html', users=users, task=task)
 
       if selected_action == 'delete unactive accounts':
 
@@ -123,7 +123,7 @@ def admin_user():
           send_newsletter,
           retry=Retry(max=3, interval=[10, 30, 60])
         )
-        return render_template('admin_user.html', users=users, task=task)
+        return render_template('admin/admin_user.html', users=users, task=task)
 
       if selected_action == 'test email':
 
@@ -139,7 +139,7 @@ def admin_user():
           users_emails,
           retry=Retry(max=3, interval=[50, 100, 200])
         )
-        return render_template('admin_user.html', users=users, task=task)
+        return render_template('admin/admin_user.html', users=users, task=task)
 
       if selected_action == 'backup':
         backup(User)
@@ -148,7 +148,7 @@ def admin_user():
       save_event(event=e, site=admin_user.__name__)
       return 'Error with actions'
   
-  return render_template('admin_user.html', users=users)
+  return render_template('admin/admin_user.html', users=users)
 
 
 @app.route('/admin/blocked', methods=['GET', 'POST'])
@@ -170,7 +170,7 @@ def admin_blocked():
         Blocked.query.filter(User.username.contains(searching)
           | (Blocked.ip.contains(searching))).all()
       )
-      return render_template('admin_blocked.html', blocked=blocked)
+      return render_template('admin/admin_blocked.html', blocked=blocked)
       
     data = request.form.getlist('id')
     selected_action = request.form['action']
@@ -184,7 +184,7 @@ def admin_blocked():
           data=data,
           retry=Retry(max=3, interval=[10, 30, 60])
         )
-        return render_template('admin_blocked.html', blocked=blocked, task=task)
+        return render_template('admin/admin_blocked.html', blocked=blocked, task=task)
       
       if selected_action == 'backup':
         backup(Blocked)
@@ -196,7 +196,7 @@ def admin_blocked():
       save_event(event=e, site=admin_blocked.__name__)
       return 'Error with actions'
 
-  return render_template('admin_blocked.html', blocked=blocked)
+  return render_template('admin/admin_blocked.html', blocked=blocked)
 
 
 @app.route('/admin/product', methods=['GET', 'POST'])
@@ -219,7 +219,7 @@ def admin_product():
           | (Product.category.contains(searching))
           | (Product.company.contains(searching))).all()
       )
-      return render_template('admin_product.html', products=products)
+      return render_template('admin/admin_product.html', products=products)
       
     data = request.form.getlist('id')
     selected_action = request.form['action']
@@ -234,7 +234,7 @@ def admin_product():
           retry=Retry(max=3, interval=[10, 30, 60])
         )
 
-        return render_template('admin_blocked.html', products=products, task=task)
+        return render_template('admin/admin_blocked.html', products=products, task=task)
       
       if selected_action == 'backup':
         backup(Product)
@@ -247,7 +247,7 @@ def admin_product():
       save_event(event=e, site=admin_product.__name__)
       return 'Error with actions'
 
-  return render_template('admin_product.html', products=products)
+  return render_template('admin/admin_product.html', products=products)
 
 
 # admin operations like add, update, delete
@@ -298,7 +298,7 @@ def add_user():
 
     return redirect( url_for('admin_user'))
 
-  return render_template('add_user.html')
+  return render_template('admin/add_user.html')
 
 
 @app.route('/update-user/<int:id>', methods=['GET', 'POST'])
@@ -338,7 +338,7 @@ def update_user(id):
       return 'xd'
   
   else:
-    return render_template('update_user.html', user=user )
+    return render_template('admin/update_user.html', user=user )
 
 
 @app.route('/delete-user/<int:id>')
@@ -397,7 +397,7 @@ def add_blocked():
       return 'xd'
 
     return redirect( url_for('admin_blocked'))
-  return render_template('add_blocked.html')
+  return render_template('admin/add_blocked.html')
 
 
 @app.route('/update-blocked/<int:id>', methods=['GET', 'POST'])
@@ -424,7 +424,7 @@ def update_blocked(id):
       return 'xd'
 
   else:
-    return render_template('update_blocked.html', blocked=blocked )
+    return render_template('admin/update_blocked.html', blocked=blocked )
 
 
 @app.route('/delete-blocked/<int:id>')
@@ -486,7 +486,7 @@ def add_product():
 
     return redirect( url_for('admin_product'))
 
-  return render_template('add_product.html')
+  return render_template('admin/add_product.html')
 
 
 @app.route('/update-product/<int:id>', methods=['GET', 'POST'])
@@ -514,7 +514,7 @@ def update_product(id):
       return 'xd'
 
   else:
-    return render_template('update_product.html', product=product )
+    return render_template('admin/update_product.html', product=product )
 
 
 @app.route('/delete-product/<int:id>')

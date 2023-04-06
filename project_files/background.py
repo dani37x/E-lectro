@@ -86,7 +86,7 @@ def captcha():
     return redirect( url_for('login'))
 
 
-  return render_template('captcha.html', form=form, data=data, answer=answer)
+  return render_template('captcha/captcha.html', form=form, data=data, answer=answer)
 
 
 @app.route('/cancel/<task_id>', methods=['GET', 'POST'])

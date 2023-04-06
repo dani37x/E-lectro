@@ -5,11 +5,6 @@ from project_files import login_manager
 from project_files import bcrypt
 from project_files import SESSIONS
 
-from flask_login import login_user, logout_user, login_required, current_user
-from flask import render_template, url_for, redirect, request, abort, session
-
-from datetime import datetime, timedelta
-
 from .form import UserCreator, UserLogin, RemindPassword, NewPassword, Key
 
 from .database import User, Blocked
@@ -20,7 +15,10 @@ from .scripts.functions import check_session, random_string, open_json, save_jso
 from .scripts.actions import  message
 from .scripts.actions import newsletter_activation, newsletter_deactivation
 
+from flask_login import login_user, logout_user, login_required, current_user
+from flask import render_template, url_for, redirect, request, abort, session
 
+from datetime import datetime, timedelta
 
 
 @app.route('/account', methods=['GET', 'POST'])
@@ -33,7 +31,7 @@ def account():
   sess = random_string(size=39)
   user = User.query.filter_by(username=current_user.username).first()
 
-  return render_template('account.html', sess=sess, newsletter=user.newsletter)
+  return render_template('account/account.html', sess=sess, newsletter=user.newsletter)
 
 
 @app.route('/account/newsletter/register', methods=['GET', 'POST'])
@@ -60,6 +58,7 @@ def unregister_newsletter():
 
 @app.route('/account/register', methods=['GET', 'POST'])
 def register():
+
   form = UserCreator()
 
   if form.validate_on_submit():
@@ -92,7 +91,7 @@ def register():
       save_event(event=e, site=register.__name__)
       return 'Error with add register sessions'
 
-  return render_template('register.html', form=form)
+  return render_template('auth/register.html', form=form)
 
 
 @app.route('/register/<rendered_session>', methods=['GET', 'POST'])
@@ -136,11 +135,12 @@ def register_session(rendered_session):
 
       return redirect( url_for('register'))
 
-  return render_template('hash.html', form=form)
+  return render_template('auth/hash.html', form=form)
 
 
 @app.route('/account/login', methods=['GET', 'POST'])
 def login():
+
   form = UserLogin()
 
   if form.validate_on_submit():
@@ -167,7 +167,7 @@ def login():
       session['chances'] = 4
       return redirect( url_for('page'))
 
-  return render_template('login.html', form=form)
+  return render_template('auth/login.html', form=form)
 
 
 @app.route("/account/logout")
@@ -217,7 +217,7 @@ def remind():
 
         return redirect( url_for( 'hash_session', rendered_session=sess))
 
-  return render_template('remind_password.html', form=form)
+  return render_template('auth/remind_password.html', form=form)
 
 
 
@@ -242,7 +242,7 @@ def hash_session(rendered_session):
 
       return redirect( url_for('remind'))
 
-  return render_template('hash.html',  form=form)
+  return render_template('auth/hash.html',  form=form)
 
 
 @app.route('/account/new_password/<rendered_session>', methods=['GET', 'POST'])
@@ -264,7 +264,7 @@ def new_password(rendered_session):
           session.pop('username', None)
           return redirect( url_for('login'))
             
-      return render_template('new_password.html', form=form)
+      return render_template('auth/new_password.html', form=form)
 
     else:
         return redirect('remind')    
@@ -351,7 +351,7 @@ def account_details():
     return redirect( url_for('account_details'))
         
   else:
-    return render_template('details.html', user=user)
+    return render_template('account/details.html', user=user)
   
 
 
