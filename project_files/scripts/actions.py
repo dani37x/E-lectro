@@ -4,13 +4,13 @@ from project_files import mail
 from project_files import queue
 from project_files import BLOCKED, USER, PRODUCT, EVENTS, DATA
 
+from ..scripts.functions import open_json, save_json , string_to_date
+
 from ..database import User, Blocked, Product
 
 from flask_mail import Message
 
 from datetime import datetime, date, timedelta
-
-from ..scripts.functions import open_json, save_json , string_to_date
 
 from rq import Retry
 

@@ -48,7 +48,6 @@ scheduler.start()
 def captcha():
 
   try:
-
     if failed_captcha(username=current_user.username):
         block_users([current_user.id])
         return redirect( url_for('logout'))
@@ -62,8 +61,9 @@ def captcha():
       )
       return redirect( url_for('logout'))
     
-    answer = random_char(every_char=False)
-    obstacle = random_char(without_char=answer, every_char=False)
+    prohibited_chars = ['i', 'l', '_', '-', '`', '"', '=', '.', ',']
+    answer = random_char(without=prohibited_chars)
+    obstacle = random_char(disabled_char=answer, without=prohibited_chars)
     data = generator(answer=answer, obstacle=obstacle)
     form = CharsCounter()
 
@@ -86,7 +86,7 @@ def captcha():
     return redirect( url_for('login'))
 
 
-  return render_template('captcha.html', form=form, data=data, answer=answer)
+  return render_template('captcha/captcha.html', form=form, data=data, answer=answer)
 
 
 @app.route('/cancel/<task_id>', methods=['GET', 'POST'])

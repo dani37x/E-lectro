@@ -4,12 +4,12 @@ from project_files import queue
 from project_files import BLOCKED, USER, PRODUCT
 from project_files import EVENTS, DATA, CLASSIFIER, SESSIONS
 
+from ..database import Blocked, User, Product
+
 from flask import request, abort, session, redirect, url_for
 from flask_login import  current_user
 
 from functools import wraps
-
-from ..database import Blocked, User, Product
 
 from datetime import datetime, date, timedelta
 
@@ -244,26 +244,20 @@ def classification(category, money):
     return prediction
 
 
-def random_char(without_char=None, every_char=True):
+def random_char(disabled_char=None, without=None):
   list_of_chars = []
   list_of_chars.extend(string.ascii_lowercase)
   list_of_chars.extend(string.ascii_uppercase)
   list_of_chars.extend(string.digits)
   list_of_chars.extend(string.punctuation)
 
-  if every_char == False:
-    list_of_chars.remove('I')
-    list_of_chars.remove('l')
-    list_of_chars.remove('|')
-    list_of_chars.remove('0')
-    list_of_chars.remove('o')
-    list_of_chars.remove('O')
-    list_of_chars.remove('"')
-    list_of_chars.remove('_')
-    list_of_chars.remove('-')
+  if disabled_char != None:
+    list_of_chars.remove(disabled_char)
 
-  if without_char != None:
-    list_of_chars.remove(without_char)
+  if without != None:
+    for ch in without:
+      list_of_chars.remove(ch)
+
 
   return random.choice(list_of_chars)
 
