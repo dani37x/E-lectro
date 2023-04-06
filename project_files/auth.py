@@ -2,11 +2,13 @@ from project_files import app
 from project_files import db
 from project_files import queue
 from project_files import login_manager
-from project_files import SESSIONS
 from project_files import bcrypt
+from project_files import SESSIONS
 
 from flask_login import login_user, logout_user, login_required, current_user
 from flask import render_template, url_for, redirect, request, abort, session
+
+from datetime import datetime, timedelta
 
 from .form import UserCreator, UserLogin, RemindPassword, NewPassword, Key
 
@@ -18,7 +20,6 @@ from .scripts.functions import check_session, random_string, open_json, save_jso
 from .scripts.actions import  message
 from .scripts.actions import newsletter_activation, newsletter_deactivation
 
-from datetime import datetime, timedelta
 
 
 
@@ -140,7 +141,6 @@ def register_session(rendered_session):
 
 @app.route('/account/login', methods=['GET', 'POST'])
 def login():
-
   form = UserLogin()
 
   if form.validate_on_submit():
@@ -283,9 +283,7 @@ def account_details():
   user = User.query.get_or_404(current_user.id)
 
   if request.method == 'POST':
-    
-    username = not_null(request.form['username'])
-    email = not_null(request.form['email'])
+  
     user.first_name = not_null(request.form['first_name'])
     user.surname = not_null(request.form['surname'])
 
@@ -301,6 +299,7 @@ def account_details():
       return redirect( url_for('account_details'))
 
     try:
+      username = not_null(request.form['username'])
       if username != user.username:
 
         if User.query.filter_by(username=username).first():
@@ -320,6 +319,7 @@ def account_details():
       return redirect( url_for('account_details'))
 
     try:
+      email = not_null(request.form['email'])
       if email != user.email:
 
         if User.query.filter_by(email=email).first():
