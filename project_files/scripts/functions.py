@@ -198,9 +198,8 @@ def delete_expired_data(d, h, m, file_path):
 def similar_products_to_queries(username):
     queries = open_json(file_path=DATA)
     user_queries = [query for query in queries if query['username'] == username]
-    products = Product.query.all()
-
-    if products:
+   
+    if products := Product.query.all():
         
         if len(user_queries) == 0:
 
@@ -264,7 +263,7 @@ def random_char(disabled_char=None, without=None):
 
 def generator(answer, obstacle):
   chars = [answer, obstacle]
-  list_of_numbers = [6, 7, 8, 9, 10, 11, 12, 15, 16]
+  list_of_numbers = [2, 5, 4, 6, 7, 8, 9, 10, 11, 12, 15, 16]
   size = random.choice(list_of_numbers)
   list_of_chars = []
   data = {

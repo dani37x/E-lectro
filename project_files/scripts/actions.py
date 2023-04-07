@@ -147,6 +147,7 @@ def restore_database(model):
                 category=data['category'],
                 company=data['company'],
                 price=data['price'],
+                old_price=data['old_price'],
             )
             
             whether_exist = model.query.filter_by(name=data['name']).first()
@@ -247,5 +248,17 @@ def rq_delete_db_row(object):
     app.app_context().push()
     db.session.delete(object)
     db.session.commit()
+
+
+def discount(percent, data):
+    if '%' in percent:
+        percent = percent[0]
+    percent = int(percent)
+    
+    for product in data:
+        product = Product.query.filter_by(id=product).first()
+        product.old_price = product.price
+        product.price *= (1-(percent/100))
+        db.session.commit()
 
 

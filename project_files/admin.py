@@ -15,7 +15,7 @@ from .scripts.functions import not_null, save_event
 from .scripts.actions import delete_rows, block_users, message, backup
 from .scripts.actions import account_activation, account_deactivation
 from .scripts.actions import delete_inactive_accounts, restore_database
-from .scripts.actions import send_newsletter
+from .scripts.actions import send_newsletter, discount
 from .scripts.actions import rq_add_row_to_db, rq_delete_db_row
 
 from rq import Retry
@@ -65,7 +65,6 @@ def admin_user():
 
     try:
       if selected_action == 'delete user':
-
         task = queue.enqueue(
           delete_rows,
           model=User,
@@ -76,7 +75,6 @@ def admin_user():
 
 
       if selected_action == 'block users':
-        
         task = queue.enqueue(
           block_users,
           data=data,
@@ -86,7 +84,6 @@ def admin_user():
 
 
       if selected_action == 'account activation':
-
         task = queue.enqueue(
           account_activation,
             model=User,
@@ -97,7 +94,6 @@ def admin_user():
         return render_template('admin/admin_user.html', users=users, task=task)
       
       if selected_action == 'account deactivation':
-
         task = queue.enqueue(
           account_deactivation,
           model=User,
@@ -107,18 +103,16 @@ def admin_user():
         return render_template('admin/admin_user.html', users=users, task=task)
 
       if selected_action == 'delete unactive accounts':
-
         task = queue.enqueue(
           delete_inactive_accounts,
           retry=Retry(max=3, interval=[10, 30, 60])  
         )
-        return render_template('admin_user.html', users=users, task=task)
+        return render_template('admin/admin_user.html', users=users, task=task)
 
       if selected_action == 'restore database':
         restore_database(User)
 
       if selected_action == 'send newsletter':        
-        
         task = queue.enqueue(
           send_newsletter,
           retry=Retry(max=3, interval=[10, 30, 60])
@@ -126,7 +120,6 @@ def admin_user():
         return render_template('admin/admin_user.html', users=users, task=task)
 
       if selected_action == 'test email':
-
         users_emails = []
         for id in data:
           user = User.query.filter_by(id=id).first()
@@ -177,7 +170,6 @@ def admin_blocked():
 
     try:
       if selected_action == 'delete user':
-
         task = queue.enqueue(
           delete_rows,
           model=Blocked,
@@ -226,7 +218,6 @@ def admin_product():
 
     try:
       if selected_action == 'delete products':
-
         task = queue.enqueue(
           delete_rows,
           model=Product,
@@ -236,6 +227,9 @@ def admin_product():
 
         return render_template('admin/admin_blocked.html', products=products, task=task)
       
+      if r'% discount' in selected_action:
+        discount(percent=selected_action[0:2], data=data)
+
       if selected_action == 'backup':
         backup(Product)
         #flash message
@@ -465,6 +459,7 @@ def add_product():
       category=not_null(request.form['category']),
       company=not_null(request.form['company']),
       price=not_null(request.form['price']),
+      old_price=not_null(request.form['old_price']),
       date=f"{str(datetime.now().strftime('%d-%m-%Y  %H:%M:%S'))}"
     )
 

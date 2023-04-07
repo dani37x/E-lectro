@@ -11,14 +11,13 @@ from flask_mail import Mail, Message
 
 from flask_bcrypt import Bcrypt
 
+from apscheduler.schedulers.background import BackgroundScheduler
+
 import redis
 from rq import Queue
 from rq.registry import FailedJobRegistry
 
 import os
-
-from apscheduler.schedulers.background import BackgroundScheduler
-
 
 # main config
 

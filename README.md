@@ -105,6 +105,8 @@ E-lectro is a web application in Flask. Its destination is an online shop but ce
   - [x] random quizzes with random letters and sizes
   - [x] the captcha wrapper for views.
   - [x] registration how many times the user did not pass the captcha. Consequences with it(block of account).
+- [x] User panel
+  - [x] a user can change his nickname, e-mail, and the personal data
 - [ ] better Readme section of installation which depict the correct process with Redis and Redis queue
 - [ ] subpage where user can edit personal data
 - [ ] multi-device login (max 3)
@@ -114,8 +116,6 @@ E-lectro is a web application in Flask. Its destination is an online shop but ce
 - [ ] list of products
 - [ ] own hash password algorithm
 - [ ] own authentication system
-- [ ] user can change his nickname and own personal data
-- [ ] Database change - from sqlalchemy to SQLITE3
 
 
 ### Built With
