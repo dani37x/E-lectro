@@ -28,8 +28,7 @@ def load_user(user_id):
 
 @app.before_first_request
 def before_first_request():
-  pass
-  # db.create_all()
+  db.create_all()
 
 
 @app.before_request
@@ -63,7 +62,7 @@ def page():
       )
 
   return render_template(
-    'auth/page.html',
+    'shop/page.html',
     products=products,
     user=current_user.username,
     recently_searched=recently_searched(),

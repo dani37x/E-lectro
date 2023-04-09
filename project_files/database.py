@@ -38,7 +38,8 @@ class Product(db.Model):
     name = db.Column(db.String(30), unique=False, nullable=False)
     category = db.Column(db.String(30), unique=False, nullable=False)
     company = db.Column(db.String(30), unique=False, nullable=False)
-    price = db.Column(db.Integer(), unique=False, nullable=False)
+    price = db.Column(db.Float(), unique=False, nullable=False)
+    old_price = db.Column(db.Float(), unique=False, nullable=False)
     date = db.Column(db.String(30), unique=False, nullable=False)
 
 
