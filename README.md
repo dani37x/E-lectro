@@ -135,22 +135,38 @@ E-lectro is a web application in Flask. Its destination is an online shop but ce
 ### Installation
 <a name="installation"></a>
 
-1. Get a free Mail API Key at [https://mailtrap.io/](https://mailtrap.io/)
 
-2. Clone the repository
+1. Clone the repository
    ```sh
    git clone https://github.com/dani37x/E-lectro.git
    ```
-3. Install python packages from [requirements.txt](https://github.com/dani37x/E-lectro/blob/master/requirements.txt) in `env`
+2. Install python packages from [requirements.txt](https://github.com/dani37x/E-lectro/blob/master/requirements.txt) in `env`
    ```sh
    pip install -r requirements.txt
    ```
+3. Get a free Mail API Key at [https://mailtrap.io/](https://mailtrap.io/)
 4. Enter your API keys in variables in secret file
    ```python
    os.environ['MAIL_USERNAME'] = '';
    os.environ['MAIL_PASSWORD'] = '';
    ```
-
+5. If you are Linux user go to step *11*.
+6. Open Powershell as Administrator
+7. Run command
+```sh
+wsl --install
+```
+8. After correct installation open WSL on Windows
+9. Activate virtual environment
+10. Install Python and Python's packages from `requirements.txt` in environment.
+11. Run redis-server with command
+```sh
+sudo systemctl start redis-server
+```
+12. Run Redis worker with command
+  ```
+  rq worker
+  ```
 
 
 ## Contact
