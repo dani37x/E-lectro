@@ -32,10 +32,9 @@ def block_users(data):
 
     for id in data:
         user_to_block = User.query.get(id)
-
         wheter_blocked = Blocked.query.filter_by(username=user_to_block.username).first()
+
         if wheter_blocked == None:
-        
             new_row = Blocked(
                 username=user_to_block.username,
                 ip=user_to_block.ip,
@@ -117,7 +116,6 @@ def restore_database(model):
         data_from_file = open_json(file_path=USER)
 
         for data in data_from_file:
-
             user = model(
                 username=data['username'],
                 first_name=data['first_name'],
@@ -130,11 +128,9 @@ def restore_database(model):
                 points=data['points'],
                 newsletter=data['newsletter']
             )
-
             whether_exist = model.query.filter_by(username=data['username']).first()
             
             if whether_exist == None:
-
                 db.session.add(user)
                 db.session.commit()
 
@@ -149,7 +145,6 @@ def restore_database(model):
                 price=data['price'],
                 old_price=data['old_price'],
             )
-            
             whether_exist = model.query.filter_by(name=data['name']).first()
 
             if whether_exist == None:
@@ -165,7 +160,6 @@ def restore_database(model):
                 ip=data['ip'],
                 date=data['date'],
             )        
-            
             whether_exist = model.query.filter_by(username=data['username']).first()
             
             if whether_exist == None:
@@ -251,6 +245,9 @@ def rq_delete_db_row(object):
 
 
 def discount(percent, data):
+    app.app_context().push()
+    time.sleep(10)
+
     if '%' in percent:
         percent = percent[0]
     percent = int(percent)
@@ -261,4 +258,15 @@ def discount(percent, data):
         product.price *= (1-(percent/100))
         db.session.commit()
 
+
+def previous_price(data):
+    app.app_context().push()
+    time.sleep(10)
+
+    for product in data:
+        product = Product.query.filter_by(id=product).first()
+        if product.old_price != 0:
+            variable = product.price
+            product.price = product.old_price
+            product.old_price = variable
 

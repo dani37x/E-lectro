@@ -15,7 +15,7 @@ from .scripts.functions import not_null, save_event
 from .scripts.actions import delete_rows, block_users, message, backup
 from .scripts.actions import account_activation, account_deactivation
 from .scripts.actions import delete_inactive_accounts, restore_database
-from .scripts.actions import send_newsletter, discount
+from .scripts.actions import send_newsletter, discount, previous_price
 from .scripts.actions import rq_add_row_to_db, rq_delete_db_row
 
 from rq import Retry
@@ -46,11 +46,9 @@ def admin_user():
   users = User.query.all() 
 
   if request.method == 'POST':
-
     searching = request.form['search']
 
     if searching != None and searching != '':
-
       users = (
         User.query.filter(User.username.contains(searching)
           | (User.first_name.contains(searching))
@@ -109,9 +107,6 @@ def admin_user():
         )
         return render_template('admin/admin_user.html', users=users, task=task)
 
-      if selected_action == 'restore database':
-        restore_database(User)
-
       if selected_action == 'send newsletter':        
         task = queue.enqueue(
           send_newsletter,
@@ -134,8 +129,11 @@ def admin_user():
         )
         return render_template('admin/admin_user.html', users=users, task=task)
 
+      if selected_action == 'restore database':
+        restore_database(model=User)
+
       if selected_action == 'backup':
-        backup(User)
+        backup(model=User)
 
     except Exception as e:
       save_event(event=e, site=admin_user.__name__)
@@ -154,11 +152,9 @@ def admin_blocked():
   blocked = Blocked.query.all() 
 
   if request.method == 'POST':
-
     searching = request.form['search']
 
     if searching != None and searching != '':
-
       blocked = (
         Blocked.query.filter(User.username.contains(searching)
           | (Blocked.ip.contains(searching))).all()
@@ -179,10 +175,10 @@ def admin_blocked():
         return render_template('admin/admin_blocked.html', blocked=blocked, task=task)
       
       if selected_action == 'backup':
-        backup(Blocked)
+        backup(model=Blocked)
 
       if selected_action == 'restore database':
-        restore_database(Blocked)
+        restore_database(model=Blocked)
 
     except Exception as e:
       save_event(event=e, site=admin_blocked.__name__)
@@ -201,11 +197,9 @@ def admin_product():
   products = Product.query.all() 
 
   if request.method == 'POST':
-
     searching = request.form['search']
-
+    print(len(searching))
     if searching != None and searching != '':
-
       products = (
         Product.query.filter(Product.name.contains(searching)
           | (Product.category.contains(searching))
@@ -224,18 +218,31 @@ def admin_product():
           data=data,
           retry=Retry(max=3, interval=[10, 30, 60])
         )
-
         return render_template('admin/admin_blocked.html', products=products, task=task)
       
       if r'% discount' in selected_action:
-        discount(percent=selected_action[0:2], data=data)
+        task = queue.enqueue(
+          discount,
+          percent=selected_action[0:2],
+          data=data,
+          retry=Retry(max=3, interval=[10, 30, 60])
+        )
+        return render_template('admin/admin_product.html', products=products, task=task)
+
+      if selected_action == 'previous_price':
+        task = queue.enqueue(
+          previous_price,
+          data=data,
+          retry=Retry(max=3, interval=[10, 30, 60])
+        )
+        return render_template('admin/admin_product.html', products=products, task=task)
 
       if selected_action == 'backup':
-        backup(Product)
+        backup(model=Product)
         #flash message
 
       if selected_action == 'restore database':
-        restore_database(Product)
+        restore_database(model=Product)
 
     except Exception as e:
       save_event(event=e, site=admin_product.__name__)
@@ -365,9 +372,7 @@ def delete_user(id):
 def add_blocked():
 
   if request.method == 'POST':
-
     username = not_null(request.form['username'])
-
     new_blocked = Blocked(
       username=username,
       ip=not_null(request.form['ip']),
@@ -404,7 +409,6 @@ def update_blocked(id):
   blocked = Blocked.query.get_or_404(id)
 
   if request.method == 'POST':
-
     blocked.username = not_null(request.form['username'])
     blocked.ip = not_null( request.form['ip'])
     blocked.date = not_null( request.form['date'])
@@ -451,9 +455,7 @@ def delete_blocked(id):
 def add_product():
 
   if request.method == 'POST':
-
     product = not_null(request.form['name'])
-
     new_product = Product(
       name=product,
       category=not_null(request.form['category']),
@@ -498,6 +500,7 @@ def update_product(id):
     product.category = not_null(request.form['category'])
     product.company = not_null(request.form['company'])
     product.price = not_null(request.form['price'])
+    product.old_price = not_null(request.form['old_price'])
     product.date = not_null(request.form['date'])
 
     try:
@@ -507,7 +510,7 @@ def update_product(id):
     except Exception as e:
       save_event(event=e, site=update_product.__name__)
       return 'xd'
-
+    
   else:
     return render_template('admin/update_product.html', product=product )
 
