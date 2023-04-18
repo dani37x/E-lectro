@@ -102,13 +102,10 @@ def register_session(rendered_session):
   if request.method == 'POST':
 
     if form.validate_on_submit():
-      
       session_list = open_json(file_path=SESSIONS)
 
       for sess in session_list:
-
         if sess['session'] == rendered_session and sess['key'] == form.key.data:
-          
           user = User(
             username=sess['username'],
             first_name=sess['first_name'],
@@ -122,14 +119,13 @@ def register_session(rendered_session):
             newsletter=False,
             date=f"{str(datetime.now().strftime('%d-%m-%Y  %H:%M:%S'))}",
           )
-          try:
 
+          try:
             db.session.add(user)
             db.session.commit()
             return redirect( url_for('login'))
 
           except Exception as e:
-
             save_event(event=e, site=register.__name__)
             return 'Error with register' 
 
@@ -143,29 +139,30 @@ def login():
 
   form = UserLogin()
 
-  if form.validate_on_submit():
+  if request.method == 'POST':
 
-    user = User.query.filter_by(
-      email=form.email.data,
-      username=form.username.data
-    ).first()
+    if form.validate_on_submit():
 
-    if user and (bcrypt.check_password_hash(user.password, form.password.data)):
+      user = User.query.filter_by(
+        email=form.email.data,
+        username=form.username.data
+      ).first()
 
-      wheter_blocked = Blocked.query.filter_by(username=user.username).first()
-      if wheter_blocked:
-            
-        if unblock(blocked_user=wheter_blocked):
-          login_user(user, remember=form.remember.data)
-          session['chances'] = 4
-          return redirect( url_for('page'))
+      if user and (bcrypt.check_password_hash(user.password, form.password.data)):
+        wheter_blocked = Blocked.query.filter_by(username=user.username).first()
 
-        else:
-          return abort(403)
+        if wheter_blocked:
+          if unblock(blocked_user=wheter_blocked):
+            login_user(user, remember=form.remember.data)
+            session['chances'] = 4
+            return redirect( url_for('page'))
 
-      login_user(user, remember=form.remember.data)
-      session['chances'] = 4
-      return redirect( url_for('page'))
+          else:
+            return abort(403)
+
+        login_user(user, remember=form.remember.data)
+        session['chances'] = 4
+        return redirect( url_for('page'))
 
   return render_template('auth/login.html', form=form)
 
@@ -174,9 +171,14 @@ def login():
 # @check_user('logout')
 @login_required
 def logout():
-    logout_user()
-    return redirect('login')
-
+    try:
+      if session['captcha_completed']:
+        session['captcha_completed'] = None
+      logout_user()
+      return redirect('login')
+    except:
+      return redirect('login')
+    
 
 @app.route("/account/remind", methods=['GET', 'POST'])
 def remind():

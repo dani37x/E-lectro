@@ -54,7 +54,7 @@ def captcha():
 
     session['chances'] = session['chances'] - 1
 
-    if session.get('chances') < 1 or session.get('chances') == None:
+    if session.get('chances') < 0 or session.get('chances') == None:
       save_event(
         event=f'The user {current_user.username} was not passed the captcha',
         site=captcha.__name__
@@ -67,12 +67,17 @@ def captcha():
     data = generator(answer=answer, obstacle=obstacle)
     form = CharsCounter()
 
+    current_chance = session.get('chances')
+    session[f'chance {current_chance}'] = data['answer_count']
+
+    print('przed postem', data['answer_count'])
     if request.method == 'POST':
 
       if form.validate_on_submit():
-
         chars = form.chars.data
-        if chars == data['answer_count']:
+        print('moja odp i po poscie', chars, data['answer_count'])
+        # if chars == data['answer_count']:
+        if chars == session[f'chance {current_chance+1}']:
           session['chances'] = 4
           session['captcha_completed'] = True
           return redirect( url_for(session.get('previous_site','login')))
@@ -84,7 +89,6 @@ def captcha():
   except Exception as e:
     save_event(event=e, site=captcha.__name__)
     return redirect( url_for('login'))
-
 
   return render_template('captcha/captcha.html', form=form, data=data, answer=answer)
 
