@@ -15,7 +15,8 @@ from .scripts.functions import not_null, save_event
 from .scripts.actions import delete_rows, block_users, message, backup
 from .scripts.actions import account_activation, account_deactivation
 from .scripts.actions import delete_inactive_accounts, restore_database
-from .scripts.actions import send_newsletter, discount, previous_price
+from .scripts.actions import send_newsletter
+from .scripts.actions import discount, previous_price, price_hike
 from .scripts.actions import rq_add_row_to_db, rq_delete_db_row
 
 from rq import Retry
@@ -198,7 +199,7 @@ def admin_product():
 
   if request.method == 'POST':
     searching = request.form['search']
-    print(len(searching))
+
     if searching != None and searching != '':
       products = (
         Product.query.filter(Product.name.contains(searching)
@@ -208,6 +209,7 @@ def admin_product():
       return render_template('admin/admin_product.html', products=products)
       
     data = request.form.getlist('id')
+    percent = request.form['percent']
     selected_action = request.form['action']
 
     try:
@@ -218,17 +220,26 @@ def admin_product():
           data=data,
           retry=Retry(max=3, interval=[10, 30, 60])
         )
-        return render_template('admin/admin_blocked.html', products=products, task=task)
+        return render_template('admin/admin_product.html', products=products, task=task)
       
-      if r'% discount' in selected_action:
+      if selected_action == 'discount':
         task = queue.enqueue(
           discount,
-          percent=selected_action[0:2],
+          percent=percent,
           data=data,
           retry=Retry(max=3, interval=[10, 30, 60])
         )
         return render_template('admin/admin_product.html', products=products, task=task)
 
+      if selected_action == 'price_hike':
+        task = queue.enqueue(
+          price_hike,
+          percent=percent,
+          data=data,
+          retry=Retry(max=3, interval=[10, 30, 60])
+        )
+        return render_template('admin/admin_product.html', products=products, task=task)
+      
       if selected_action == 'previous_price':
         task = queue.enqueue(
           previous_price,
