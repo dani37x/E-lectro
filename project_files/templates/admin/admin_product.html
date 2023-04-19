@@ -1,23 +1,24 @@
 <a href="{{ url_for('add_product') }}"> add product </a>
 <br>
+<br>
 
 <form method="post" action="">
+    <label for="percent"> percent: </label>
+        <input type="number" id="percent" name="percent">
     <label for="action">Choose action:</label>
-    <select id="action" name="action">
-        <option value="-----"> </option>
-        <option value="5% discount"> 5% discount </option>
-        <option value="10% discount"> 10% discount </option>
-        <option value="15% discount"> 15% discount </option>
-        <option value="25% discount"> 25% discount </option>
-        <option value="30% discount"> 30% discount </option>
-        <option value="50% discount"> 50% discount </option>
-        <option value="delete products"> delete products </option>
-        <option value="restore database"> restore database </option>
-        <option value="backup"> backup </option>
-    </select>
+        <select id="action" name="action">
+            <option value="-----"> </option>
+            <option value="discount"> discount </option>
+            <option value="price_hike"> price hike </option>
+            <option value="previous_price"> previous price </option>
+            <option value="delete products"> delete products </option>
+            <option value="restore database"> restore database </option>
+            <option value="backup"> backup </option>
+        </select>
+    <br>
     <br>
     <label for="search"> Serach: </label>
-    <input type="text" id="search" name="search">
+        <input type="text" id="search" name="search">
     <table border="1px">
         <th> select </th>
         <th> name </th>

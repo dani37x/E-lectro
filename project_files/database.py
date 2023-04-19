@@ -17,7 +17,6 @@ class User(UserMixin, db.Model):
     newsletter = db.Column(db.Boolean, nullable=False)
     date = db.Column(db.String(30), unique=False, nullable=False)
 
-
     def __repr__(self):
         return f'User {self.username}'
     
@@ -41,7 +40,6 @@ class Product(db.Model):
     price = db.Column(db.Float(), unique=False, nullable=False)
     old_price = db.Column(db.Float(), unique=False, nullable=False)
     date = db.Column(db.String(30), unique=False, nullable=False)
-
 
     def __repr__(self):
         return f'Product {self.name}'

@@ -161,7 +161,7 @@ wsl --install
 10. Install Python and Python's packages from `requirements.txt` in environment.
 11. Run redis-server with command
 ```sh
-sudo systemctl start redis-server
+sudo service redis-server start
 ```
 12. Run Redis worker with command
   ```

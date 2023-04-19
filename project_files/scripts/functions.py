@@ -262,42 +262,40 @@ def random_char(disabled_char=None, without=None):
 
 
 def generator(answer, obstacle):
-  chars = [answer, obstacle]
-  list_of_numbers = [2, 5, 4, 6, 7, 8, 9, 10, 11, 12, 15, 16]
-  size = random.choice(list_of_numbers)
-  list_of_chars = []
-  data = {
+    chars = [answer, obstacle]
+    list_of_numbers = [2, 5, 4, 6, 7, 8, 9, 10, 11, 12, 15, 16]
+    size = random.choice(list_of_numbers)
+    list_of_chars = []
+    data = {
       'answer_count': 0, 
       'obstacle_count': 0, 
       'generated_string': ''
     }
 
-  for j in range(0, (size*size)):
+    for j in range(0, (size*size)):
+        if data['answer_count'] < random.choice(list_of_numbers):
+            char_to_add = random.choice(chars)
+        else:
+            char_to_add = obstacle
 
-    if data['answer_count'] < random.choice(list_of_numbers):
-      char_to_add = random.choice(chars)
-    else:
-      char_to_add = obstacle
+        list_of_chars.append(char_to_add)
+        
+        if char_to_add == answer:
+            data['answer_count'] += 1
+        else:
+            data['obstacle_count'] += 1
 
-    list_of_chars.append(char_to_add)
+    random.shuffle(list_of_chars)
+    element_count = 0
 
-    if char_to_add == answer:
-      data['answer_count'] += 1
-    else:
-      data['obstacle_count'] += 1
+    for element in list_of_chars:
+        if element_count % size == 0:
+            data['generated_string'] += '\n'
+            
+        data['generated_string'] += element
+        element_count += 1
 
-  random.shuffle(list_of_chars)
-
-  element_count = 0
-  for element in list_of_chars:
-
-    if element_count % size == 0:
-      data['generated_string'] += '\n'
-
-    data['generated_string'] += element
-    element_count += 1
-
-  return data
+    return data
 
 
 def random_return():
