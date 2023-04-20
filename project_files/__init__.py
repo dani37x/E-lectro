@@ -36,14 +36,14 @@ SERVER_NAME = ''
 #  files' paths
 
 
-BLOCKED = r'D:\projekty\E-lectro\instance\Blocked.json'
-PRODUCT = r'D:\projekty\E-lectro\instance\Product.json'
-USER = r'D:\projekty\E-lectro\instance\User.json'
+BLOCKED = r'D:\projekty\E-lectro\instance\BLOCKED.json'
+PRODUCT = r'D:\projekty\E-lectro\instance\PRODUCT.json'
+USER = r'D:\projekty\E-lectro\instance\USER.json'
 CLASSIFIER = r'D:\projekty\E-lectro\project_files\machine_learning\classifier.pkl'
-EVENTS = r'D:.\instance\events.json'
-DATA = r'.\instance\data.json'
-SESSIONS = r'.\instance\sessions.json'
-PRICES = r'.\instance\prices.json'
+EVENTS = r'D:.\instance\EVENTS.json'
+DATA = r'.\instance\DATA.json'
+SESSIONS = r'.\instance\SESSIONS.json'
+PRICES = r'.\instance\PRICES.json'
 
 
 # database and login
