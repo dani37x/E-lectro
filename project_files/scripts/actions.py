@@ -4,7 +4,8 @@ from project_files import mail
 from project_files import queue
 from project_files import BLOCKED, USER, PRODUCT, EVENTS, DATA
 
-from ..scripts.functions import open_json, save_json , string_to_date
+from .functions import open_json, save_json , string_to_date
+from .functions import save_price
 
 from ..database import User, Blocked, Product
 
@@ -245,8 +246,8 @@ def rq_delete_db_row(object):
 
 
 def discount(percent, data):
+    time.sleep(5)
     app.app_context().push()
-    time.sleep(10)
     percent = 1-(int(percent)/100)
     
     for product in data:
@@ -254,11 +255,10 @@ def discount(percent, data):
         product.old_price = product.price
         product.price *= percent
         db.session.commit()
+        save_price(data=[product])
 
 
 def price_hike(percent, data):
-    app.app_context().push()
-    time.sleep(10)
     percent = 1+(int(percent)/100)
 
     for product in data:
@@ -266,18 +266,17 @@ def price_hike(percent, data):
         product.old_price = product.price
         product.price *= percent
         db.session.commit()
+        save_price(data=[product])
 
 
 def previous_price(data):
-    app.app_context().push()
-    time.sleep(10)
-
     for product in data:
         product = Product.query.filter_by(id=product).first()
         if product.old_price != 0:
             variable = product.price
             product.price = product.old_price
             product.old_price = variable
+            save_price(data=[product])
 
 
 

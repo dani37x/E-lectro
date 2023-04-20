@@ -43,6 +43,7 @@ CLASSIFIER = r'D:\projekty\E-lectro\project_files\machine_learning\classifier.pk
 EVENTS = r'D:.\instance\events.json'
 DATA = r'.\instance\data.json'
 SESSIONS = r'.\instance\sessions.json'
+PRICES = r'.\instance\prices.json'
 
 
 # database and login
