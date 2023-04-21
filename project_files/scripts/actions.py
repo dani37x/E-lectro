@@ -246,7 +246,7 @@ def rq_delete_db_row(object):
 
 
 def discount(percent, data):
-    time.sleep(5)
+    time.sleep(10)
     app.app_context().push()
     percent = 1-(int(percent)/100)
     
@@ -254,17 +254,21 @@ def discount(percent, data):
         product = Product.query.filter_by(id=product).first()
         product.old_price = product.price
         product.price *= percent
+        product.price = round(product.price, 2)
         db.session.commit()
         save_price(data=[product])
 
 
 def price_hike(percent, data):
+    time.sleep(10)
+    app.app_context().push()
     percent = 1+(int(percent)/100)
 
     for product in data:
         product = Product.query.filter_by(id=product).first()
         product.old_price = product.price
         product.price *= percent
+        product.price = round(product.price, 2)
         db.session.commit()
         save_price(data=[product])
 
@@ -279,4 +283,5 @@ def previous_price(data):
             save_price(data=[product])
 
 
+    
 

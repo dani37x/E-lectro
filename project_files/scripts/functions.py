@@ -325,3 +325,14 @@ def save_price(data):
             })
         
     save_json(file_path=file_path, data=objects_list)
+
+
+def the_lowest_price(product):
+    objects_list = open_json(file_path=PRICES)
+    product_info = []
+
+    for object in objects_list:
+        if int(object['id']) == product.id:
+            product_info.append(float(object['price']))
+
+    return min(product_info)
