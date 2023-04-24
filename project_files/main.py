@@ -3,6 +3,7 @@ from project_files import db
 from project_files import login_manager
 
 from .database import User, Blocked, Product
+from sqlalchemy import desc, asc
 
 from .scripts.functions import check_admin, check_user, captcha
 from .scripts.functions import similar_products_to_queries, recently_searched
@@ -45,11 +46,23 @@ def page():
 
   if request.method == 'POST':
     queryset = request.form['search']
+    sort_type = request.form['sort_type']
 
     products = (
       Product.query.filter(Product.name.contains(queryset)
-        | (Product.category.contains(queryset))
-        | (Product.company.contains(queryset))).all()
+          | (Product.category.contains(queryset))
+          | (Product.company.contains(queryset)))
+      .order_by(
+          desc(Product.name) if sort_type == 'desc_name' else \
+          asc(Product.name) if sort_type == 'asc_name' else \
+          desc(Product.category) if sort_type == 'desc_category' else \
+          asc(Product.category) if sort_type == 'asc_category' else \
+          desc(Product.company) if sort_type == 'desc_company' else \
+          asc(Product.company) if sort_type == 'asc_company' else \
+          desc(Product.price) if sort_type == 'desc_price' else \
+          asc(Product.price) if sort_type == 'asc_price' else None
+      )
+      .all()
     )
 
     if len(queryset) > 3:
@@ -72,12 +85,9 @@ def page():
 @captcha('category')
 def category():
 
-  session['previous_site'] = category.__name__
-  if session.get('captcha_completed', None) == None:
-    return redirect( url_for('captcha'))
-
   products = Product.query.all()
   categories = []
+
   for product in products:
     if product.category not in categories:
       categories.append(product.category)

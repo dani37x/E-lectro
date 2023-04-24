@@ -1,6 +1,6 @@
 from project_files import app
 from project_files import scheduler
-from project_files import SESSIONS, EVENTS, DATA
+from project_files import SESSIONS, EVENTS, DATA, PRICES
 from project_files import session
 from project_files import job_registry
 from project_files import session
@@ -38,6 +38,12 @@ scheduler.add_job(
   args=[7, 0, 0, DATA], 
   trigger='interval', 
   hours=1
+)
+scheduler.add_job(
+  delete_expired_data, 
+  args=[0, 12, 0, PRICES], 
+  trigger='interval', 
+  days=30
 )
 scheduler.start()
 
