@@ -85,12 +85,9 @@ def page():
 @captcha('category')
 def category():
 
-  products = Product.query.all()
-  categories = []
-
-  for product in products:
-    if product.category not in categories:
-      categories.append(product.category)
+  categories = db.session.query(Product.category.distinct()).all()
+  categories = [str(category[0]) for category in categories]
+  categories = list(categories)
 
   return render_template('shop/category.html', categories=categories)
 
