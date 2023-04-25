@@ -1,6 +1,6 @@
 from project_files import app
 from project_files import scheduler
-from project_files import SESSIONS, EVENTS, DATA
+from project_files import SESSIONS, EVENTS, DATA, PRICES
 from project_files import session
 from project_files import job_registry
 from project_files import session
@@ -39,6 +39,12 @@ scheduler.add_job(
   trigger='interval', 
   hours=1
 )
+scheduler.add_job(
+  delete_expired_data, 
+  args=[0, 12, 0, PRICES], 
+  trigger='interval', 
+  days=30
+)
 scheduler.start()
 
 
@@ -61,29 +67,27 @@ def captcha():
       )
       return redirect( url_for('logout'))
     
+
     prohibited_chars = ['i', 'l', '_', '-', '`', '"', '=', '.', ',']
     answer = random_char(without=prohibited_chars)
     obstacle = random_char(disabled_char=answer, without=prohibited_chars)
     data = generator(answer=answer, obstacle=obstacle)
     form = CharsCounter()
-
     current_chance = session.get('chances')
     session[f'chance {current_chance}'] = data['answer_count']
 
-    print('przed postem', data['answer_count'])
     if request.method == 'POST':
 
       if form.validate_on_submit():
         chars = form.chars.data
-        print('moja odp i po poscie', chars, data['answer_count'])
-        # if chars == data['answer_count']:
         if chars == session[f'chance {current_chance+1}']:
           session['chances'] = 4
           session['captcha_completed'] = True
           return redirect( url_for(session.get('previous_site','login')))
         
         else:
-          session['chances'] = session['chances'] + 1
+          if session.get('chances') != 0:
+            session['chances'] = session['chances'] + 1
           return redirect( url_for('captcha'))
         
   except Exception as e:

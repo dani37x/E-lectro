@@ -7,31 +7,44 @@
 
 <form method="post" action="">
   <label for="action">Sorting</label>
-  <select id="action" name="action">
-  </select>
+    <select id="action" name="sort_type">
+      <option value="asc_name"> Ascending Name</option>
+      <option value="desc_name"> Descending Name</option>
+      <option value="asc_category"> Ascending Category</option>
+      <option value="desc_category"> Descending Category</option>
+      <option value="asc_company"> Ascending Company</option>
+      <option value="desc_company"> Descending Company</option>
+      <option value="asc_price"> Ascending Price</option>
+      <option value="desc_price"> Descending Price</option>
+    </select>
+    <br>
   <label for="search">Serach:</label>
-  <input type="text" id="search" name="search">
+    <input type="text" id="search" name="search">
   <br>
-    <p> trending </p>
-    {% for search in recently_searched %}
-        {{search}}
-        <br>
-    {% endfor %}
-  <br>
-  <table border="1px">
-      <th> name </th>
-      <th> category </th>
-      <th> company </th>
-      {% for product in products %}
-      <tr>
-          <td>{{ product.name }}</td>
-          <td>{{ product.category }}</td>
-          <td>{{ product.company }}</td>
-      </tr>
-      {% endfor %}
-      <input type="submit">
-  </table>
+  <input type="submit">
 </form>
+
+<br>
+  <p> trending </p>
+  {% for search in recently_searched %}
+      {{search}}
+      <br>
+  {% endfor %}
+<br>
+<table border="1px">
+    <th> name </th>
+    <th> category </th>
+    <th> company </th>
+    <th> price </th>
+    {% for product in products %}
+    <tr>
+        <td>{{ product.name }}</td>
+        <td>{{ product.category }}</td>
+        <td>{{ product.company }}</td>
+        <td>{{ product.price }}</td>
+    </tr>
+    {% endfor %}
+</table>
 
 
 <br>
@@ -42,7 +55,6 @@
   <h2> You also may like</h2>
   {% for product in similar_products_to_queries %}
     <p> {{product.name}} </p>
-    <br>
   {% endfor %}
 {% endif %}
 

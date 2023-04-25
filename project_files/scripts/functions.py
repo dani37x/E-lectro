@@ -2,7 +2,8 @@ from project_files import db
 from project_files import app
 from project_files import queue
 from project_files import BLOCKED, USER, PRODUCT
-from project_files import EVENTS, DATA, CLASSIFIER, SESSIONS
+from project_files import EVENTS, DATA, CLASSIFIER
+from project_files import SESSIONS, PRICES
 
 from ..database import Blocked, User, Product
 
@@ -97,7 +98,6 @@ def not_null(field):
 
 def user_searched(username, ip, searched):
     objects_list = open_json(file_path=DATA)
-
     searched = str(searched).lower()
 
     objects_list.append({
@@ -118,7 +118,6 @@ def unblock(blocked_user):
     app.app_context().push()
 
     if (datetime.now() > string_to_date(blocked_user.date)):
-
         try:
             db.session.delete(blocked_user)
             db.session.commit()
@@ -164,8 +163,8 @@ def random_string(size):
     
     random_choices = random.sample(s, size)
     random.shuffle(random_choices)
-    
     string_to_return = ''
+
     for element in random_choices:
         string_to_return += element
     
@@ -187,8 +186,8 @@ def check_session(session_list):
 
 def delete_expired_data(d, h, m, file_path):
     objects_list = open_json(file_path=file_path)
-    if len(objects_list) > 0:
 
+    if len(objects_list) > 0:
         durabity = datetime.now() - timedelta(days=d, hours=h, minutes=m)
         current_objects = [object for object in objects_list if string_to_date(object['time']) > durabity]
 
@@ -202,7 +201,6 @@ def similar_products_to_queries(username):
     if products := Product.query.all():
         
         if len(user_queries) == 0:
-
             random_products = []
             for number in range(6):
                 product_to_add = random.choice(products)
@@ -298,25 +296,43 @@ def generator(answer, obstacle):
     return data
 
 
-def random_return():
-    decisions = [True, False]
-    return random.choice(decisions)
-
-
 def failed_captcha(username):
     object_list = open_json(file_path=EVENTS)
     sentence = f'The user {username}'    
     counter = 0
 
     for object in object_list:
-        
         if object['site'] == 'captcha' and sentence in object['event']:
             counter += 1
-        
+            
         if counter == 4:
             return True
         
     return False
 
 
+def save_price(data):
+    file_path = back_to_slash(PRICES)
+    objects_list = open_json(file_path=file_path)
 
+    for object in data:
+        print(object, type(object))
+        objects_list.append({
+                "id": f"{object.id}",
+                "name": f"{object.name}",
+                "price": f"{object.price}",
+                "time": f"{str(datetime.now().strftime('%d-%m-%Y  %H:%M:%S'))}",
+            })
+        
+    save_json(file_path=file_path, data=objects_list)
+
+
+def the_lowest_price(product):
+    objects_list = open_json(file_path=PRICES)
+    product_info = []
+
+    for object in objects_list:
+        if int(object['id']) == product.id:
+            product_info.append(float(object['price']))
+
+    return min(product_info)
