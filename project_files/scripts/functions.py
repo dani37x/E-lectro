@@ -4,6 +4,7 @@ from project_files import queue
 from project_files import BLOCKED, USER, PRODUCT
 from project_files import EVENTS, DATA, CLASSIFIER
 from project_files import SESSIONS, PRICES
+from project_files import disallowed_words
 
 from ..database import Blocked, User, Product
 
@@ -147,12 +148,15 @@ def save_event(event, site):
 def recently_searched():
 
     objects_list = open_json(file_path=DATA)
-    # if len(objects_list) > 0:
+    queries = []
 
-    queries = [object['searched'] for object in objects_list if len(object['searched']) > 2]
-    counter = Counter(queries)
+    if len(objects_list) > 0:
+        for obj in objects_list:
+            if len(obj['searched']) > 2 and obj['searched'] not in disallowed_words:
+                queries.append(obj['searched'])
 
-    return dict(counter.most_common()[:5])
+        counter = Counter(queries)
+        return dict(counter.most_common()[:5])
 
     
 def random_string(size):
@@ -189,7 +193,7 @@ def delete_expired_data(d, h, m, file_path):
 
     if len(objects_list) > 0:
         durabity = datetime.now() - timedelta(days=d, hours=h, minutes=m)
-        current_objects = [object for object in objects_list if string_to_date(object['time']) > durabity]
+        current_objects = [obj for obj in objects_list if string_to_date(obj['time']) > durabity]
 
         save_json(file_path=file_path, data=current_objects)
 
@@ -301,13 +305,12 @@ def failed_captcha(username):
     sentence = f'The user {username}'    
     counter = 0
 
-    for object in object_list:
-        if object['site'] == 'captcha' and sentence in object['event']:
+    for obj in object_list:
+        if obj['site'] == 'captcha' and sentence in obj['event']:
             counter += 1
-            
         if counter == 4:
             return True
-        
+    
     return False
 
 
@@ -315,12 +318,11 @@ def save_price(data):
     file_path = back_to_slash(PRICES)
     objects_list = open_json(file_path=file_path)
 
-    for object in data:
-        print(object, type(object))
+    for obj in data:
         objects_list.append({
-                "id": f"{object.id}",
-                "name": f"{object.name}",
-                "price": f"{object.price}",
+                "id": f"{obj.id}",
+                "name": f"{obj.name}",
+                "price": f"{obj.price}",
                 "time": f"{str(datetime.now().strftime('%d-%m-%Y  %H:%M:%S'))}",
             })
         
@@ -331,8 +333,8 @@ def the_lowest_price(product):
     objects_list = open_json(file_path=PRICES)
     product_info = []
 
-    for object in objects_list:
-        if int(object['id']) == product.id:
-            product_info.append(float(object['price']))
+    for obj in objects_list:
+        if int(obj['id']) == product.id:
+            product_info.append(float(obj['price']))
 
     return min(product_info)

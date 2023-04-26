@@ -38,7 +38,6 @@ def before_request():
 
 @app.route('/', methods=['GET', 'POST'])
 @login_required
-# @check_user('page')
 @captcha('page')
 def page():
 
@@ -113,8 +112,7 @@ def products(category):
 
     random.shuffle(the_others)
     products_for_user.extend(the_others)
-    
-    return render_template('shop/products.html', products=products_for_user)
+    return render_template('shop/products.html', list_of_products=products_for_user)
   
   return render_template('shop/products.html', list_of_products=list_of_products)
 
