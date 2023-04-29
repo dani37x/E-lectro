@@ -8,6 +8,7 @@ from flask_login import login_required, current_user
 from flask import render_template, url_for, redirect, request
 
 from .database import User, Blocked, Product
+from sqlalchemy import desc, asc
 
 from .scripts.functions import check_admin, check_user, captcha
 from .scripts.functions import not_null, save_event
@@ -28,11 +29,8 @@ from datetime import datetime
 @login_required
 # @check_user('admin')
 # @check_admin('admin')
+@captcha('admin')
 def admin():
-
-  session['previous_site'] = admin.__name__
-  if session.get('captcha_completed', None) == None:
-    return redirect( url_for('captcha'))
 
   return render_template('admin/admin.html')
 
@@ -48,16 +46,30 @@ def admin_user():
 
   if request.method == 'POST':
     searching = request.form['search']
+    sort_type = request.form['sort_type']
 
-    if searching != None and searching != '':
-      users = (
-        User.query.filter(User.username.contains(searching)
-          | (User.first_name.contains(searching))
-          | (User.surname.contains(searching))
-          | (User.email.contains(searching))
-          | (User.active.contains(searching))).all()
-      )
-      return render_template('admin_user.html', users=users)
+    # if searching != None and searching != '':
+    users = (
+      User.query.filter(
+        User.username.contains(searching) |
+        User.first_name.contains(searching) |
+        User.surname.contains(searching) |
+        User.email.contains(searching) |
+        User.account_type.contains(searching)
+      ).order_by(
+        desc(User.username) if sort_type == 'desc_username' else \
+        asc(User.username) if sort_type == 'asc_username' else \
+        desc(User.first_name) if sort_type == 'desc_first_name' else \
+        asc(User.first_name) if sort_type == 'asc_first_name' else \
+        desc(User.surname) if sort_type == 'desc_surname' else \
+        asc(User.surname) if sort_type == 'asc_surname' else \
+        desc(User.email) if sort_type == 'desc_email' else \
+        asc(User.email) if sort_type == 'asc_email' else \
+        desc(User.account_type) if sort_type == 'desc_account_type' else \
+        asc(User.account_type) if sort_type == 'asc_account_type' else None
+      ).all()
+    )
+      # return render_template('admin/admin_user.html', users=users)
 
     data = request.form.getlist('id')
     selected_action = request.form['action']
@@ -154,13 +166,21 @@ def admin_blocked():
 
   if request.method == 'POST':
     searching = request.form['search']
+    sort_type = request.form['sort_type']
 
-    if searching != None and searching != '':
-      blocked = (
-        Blocked.query.filter(User.username.contains(searching)
-          | (Blocked.ip.contains(searching))).all()
-      )
-      return render_template('admin/admin_blocked.html', blocked=blocked)
+    # if searching != None and searching != '':
+    blocked = (
+      Blocked.query.filter(
+        User.username.contains(searching) |
+        Blocked.ip.contains(searching)
+      ).order_by(
+        desc(Blocked.username) if sort_type == 'desc_username' else \
+        asc(Blocked.username) if sort_type == 'asc_username' else \
+        desc(Blocked.ip) if sort_type == 'desc_ip' else \
+        asc(Blocked.ip) if sort_type == 'asc_ip' else None
+      ).all()
+    )
+      # return render_template('admin/admin_blocked.html', blocked=blocked)
       
     data = request.form.getlist('id')
     selected_action = request.form['action']
@@ -199,14 +219,26 @@ def admin_product():
 
   if request.method == 'POST':
     searching = request.form['search']
+    sort_type = request.form['sort_type']
 
-    if searching != None and searching != '':
-      products = (
-        Product.query.filter(Product.name.contains(searching)
-          | (Product.category.contains(searching))
-          | (Product.company.contains(searching))).all()
-      )
-      return render_template('admin/admin_product.html', products=products)
+    # if searching != None and searching != '':
+    products = (
+      Product.query.filter(
+        Product.name.contains(searching) |
+        Product.category.contains(searching) |
+        Product.company.contains(searching)
+      ).order_by(
+        desc(Product.name) if sort_type == 'desc_name' else \
+        asc(Product.name) if sort_type == 'asc_name' else \
+        desc(Product.category) if sort_type == 'desc_category' else \
+        asc(Product.category) if sort_type == 'asc_category' else \
+        desc(Product.company) if sort_type == 'desc_company' else \
+        asc(Product.company) if sort_type == 'asc_company' else \
+        desc(Product.price) if sort_type == 'desc_price' else \
+        asc(Product.price) if sort_type == 'asc_price' else None
+      ).all()
+    )
+      # return render_template('admin/admin_product.html', products=products)
       
     data = request.form.getlist('id')
     percent = request.form['percent']
@@ -295,7 +327,7 @@ def add_user():
     try:
       queue.enqueue(
         rq_add_row_to_db, 
-        object=new_user,
+        obj=new_user,
         retry=Retry(max=3, interval=[10, 30, 60])
       )
 
@@ -365,7 +397,7 @@ def delete_user(id):
   try:
     queue.enqueue(
       rq_delete_db_row, 
-      object=name_to_delete,
+      obj=name_to_delete,
       retry=Retry(max=3, interval=[10, 30, 60])
     )
     return redirect(url_for('admin_user'))
@@ -393,7 +425,7 @@ def add_blocked():
     try:
       queue.enqueue(
         rq_add_row_to_db, 
-        object=new_blocked,
+        obj=new_blocked,
         retry=Retry(max=3, interval=[10, 30, 60])
       )
 
@@ -448,7 +480,7 @@ def delete_blocked(id):
   try:
     queue.enqueue(
       rq_delete_db_row,
-      object=name_to_delete,
+      obj=name_to_delete,
       retry=Retry(max=3, interval=[10, 30, 60])
     )
     return redirect(url_for('admin_blocked'))
@@ -479,7 +511,7 @@ def add_product():
     try:
       queue.enqueue(
         rq_add_row_to_db, 
-        object=new_product,
+        obj=new_product,
         retry=Retry(max=3, interval=[10, 30, 60])
       )
 
@@ -538,7 +570,7 @@ def delete_product(id):
   try:
     queue.enqueue(
       rq_delete_db_row, 
-      object=name_to_delete,
+      obj=name_to_delete,
       retry=Retry(max=3, interval=[10, 30, 60])
     )
     return redirect(url_for('admin_product'))

@@ -1,7 +1,14 @@
-## About The Project
+## E-lectro
 <a name="readme-top"></a>
 
-E-lectro is a web application in Flask. Its destination is an online shop but centers on non-visual things. This project focuses on security and curious solutions for specific problems such as Random Forest Classifier, which classifies users and adequate products for them, or Redis queue, which his aim is async task queue. Full backend project, and what is more, everything terrific works deeply. The project contains ready solutions like entries Limiter or SQLAlchemy ORM, but there occur own functions with prevalence. 
+E-lectro is a web application built using the Flask framework, with the main purpose of serving as an online shop. However, unlike traditional e-commerce websites, E-lectro focuses on non-visual aspects, such as security and unique solutions for specific problems.
+
+One such solution is the Random Forest Classifier, which is used to classify users and recommend suitable products for them. This algorithm takes into account various factors such as past purchases, search history, and other user data to make personalized product recommendations.
+
+Another feature of E-lectro is the use of Redis queue, which is used as an asynchronous task queue. This allows for faster processing of user requests and helps to improve the overall performance of the application.
+The project is a full backend solution, with a strong emphasis on security. It includes ready-made solutions like entries limiter and SQLAlchemy ORM, but also incorporates custom functions to solve specific problems.
+
+Overall, E-lectro is a well-designed and fully-functional web application that demonstrates the power and flexibility of the Flask framework. Its unique features and emphasis on security make it a standout project in the world of e-commerce.
 
 <br>
 <div align="center">
@@ -22,6 +29,7 @@ E-lectro is a web application in Flask. Its destination is an online shop but ce
   - [x] delete row
   - [x] add a new row
   - [x] search rows that contain query
+  - [ ] sort system descending and ascending by database tables and their column properties
 - [x] Protections wrappers:
   - [x] wrapper for admin views, check whether a user is an admin
   - [x] wrapper for common users, check their ip and account details
@@ -41,7 +49,6 @@ E-lectro is a web application in Flask. Its destination is an online shop but ce
   - [x] old functions with async queue usage
   - [x] time to cancel task from queue
   - [x] delete cancelled task from rq history
-  - [ ] more functions with redis task queue
 - [x] Forms
   - [x] Register form
   - [x] Login form 
@@ -62,7 +69,7 @@ E-lectro is a web application in Flask. Its destination is an online shop but ce
 - [x] entries limiter
 - [x] Event system, which gathers errors, actions to `events.json` which will be performed by users
 - [x] Searching input for users which looking for products
-- [x] Trending rank. Rank searches from users. Function gathers users queries and creates rank with them, then they are going to appeal on searching input area
+- [x] Trending rank. Rank searches from users. Function gathers users queries and creates rank with them, then they are going to appeal on searching input area. Disallowed words do not contribute to the total
 - [x] E-mails:
   - [x] no-reply mail
   - [x] reset password mail
@@ -84,6 +91,7 @@ E-lectro is a web application in Flask. Its destination is an online shop but ce
   - [x] list of categories
   - [x] dynamic list of products in category
   - [x] dynamic single page for every product
+  - [x] sort system descending and ascending by product properties such as name, company, category, price
 - [x] password change by a user on account
 - [x] cookies with category of product with price from the searched product by the user
 - [x] APScheduler
@@ -93,22 +101,23 @@ E-lectro is a web application in Flask. Its destination is an online shop but ce
   - [x] register for the newsletter
   - [x] unregister for  the newsletter
 - [x] ML algorithm - *RandomForestClassifier*
-  - [x] Machine Learning algorithm which adjust the best products for the shop's customers in every category of products.
+  - [x] Machine Learning algorithm which adjust the best products for the shop's customers in every category of products
   - [x] upgrade ML algorithm with many indicators
 - [x] shop API
 - [x] flask bcrypt
 - [x] User personal data
   - [x] editable
   - [x] when the user wants to change 'the username' the app checks whether the new name is free
-  - [x] when the user wants to change the e-mail app sends an e-mail message with a code. After 15 minutes code will expire. Without code, change is not possible
-- [x] Own captcha system. Every user has only three chances before logout.
+  - [x] when the user wants to change the e-mail app sends an e-mail message with a code. After 15 minutes code will expire Without code, change is not possible
+- [x] Own captcha system. Every user has only three chances before logout
   - [x] random quizzes with random letters and sizes
   - [x] the captcha wrapper for views.
-  - [x] registration how many times the user did not pass the captcha. Consequences with it(block of account).
+  - [x] registration how many times the user did not pass the captcha. Consequences with it(block of account)
+  - [x] only three tries for every user and only three times the user can't pass the captcha test by seven days
+  - [ ] after a correct answer earlier wrong answers are deleted from the register
 - [x] User panel
   - [x] a user can change his nickname, e-mail, and the personal data
 - [ ] better Readme section of installation which depict the correct process with Redis and Redis queue
-- [ ] subpage where user can edit personal data
 - [ ] multi-device login (max 3)
 - [ ] account lvl and points system with discounts.
 - [ ] payments for products

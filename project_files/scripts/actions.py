@@ -93,17 +93,15 @@ def backup(model):
         path = BLOCKED
 
     data_from_file = open_json(file_path=path)
-
     objects_list = []
     columns = tuple([m.key for m in model.__table__.columns])
-
     model_data = model.query.all()
-    for row in model_data:
 
+    for row in model_data:
         data = {}
         for column_name in columns:
             data[column_name] = getattr(row, column_name)
-            
+
         objects_list.append(data)
 
 
@@ -205,9 +203,8 @@ def send_newsletter():
     app.app_context().push()
 
     if users :=  User.query.filter_by(newsletter=True).all():
-
+        
         if products := Product.query.all():
-
             products = products[-5:]            
             mails = [user.email for user in users]
 
@@ -233,15 +230,15 @@ def newsletter_deactivation(username):
         db.session.commit()
 
 
-def rq_add_row_to_db(object):
+def rq_add_row_to_db(obj):
     app.app_context().push()
-    db.session.add(object)
+    db.session.add(obj)
     db.session.commit()
 
 
-def rq_delete_db_row(object):
+def rq_delete_db_row(obj):
     app.app_context().push()
-    db.session.delete(object)
+    db.session.delete(obj)
     db.session.commit()
 
 

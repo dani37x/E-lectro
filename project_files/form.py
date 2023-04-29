@@ -1,3 +1,4 @@
+from project_files import disallowed_words
 from .database import User
 
 from flask_wtf import FlaskForm
@@ -40,18 +41,10 @@ def password_checking(form, field):
     raise ValidationError('Password must contain number')
 
 
-# more words if it is required :)
-
-not_allowed = [
-  'fuck', 'shit', 'hitler', 'stalin', '666', 
-  'admin', 'mod', 'product', 'blocked', 'user',
-  'the user', 'captcha'
-]
-
 def existing_user(form, field):
   if field.data in User.query.filter(User.username).all():
       raise ValidationError('this username already exist')
-  for word in not_allowed:
+  for word in disallowed_words:
     if word in field.data or word.upper() in field.data:
       raise ValidationError('element contains not allowed word')
     
@@ -59,7 +52,7 @@ def existing_user(form, field):
 def existing_email(form, field):
   if field.data in User.query.filter(User.email).all():
       raise ValidationError('this email already exist')
-  for word in not_allowed:
+  for word in disallowed_words:
     if word in field.data or word.upper() in field.data:
       raise ValidationError('element contains not allowed word')
 
