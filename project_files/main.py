@@ -48,20 +48,20 @@ def page():
     sort_type = request.form['sort_type']
 
     products = (
-      Product.query.filter(Product.name.contains(queryset)
-          | (Product.category.contains(queryset))
-          | (Product.company.contains(queryset)))
-      .order_by(
-          desc(Product.name) if sort_type == 'desc_name' else \
-          asc(Product.name) if sort_type == 'asc_name' else \
-          desc(Product.category) if sort_type == 'desc_category' else \
-          asc(Product.category) if sort_type == 'asc_category' else \
-          desc(Product.company) if sort_type == 'desc_company' else \
-          asc(Product.company) if sort_type == 'asc_company' else \
-          desc(Product.price) if sort_type == 'desc_price' else \
-          asc(Product.price) if sort_type == 'asc_price' else None
-      )
-      .all()
+      Product.query.filter(
+        Product.name.contains(queryset) |
+        Product.category.contains(queryset) |
+        Product.company.contains(queryset)
+      ).order_by(
+        desc(Product.name) if sort_type == 'desc_name' else \
+        asc(Product.name) if sort_type == 'asc_name' else \
+        desc(Product.category) if sort_type == 'desc_category' else \
+        asc(Product.category) if sort_type == 'asc_category' else \
+        desc(Product.company) if sort_type == 'desc_company' else \
+        asc(Product.company) if sort_type == 'asc_company' else \
+        desc(Product.price) if sort_type == 'desc_price' else \
+        asc(Product.price) if sort_type == 'asc_price' else None
+      ).all()
     )
 
     if len(queryset) > 3:

@@ -314,16 +314,18 @@ def failed_captcha(username):
     return False
 
 
-def save_price(data):
+def save_price(data, days):
     file_path = back_to_slash(PRICES)
     objects_list = open_json(file_path=file_path)
+    days = int(days)
 
     for obj in data:
         objects_list.append({
                 "id": f"{obj.id}",
                 "name": f"{obj.name}",
                 "price": f"{obj.price}",
-                "time": f"{str(datetime.now().strftime('%d-%m-%Y  %H:%M:%S'))}",
+                "start_date": f"{datetime.now().strftime('%d-%m-%Y  %H:%M:%S')}",
+                "end_date": f"{(datetime.now() + timedelta(days=days)).strftime('%d-%m-%Y  %H:%M:%S')}"
             })
         
     save_json(file_path=file_path, data=objects_list)
@@ -338,3 +340,21 @@ def the_lowest_price(product):
             product_info.append(float(obj['price']))
 
     return min(product_info)
+
+
+def end_of_promo():
+    app.app_context().push()
+    object_list = open_json(file_path=PRICES)
+    not_ended = []
+    
+    if len(object_list) > 1:
+        for obj in object_list:
+            if string_to_date(obj['end_date']) < datetime.now():
+                product = Product.query.get(int(obj['id']))
+                product.price = 100
+                db.session.commit()
+
+            else:
+                not_ended.append(obj)
+            
+        save_json(file_path=PRICES, data=not_ended)

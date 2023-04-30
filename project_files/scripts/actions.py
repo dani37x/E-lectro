@@ -242,7 +242,7 @@ def rq_delete_db_row(obj):
     db.session.commit()
 
 
-def discount(percent, data):
+def discount(percent, data, days):
     time.sleep(10)
     app.app_context().push()
     percent = 1-(int(percent)/100)
@@ -253,7 +253,7 @@ def discount(percent, data):
         product.price *= percent
         product.price = round(product.price, 2)
         db.session.commit()
-        save_price(data=[product])
+        save_price(data=[product], days=days)
 
 
 def price_hike(percent, data):

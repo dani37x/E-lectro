@@ -14,6 +14,7 @@ from .form import CharsCounter
 from .scripts.functions import save_event, check_user, check_admin
 from .scripts.functions import  generator, random_char
 from .scripts.functions import delete_expired_data, save_event, failed_captcha
+from .scripts.functions import end_of_promo
 
 from .scripts.actions import block_users
 
@@ -44,6 +45,11 @@ scheduler.add_job(
   args=[0, 12, 0, PRICES], 
   trigger='interval', 
   days=30
+)
+scheduler.add_job(
+  end_of_promo,
+  trigger='interval', 
+  minutes=1
 )
 scheduler.start()
 
