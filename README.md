@@ -29,7 +29,7 @@ Overall, E-lectro is a well-designed and fully-functional web application that d
   - [x] delete row
   - [x] add a new row
   - [x] search rows that contain query
-  - [ ] sort system descending and ascending by database tables and their column properties
+  - [x] sort system descending and ascending by database tables and their column properties
 - [x] Protections wrappers:
   - [x] wrapper for admin views, check whether a user is an admin
   - [x] wrapper for common users, check their ip and account details
@@ -44,6 +44,12 @@ Overall, E-lectro is a well-designed and fully-functional web application that d
   - [x] backups
   - [x] restore databases
   - [x] newsletter for registered users
+  - [x] set timed price hikes for products
+  - [x] set timed discounts for products
+  - [x] set the previous price for every product
+  - [x] set the lowest price for products from last month
+  - [x] set the highest price for products from last month
+  - [x] set the random price for products from last month
 - [x] Redis and Redis queue
   - [x] Redis queue and workers
   - [x] old functions with async queue usage
@@ -64,10 +70,11 @@ Overall, E-lectro is a well-designed and fully-functional web application that d
   - [x] correct password with website standards
   - [x] Exists user
   - [x] Exists e-mail
+  - [x] not null validator for HTML form.
 - [x] automatic function which takes off a block from users' accounts after a specific date.
 - [x] Error handlers
 - [x] entries limiter
-- [x] Event system, which gathers errors, actions to `events.json` which will be performed by users
+- [x] Event system, which gathers errors, actions to `EVENTS.json` which will be performed by users
 - [x] Searching input for users which looking for products
 - [x] Trending rank. Rank searches from users. Function gathers users queries and creates rank with them, then they are going to appeal on searching input area. Disallowed words do not contribute to the total
 - [x] E-mails:
@@ -115,6 +122,14 @@ Overall, E-lectro is a well-designed and fully-functional web application that d
   - [x] registration how many times the user did not pass the captcha. Consequences with it(block of account)
   - [x] only three tries for every user and only three times the user can't pass the captcha test by seven days
   - [ ] after a correct answer earlier wrong answers are deleted from the register
+- [x] Price system
+  - [x] the recording system in PRICES.json tracks every action taken within the price system.
+  - [x] timed promotions
+  - [x] timed price hike
+  - [x] a super user can easily change the previous price of a product
+  - [x] the lowest price function informs the user about the lowest price observed in the last 30 days
+  - [x] If a product is on promotion, the highest price function informs the user about the highest price recorded within the last 30 days.
+  - [x] users can see how much money they will save on each product during the promotion, thanks to the discount
 - [x] User panel
   - [x] a user can change his nickname, e-mail, and the personal data
 - [ ] better Readme section of installation which depict the correct process with Redis and Redis queue

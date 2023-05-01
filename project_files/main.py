@@ -8,7 +8,7 @@ from sqlalchemy import desc, asc
 from .scripts.functions import check_admin, check_user, captcha
 from .scripts.functions import similar_products_to_queries, recently_searched
 from .scripts.functions import classification, save_event, user_searched
-from .scripts.functions import the_lowest_price
+from .scripts.functions import the_price
 
 from flask_login import login_required, current_user
 from flask import render_template, url_for, redirect, request, session, make_response
@@ -122,12 +122,17 @@ def products(category):
 def product_info(product_id):
 
   product = Product.query.filter_by(id=product_id).first()
+  discount = the_price(product=product, price_type='the_highest_price')
+  discount = round(product.price*100/discount, 0)
+
 
   resp = make_response(
     render_template(
       'shop/product_info.html', 
       product=product,
-      the_lowest_price=the_lowest_price(product=product)
+      discount=int(discount) if discount < 100 else None,
+      the_lowest_price=the_price(product=product, price_type='the_lowest_price'),
+      the_highest_price=the_price(product=product, price_type='the_highest_price')
   ))
 
   resp.set_cookie(

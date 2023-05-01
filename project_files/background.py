@@ -42,7 +42,7 @@ scheduler.add_job(
 )
 scheduler.add_job(
   delete_expired_data, 
-  args=[0, 12, 0, PRICES], 
+  args=[1, 0, 0, PRICES], 
   trigger='interval', 
   days=30
 )

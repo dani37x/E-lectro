@@ -17,8 +17,6 @@ from datetime import datetime, date, timedelta
 
 from collections import Counter
 
-from rq import Retry
-
 import json
 import string
 import random
@@ -314,7 +312,7 @@ def failed_captcha(username):
     return False
 
 
-def save_price(data, days):
+def save_price(data, days=0):
     file_path = back_to_slash(PRICES)
     objects_list = open_json(file_path=file_path)
     days = int(days)
@@ -324,6 +322,7 @@ def save_price(data, days):
                 "id": f"{obj.id}",
                 "name": f"{obj.name}",
                 "price": f"{obj.price}",
+                "old_price": f"{obj.old_price}",
                 "start_date": f"{datetime.now().strftime('%d-%m-%Y  %H:%M:%S')}",
                 "end_date": f"{(datetime.now() + timedelta(days=days)).strftime('%d-%m-%Y  %H:%M:%S')}"
             })
@@ -331,15 +330,19 @@ def save_price(data, days):
     save_json(file_path=file_path, data=objects_list)
 
 
-def the_lowest_price(product):
+def the_price(product, price_type):
     objects_list = open_json(file_path=PRICES)
     product_info = []
 
     for obj in objects_list:
         if int(obj['id']) == product.id:
             product_info.append(float(obj['price']))
+            product_info.append(float(obj['old_price']))
 
-    return min(product_info)
+    if price_type == 'the_lowest_price':
+        return min(product_info)
+    elif price_type == 'the_highest_price':
+        return max(product_info)
 
 
 def end_of_promo():
@@ -349,9 +352,13 @@ def end_of_promo():
     
     if len(object_list) > 1:
         for obj in object_list:
-            if string_to_date(obj['end_date']) < datetime.now():
+            if string_to_date(obj['end_date']) < datetime.now() \
+                and obj['start_date'] != obj['end_date']:
+
                 product = Product.query.get(int(obj['id']))
-                product.price = 100
+                variable = product.price
+                product.price = product.old_price
+                product.old_price = variable
                 db.session.commit()
 
             else:
