@@ -6,7 +6,11 @@
 <br>
 {{product.category}}
 <br>
-{{product.price}}
+{{product.price}}  
+{% if discount %}
+    <del> {{the_highest_price}} </del>
+    <span style="color:grey"> DISCOUNT {{discount}}% </span>
+{% endif %}
 <br>
 <p> 
     the lowest price from the last 30 days:

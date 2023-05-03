@@ -243,6 +243,7 @@ def admin_product():
     data = request.form.getlist('id')
     percent = request.form['percent']
     selected_action = request.form['action']
+    promo_days = request.form['promo_days']
 
     try:
       if selected_action == 'delete products':
@@ -259,7 +260,8 @@ def admin_product():
           discount,
           percent=percent,
           data=data,
-          retry=Retry(max=3, interval=[10, 30, 60])
+          days=promo_days,
+          retry=Retry(max=3, interval=[10, 30, 60]),
         )
         return render_template('admin/admin_product.html', products=products, task=task)
 
