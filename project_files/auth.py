@@ -9,11 +9,13 @@ from .form import UserCreator, UserLogin, RemindPassword, NewPassword, Key
 
 from .database import User, Blocked
 
-from .scripts.functions import check_user, not_null, unblock, save_event, captcha
+from .scripts.functions import check_user, unblock, save_event, captcha
 from .scripts.functions import check_session, random_string, open_json, save_json
 
 from .scripts.actions import  message
 from .scripts.actions import newsletter_activation, newsletter_deactivation
+
+from .form import not_null
 
 from flask_login import login_user, logout_user, login_required, current_user
 from flask import render_template, url_for, redirect, request, abort, session

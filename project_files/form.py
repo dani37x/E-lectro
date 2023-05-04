@@ -57,6 +57,13 @@ def existing_email(form, field):
       raise ValidationError('element contains not allowed word')
 
 
+def not_null(field):
+    if field != '' and field != None:
+        return field
+    else:
+        return ValueError('Field can not be empty')   
+
+
 class UserCreator(FlaskForm):
   username = StringField('nickname',
     validators=[
