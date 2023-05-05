@@ -71,7 +71,10 @@ Overall, E-lectro is a well-designed and fully-functional web application that d
   - [x] Exists user
   - [x] Exists e-mail
   - [x] not null validator for HTML form.
-- [x] automatic function which takes off a block from users' accounts after a specific date.
+- [x] Background functions
+  - [x] automatic function which takes off a block from users' accounts after timed block.
+  - [x] clean the json files when data is expired
+  - [x] end operations with products after specific time
 - [x] Error handlers
 - [x] entries limiter
 - [x] Event system, which gathers errors, actions to `EVENTS.json` which will be performed by users

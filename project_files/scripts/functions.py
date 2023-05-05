@@ -219,21 +219,19 @@ def generator(answer, obstacle):
 # the unblocker function after expired time-block
 
 
-def unblock(blocked_user):
+def unblock():
     app.app_context().push()
+    blocked_users = Blocked.query.all()
 
-    if (datetime.now() > string_to_date(blocked_user.date)):
-        try:
-            db.session.delete(blocked_user)
-            db.session.commit()
-            save_event(event=f'{blocked_user} was unblocked', site='Login Page')
-            return True
+    for blocked in blocked_users:
+        if (datetime.now() > string_to_date(blocked.date)):
+            try:
+                db.session.delete(blocked)
+                db.session.commit()
+                save_event(event=f'{blocked.username} was unblocked', site='unblocker')
 
-        except Exception as e:
-            save_event(event=e, site='Login page')
-            return False
-    else:
-        return False
+            except Exception as e:
+                save_event(event=e, site='unblocker')
 
 
 # Trending rank built from user queries

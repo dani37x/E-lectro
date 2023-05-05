@@ -12,7 +12,7 @@ from flask import render_template, url_for, redirect, request
 from .form import CharsCounter
 
 from .scripts.functions import save_event, check_user, check_admin
-from .scripts.functions import  generator, random_char
+from .scripts.functions import generator, random_char, unblock
 from .scripts.functions import delete_expired_data, save_event, failed_captcha
 from .scripts.functions import end_of_promo
 
@@ -22,6 +22,11 @@ from rq.job import cancel_job
 from rq.command import send_stop_job_command
 
 
+scheduler.add_job(
+  unblock, 
+  trigger='interval', 
+  hours=12,
+)
 scheduler.add_job(
   delete_expired_data, 
   args=[0, 0, 20, SESSIONS], 

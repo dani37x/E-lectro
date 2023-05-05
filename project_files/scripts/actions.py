@@ -67,7 +67,6 @@ def backup(model):
         data = {}
         for column_name in columns:
             data[column_name] = getattr(row, column_name)
-
         objects_list.append(data)
 
 
@@ -141,9 +140,9 @@ def block_users(data):
 
     for id in data:
         user_to_block = User.query.get(id)
-        wheter_blocked = Blocked.query.filter_by(username=user_to_block.username).first()
+        whether_blocked = Blocked.query.filter_by(username=user_to_block.username).first()
 
-        if wheter_blocked == None:
+        if whether_blocked == None:
             new_row = Blocked(
                 username=user_to_block.username,
                 ip=user_to_block.ip,
