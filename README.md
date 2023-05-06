@@ -71,7 +71,10 @@ Overall, E-lectro is a well-designed and fully-functional web application that d
   - [x] Exists user
   - [x] Exists e-mail
   - [x] not null validator for HTML form.
-- [x] automatic function which takes off a block from users' accounts after a specific date.
+- [x] Background functions
+  - [x] automatic function which takes off a block from users' accounts after timed block.
+  - [x] clean the json files when data is expired
+  - [x] end operations with products after specific time
 - [x] Error handlers
 - [x] entries limiter
 - [x] Event system, which gathers errors, actions to `EVENTS.json` which will be performed by users
@@ -124,8 +127,8 @@ Overall, E-lectro is a well-designed and fully-functional web application that d
   - [ ] after a correct answer earlier wrong answers are deleted from the register
 - [x] Price system
   - [x] the recording system in PRICES.json tracks every action taken within the price system.
-  - [x] timed promotions
-  - [x] timed price hike
+  - [x] timed promotions for products
+  - [x] timed price hike for products
   - [x] a super user can easily change the previous price of a product
   - [x] the lowest price function informs the user about the lowest price observed in the last 30 days
   - [x] If a product is on promotion, the highest price function informs the user about the highest price recorded within the last 30 days.

@@ -1,8 +1,18 @@
+"""
+The actions.py file is an essential component of the admin panel. It serves
+as the backbone and contains various functions for managing different aspects
+of the panel, including User, Product, and Blocked sections.
+
+Some of the functions you can find in this file include managing newsletters,
+creating backups and restoring data, managing user accounts and products, and
+dealing with blocked users.
+"""
+
 from project_files import db
 from project_files import app
 from project_files import mail
 from project_files import queue
-from project_files import BLOCKED, USER, PRODUCT, EVENTS, DATA
+from project_files import BLOCKED, USER, PRODUCT
 
 from .functions import open_json, save_json , string_to_date
 from .functions import save_price
@@ -18,6 +28,15 @@ from rq import Retry
 import time
 
 
+# joint funcs
+
+
+def rq_add_row_to_db(obj):
+    app.app_context().push()
+    db.session.add(obj)
+    db.session.commit()
+
+
 def delete_rows(model, data):
     time.sleep(10)
     app.app_context().push()
@@ -27,60 +46,10 @@ def delete_rows(model, data):
         db.session.commit()
 
 
-def block_users(data):
-    time.sleep(5)
+def rq_delete_db_row(obj):
     app.app_context().push()
-
-    for id in data:
-        user_to_block = User.query.get(id)
-        wheter_blocked = Blocked.query.filter_by(username=user_to_block.username).first()
-
-        if wheter_blocked == None:
-            new_row = Blocked(
-                username=user_to_block.username,
-                ip=user_to_block.ip,
-                date=str((datetime.now() + timedelta(days=7)).strftime("%d-%m-%Y  %H:%M:%S"))
-            )
-            db.session.add(new_row)
-            db.session.commit()
-
-
-def message(*args):
-    app.app_context().push()  
-
-    if args[0] == 'register':
-        subject = 'Register message'
-        body = f'Welcome {args[2]}. This is your activation key {args[3]}'
-
-    if args[0] == 'no-reply':
-        time.sleep(30)
-
-        subject = 'no-reply-message'
-        body = 'Do not reply for this message. This is only test.'
-
-    if args[0] == 'code':
-        subject = 'Forgotten password'
-        body = f'This is your key {args[3]}'
-
-    if args[0] == 'newsletter':
-        subject = 'Special Offer for you'
-        a_0 = f'<a href="/shop/products/{args[3][0].id} "> {args[3][0].name} </a> \n'
-        a_1 = f'<a href="/shop/products/{args[3][1].id} "> {args[3][1].name} </a> \n'
-        a_2 = f'<a href="/shop/products/{args[3][2].id} "> {args[3][2].name} </a> \n'
-        a_3 = f'<a href="/shop/products/{args[3][3].id} "> {args[3][3].name} </a> \n'
-        a_4 = f'<a href="/shop/products/{args[3][4].id} "> {args[3][4].name} </a> \n\n'
-        disclaimer = f'if you do not want receive our the latest products click here \n'
-        unsign = f'<a href="/account/newsletter/unregister"> unsign newsletter </a> \n'
-        
-        body = a_0 + a_1  + a_2 + a_3 + a_4 + disclaimer + unsign
- 
-    msg = Message(
-        subject=subject,
-        sender=args[1],
-        recipients=args[2]
-    )
-    msg.body = body
-    mail.send(msg)
+    db.session.delete(obj)
+    db.session.commit()
 
 
 def backup(model):
@@ -101,7 +70,6 @@ def backup(model):
         data = {}
         for column_name in columns:
             data[column_name] = getattr(row, column_name)
-
         objects_list.append(data)
 
 
@@ -166,6 +134,26 @@ def restore_database(model):
                 db.session.commit()
 
 
+# The funcs of User panel
+
+
+def block_users(data):
+    time.sleep(5)
+    app.app_context().push()
+
+    for id in data:
+        user_to_block = User.query.get(id)
+        whether_blocked = Blocked.query.filter_by(username=user_to_block.username).first()
+
+        if whether_blocked == None:
+            new_row = Blocked(
+                username=user_to_block.username,
+                ip=user_to_block.ip,
+                date=str((datetime.now() + timedelta(days=7)).strftime("%d-%m-%Y  %H:%M:%S"))
+            )
+            db.session.add(new_row)
+            db.session.commit()
+
 
 def account_activation(model, data):
     time.sleep(15)
@@ -198,6 +186,44 @@ def delete_inactive_accounts():
             db.session.commit()
 
 
+def message(*args):
+    app.app_context().push()  
+
+    if args[0] == 'register':
+        subject = 'Register message'
+        body = f'Welcome {args[2]}. This is your activation key {args[3]}'
+
+    if args[0] == 'no-reply':
+        time.sleep(30)
+
+        subject = 'no-reply-message'
+        body = 'Do not reply for this message. This is only test.'
+
+    if args[0] == 'code':
+        subject = 'Forgotten password'
+        body = f'This is your key {args[3]}'
+
+    if args[0] == 'newsletter':
+        subject = 'Special Offer for you'
+        a_0 = f'<a href="/shop/products/{args[3][0].id} "> {args[3][0].name} </a> \n'
+        a_1 = f'<a href="/shop/products/{args[3][1].id} "> {args[3][1].name} </a> \n'
+        a_2 = f'<a href="/shop/products/{args[3][2].id} "> {args[3][2].name} </a> \n'
+        a_3 = f'<a href="/shop/products/{args[3][3].id} "> {args[3][3].name} </a> \n'
+        a_4 = f'<a href="/shop/products/{args[3][4].id} "> {args[3][4].name} </a> \n\n'
+        disclaimer = f'if you do not want receive our the latest products click here \n'
+        unsign = f'<a href="/account/newsletter/unregister"> unsign newsletter </a> \n'
+        
+        body = a_0 + a_1  + a_2 + a_3 + a_4 + disclaimer + unsign
+ 
+    msg = Message(
+        subject=subject,
+        sender=args[1],
+        recipients=args[2]
+    )
+    msg.body = body
+    mail.send(msg)
+
+
 def send_newsletter():
     time.sleep(15)
     app.app_context().push()
@@ -218,6 +244,7 @@ def send_newsletter():
                 )
 
 
+
 def newsletter_activation(username):
     if user := User.query.filter_by(username=username).first():      
         user.newsletter = True
@@ -230,16 +257,7 @@ def newsletter_deactivation(username):
         db.session.commit()
 
 
-def rq_add_row_to_db(obj):
-    app.app_context().push()
-    db.session.add(obj)
-    db.session.commit()
-
-
-def rq_delete_db_row(obj):
-    app.app_context().push()
-    db.session.delete(obj)
-    db.session.commit()
+# The funcs of Product panel
 
 
 def discount(percent, data, days):

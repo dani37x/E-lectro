@@ -1,9 +1,20 @@
+"""
+The functions.py file in the E-lectro project serves as a collection of general-purpose
+functions and utilities.
+
+The file contains various functions that are used to support different features of
+the project, such as handling JSON files, generating random characters and strings,
+providing security wrappers for authentication and permission checks, implementing
+a search ranking system, and providing a captcha system to verify user input.
+
+Overall, the functions.py file is an important component of the E-lectro project,
+providing a collection of utility functions that help to make the project more robust,
+secure, and functional.
+"""
+
 from project_files import db
 from project_files import app
-from project_files import queue
-from project_files import BLOCKED, USER, PRODUCT
-from project_files import EVENTS, DATA, CLASSIFIER
-from project_files import SESSIONS, PRICES
+from project_files import EVENTS, DATA, CLASSIFIER, PRICES
 from project_files import disallowed_words
 
 from ..database import Blocked, User, Product
@@ -21,6 +32,90 @@ import json
 import string
 import random
 import pickle
+
+
+# funtions for files
+
+
+def open_json(file_path):
+    data = []
+    with open(file_path) as fp:
+        data = json.load(fp)
+    return data
+
+
+def save_json(file_path, data):
+    with open(file_path, 'w') as json_file:
+        json.dump(data, json_file, indent=4, separators=(',', ': '))
+
+
+def back_to_slash(path):
+  return path.replace(r" \ ".strip(), '/')
+
+
+def save_event(event, site):
+    file_path = back_to_slash(EVENTS)
+    objects_list = open_json(file_path=file_path)
+
+    objects_list.append({
+            "event": f"{event}",
+            "time": f"{str(datetime.now().strftime('%d-%m-%Y  %H:%M:%S'))}",
+            "site": f"{site}"
+        })
+
+    save_json(file_path=EVENTS, data=objects_list)
+
+
+def delete_expired_data(d, h, m, file_path):
+    objects_list = open_json(file_path=file_path)
+
+    if len(objects_list) > 0:
+        durabity = datetime.now() - timedelta(days=d, hours=h, minutes=m)
+        current_objects = [obj for obj in objects_list if string_to_date(obj['time']) > durabity]
+        save_json(file_path=file_path, data=current_objects)
+
+
+# string functions
+
+
+def string_to_date(date):
+  return datetime.strptime(date, '%d-%m-%Y  %H:%M:%S')
+
+
+def random_char(disabled_char=None, without=None):
+  list_of_chars = []
+  list_of_chars.extend(string.ascii_lowercase)
+  list_of_chars.extend(string.ascii_uppercase)
+  list_of_chars.extend(string.digits)
+  list_of_chars.extend(string.punctuation)
+
+  if disabled_char != None:
+    list_of_chars.remove(disabled_char)
+
+  if without != None:
+    for ch in without:
+      list_of_chars.remove(ch)
+
+  return random.choice(list_of_chars)
+
+
+def random_string(size):
+    small = string.ascii_lowercase
+    big = string.ascii_uppercase
+    numbers = string.digits
+    s =  small + big  + numbers
+    
+    random_choices = random.sample(s, size)
+    random.shuffle(random_choices)
+    string_to_return = ''
+
+    for element in random_choices:
+        string_to_return += element
+    
+    return string_to_return
+
+
+# protection wrappers
 
 
 def check_admin(name):
@@ -58,6 +153,9 @@ def check_user(name):
     return decorator
 
 
+# the captcha wrapper and the captcha system
+
+
 def captcha(name):
     def decorator(f):
         @wraps(f)
@@ -72,194 +170,19 @@ def captcha(name):
     return decorator
 
 
-def open_json(file_path):
-    data = []
-    with open(file_path) as fp:
-        data = json.load(fp)
-    return data
+def failed_captcha(username):
+    object_list = open_json(file_path=EVENTS)
+    sentence = f'The user {username}'    
+    counter = 0
 
-
-def save_json(file_path, data):
-    with open(file_path, 'w') as json_file:
-        json.dump(data, json_file, indent=4, separators=(',', ': '))
-
-
-def back_to_slash(path):
-  return path.replace(r" \ ".strip(), '/')
-
-
-def not_null(field):
-    if field != '' and field != None:
-        return field
-    else:
-        return ValueError    
- 
-
-def user_searched(username, ip, searched):
-    objects_list = open_json(file_path=DATA)
-    searched = str(searched).lower()
-
-    objects_list.append({
-            "username": f"{username}",
-            "ip": f"{ip}",
-            "searched": f"{searched}",
-            "time": f"{str(datetime.now().strftime('%d-%m-%Y  %H:%M:%S'))}"
-        })
-
-    save_json(file_path=DATA, data=objects_list)
-    
-
-def string_to_date(date):
-  return datetime.strptime(date, '%d-%m-%Y  %H:%M:%S')
-
-
-def unblock(blocked_user):
-    app.app_context().push()
-
-    if (datetime.now() > string_to_date(blocked_user.date)):
-        try:
-            db.session.delete(blocked_user)
-            db.session.commit()
-            save_event(event=f'{blocked_user} was unblocked', site='Login Page')
+    for obj in object_list:
+        if obj['site'] == 'captcha' and sentence in obj['event']:
+            counter += 1
+        if counter == 4:
             return True
-
-        except Exception as e:
-            save_event(event=e, site='Login page')
-            return False
-    else:
-        return False
-
-
-def save_event(event, site):
-    file_path = back_to_slash(EVENTS)
-    objects_list = open_json(file_path=file_path)
-
-    objects_list.append({
-            "event": f"{event}",
-            "time": f"{str(datetime.now().strftime('%d-%m-%Y  %H:%M:%S'))}",
-            "site": f"{site}"
-        })
-
-    save_json(file_path=EVENTS, data=objects_list)
-
-
-def recently_searched():
-
-    objects_list = open_json(file_path=DATA)
-    queries = []
-
-    if len(objects_list) > 0:
-        for obj in objects_list:
-            if len(obj['searched']) > 2 and obj['searched'] not in disallowed_words:
-                queries.append(obj['searched'])
-
-        counter = Counter(queries)
-        return dict(counter.most_common()[:5])
-
     
-def random_string(size):
-    small = string.ascii_lowercase
-    big = string.ascii_uppercase
-    numbers = string.digits
-    s =  small + big  + numbers
+    return False
     
-    random_choices = random.sample(s, size)
-    random.shuffle(random_choices)
-    string_to_return = ''
-
-    for element in random_choices:
-        string_to_return += element
-    
-    return string_to_return
-
-
-def check_session(session_list):
-    new_session = random_string(size=40)
-    wheter_exists = False
-    
-    for sess in session_list:
-        if sess['session'] == new_session:
-            wheter_exists = True
-            return check_session(session_list)
-    
-    if wheter_exists == False:
-        return new_session 
-
-
-def delete_expired_data(d, h, m, file_path):
-    objects_list = open_json(file_path=file_path)
-
-    if len(objects_list) > 0:
-        durabity = datetime.now() - timedelta(days=d, hours=h, minutes=m)
-        current_objects = [obj for obj in objects_list if string_to_date(obj['time']) > durabity]
-
-        save_json(file_path=file_path, data=current_objects)
-
-
-def similar_products_to_queries(username):
-    queries = open_json(file_path=DATA)
-    user_queries = [query for query in queries if query['username'] == username]
-   
-    if products := Product.query.all():
-        
-        if len(user_queries) == 0:
-            random_products = []
-            for number in range(6):
-                product_to_add = random.choice(products)
-                if product_to_add not in random_products:
-                    random_products.append(product_to_add)
-
-            return random_products
-
-        possible_products = []
-        for product in products:
-            for query in user_queries:
-                # print(query['searched'], product.name)
-                # print(type(query['searched']), type(product.name))
-                if str(query['searched']).lower() in str(product.name).lower() or query['searched'] == product.name:
-                    if product not in possible_products:
-                        possible_products.append(product)
-
-                if str(query['searched']).lower() in str(product.category).lower() or query['searched'] == product.name:
-                    if product not in possible_products:
-                        possible_products.append(product)
-
-        return possible_products[0:7]
-
-
-def classification(category, money):
-    #more to add
-    list_of_categories = [
-        {"AGD": 1},
-        {"TOYS": 2},
-    ]
-    for cat in list_of_categories:
-        if category in cat:
-            category = cat[category]
-
-    model = pickle.load(open(CLASSIFIER, "rb"))
-    prediction = model.predict([[category, money]])
-    
-    return prediction
-
-
-def random_char(disabled_char=None, without=None):
-  list_of_chars = []
-  list_of_chars.extend(string.ascii_lowercase)
-  list_of_chars.extend(string.ascii_uppercase)
-  list_of_chars.extend(string.digits)
-  list_of_chars.extend(string.punctuation)
-
-  if disabled_char != None:
-    list_of_chars.remove(disabled_char)
-
-  if without != None:
-    for ch in without:
-      list_of_chars.remove(ch)
-
-
-  return random.choice(list_of_chars)
-
 
 def generator(answer, obstacle):
     chars = [answer, obstacle]
@@ -298,18 +221,121 @@ def generator(answer, obstacle):
     return data
 
 
-def failed_captcha(username):
-    object_list = open_json(file_path=EVENTS)
-    sentence = f'The user {username}'    
-    counter = 0
+# the unblocker function after expired time-block
 
-    for obj in object_list:
-        if obj['site'] == 'captcha' and sentence in obj['event']:
-            counter += 1
-        if counter == 4:
-            return True
+
+def unblock():
+    app.app_context().push()
+    blocked_users = Blocked.query.all()
+
+    for blocked in blocked_users:
+        if (datetime.now() > string_to_date(blocked.date)):
+            try:
+                db.session.delete(blocked)
+                db.session.commit()
+                save_event(event=f'{blocked.username} was unblocked', site='unblocker')
+
+            except Exception as e:
+                save_event(event=e, site='unblocker')
+
+
+# Trending rank built from user queries
+
+
+def user_searched(username, ip, searched):
+    objects_list = open_json(file_path=DATA)
+    searched = str(searched).lower()
+
+    objects_list.append({
+            "username": f"{username}",
+            "ip": f"{ip}",
+            "searched": f"{searched}",
+            "time": f"{str(datetime.now().strftime('%d-%m-%Y  %H:%M:%S'))}"
+        })
+
+    save_json(file_path=DATA, data=objects_list)
+
+
+def recently_searched():
+    objects_list = open_json(file_path=DATA)
+    queries = []
+
+    if len(objects_list) > 0:
+        for obj in objects_list:
+            if len(obj['searched']) > 2 and obj['searched'] not in disallowed_words:
+                queries.append(obj['searched'])
+
+        counter = Counter(queries)
+        return dict(counter.most_common()[:5])
+
+
+def similar_products_to_queries(username):
+    queries = open_json(file_path=DATA)
+    user_queries = [query for query in queries if query['username'] == username]
+   
+    if products := Product.query.all():
+        
+        if len(user_queries) == 0:
+            random_products = []
+            for number in range(6):
+                product_to_add = random.choice(products)
+                if product_to_add not in random_products:
+                    random_products.append(product_to_add)
+
+            return random_products
+
+        possible_products = []
+        for product in products:
+            for query in user_queries:
+                # print(query['searched'], product.name)
+                # print(type(query['searched']), type(product.name))
+                if str(query['searched']).lower() in str(product.name).lower() or query['searched'] == product.name:
+                    if product not in possible_products:
+                        possible_products.append(product)
+
+                if str(query['searched']).lower() in str(product.category).lower() or query['searched'] == product.name:
+                    if product not in possible_products:
+                        possible_products.append(product)
+
+        return possible_products[0:7]
+
+
+# session checker
+
+
+def check_session(session_list):
+    new_session = random_string(size=40)
+    wheter_exists = False
     
-    return False
+    for sess in session_list:
+        if sess['session'] == new_session:
+            wheter_exists = True
+            return check_session(session_list)
+    
+    if wheter_exists == False:
+        return new_session 
+
+
+# ML Classifier implement (more in ML directory)
+
+
+def classification(category, money):
+    #more to add
+    list_of_categories = [
+        {"AGD": 1},
+        {"TOYS": 2},
+    ]
+    for cat in list_of_categories:
+        if category in cat:
+            category = cat[category]
+
+    model = pickle.load(open(CLASSIFIER, "rb"))
+    prediction = model.predict([[category, money]])
+    
+    return prediction
+
+
+# pricing system
 
 
 def save_price(data, days=0):

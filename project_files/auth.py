@@ -9,11 +9,13 @@ from .form import UserCreator, UserLogin, RemindPassword, NewPassword, Key
 
 from .database import User, Blocked
 
-from .scripts.functions import check_user, not_null, unblock, save_event, captcha
+from .scripts.functions import check_user, save_event, captcha
 from .scripts.functions import check_session, random_string, open_json, save_json
 
 from .scripts.actions import  message
 from .scripts.actions import newsletter_activation, newsletter_deactivation
+
+from .form import not_null
 
 from flask_login import login_user, logout_user, login_required, current_user
 from flask import render_template, url_for, redirect, request, abort, session
@@ -147,19 +149,10 @@ def login():
         email=form.email.data,
         username=form.username.data
       ).first()
+      has_access = Blocked.query.filter_by(username=user.username).first()
 
-      if user and (bcrypt.check_password_hash(user.password, form.password.data)):
-        wheter_blocked = Blocked.query.filter_by(username=user.username).first()
-
-        if wheter_blocked:
-          if unblock(blocked_user=wheter_blocked):
-            login_user(user, remember=form.remember.data)
-            session['chances'] = 4
-            return redirect( url_for('page'))
-
-          else:
-            return abort(403)
-
+      if user and (bcrypt.check_password_hash(user.password, form.password.data)) \
+        and not has_access:
         login_user(user, remember=form.remember.data)
         session['chances'] = 4
         return redirect( url_for('page'))
