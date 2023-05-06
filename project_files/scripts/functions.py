@@ -1,10 +1,15 @@
 """
-The functions.py file in the E-lectro project serves as a collection of general-purpose functions and utilities.
-The file contains various functions that are used to support different features of the project, such as handling
-JSON files, generating random characters and strings, providing security wrappers for authentication and
-permission checks, implementing a search ranking system, and providing a captcha
-system to verify user input. Overall, the functions.py file is an important component of the E-lectro project,
-providing a collection of utility functions that help to make the project more robust, secure, and functional.
+The functions.py file in the E-lectro project serves as a collection of general-purpose
+functions and utilities.
+
+The file contains various functions that are used to support different features of
+the project, such as handling JSON files, generating random characters and strings,
+providing security wrappers for authentication and permission checks, implementing
+a search ranking system, and providing a captcha system to verify user input.
+
+Overall, the functions.py file is an important component of the E-lectro project,
+providing a collection of utility functions that help to make the project more robust,
+secure, and functional.
 """
 
 from project_files import db

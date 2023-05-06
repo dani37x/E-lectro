@@ -1,8 +1,11 @@
 """
-The actions.py file is an essential component of the admin panel. It serves as the backbone and contains 
-various functions for managing different aspects of the panel, including User, Product, and Blocked sections. 
-Some of the functions you can find in this file include managing newsletters, creating backups and restoring 
-data, managing user accounts and products, and dealing with blocked users.
+The actions.py file is an essential component of the admin panel. It serves
+as the backbone and contains various functions for managing different aspects
+of the panel, including User, Product, and Blocked sections.
+
+Some of the functions you can find in this file include managing newsletters,
+creating backups and restoring data, managing user accounts and products, and
+dealing with blocked users.
 """
 
 from project_files import db

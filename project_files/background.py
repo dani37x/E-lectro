@@ -1,3 +1,14 @@
+"""
+The "background.py" file is a collection of functions designed to operate
+automatically without the need for human intervention. These functions
+include the ability to delete expired data from JSON files, unblock users
+after specific time who have been blocked, and set previous prices after a
+discount or price hike has ended.
+
+Additionally, the file includes views for displaying captchas and canceling
+tasks from the Redis queue and recorder.
+"""
+
 from project_files import app
 from project_files import scheduler
 from project_files import SESSIONS, EVENTS, DATA, PRICES
