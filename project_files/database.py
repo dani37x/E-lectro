@@ -2,6 +2,8 @@ from project_files import db
 
 from flask_login import UserMixin
 
+from datetime import datetime
+
 
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -16,6 +18,7 @@ class User(UserMixin, db.Model):
     points = db.Column(db.Integer, default=0)
     newsletter = db.Column(db.Boolean, nullable=False)
     date = db.Column(db.String(30), unique=False, nullable=False)
+
 
     def __repr__(self):
         return f'User {self.username}'
@@ -43,3 +46,12 @@ class Product(db.Model):
 
     def __repr__(self):
         return f'Product {self.name}'
+    
+
+class UserProducts(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'),  nullable=False)
+    product_id = db.Column(db.Integer, db.ForeignKey('product.id'),  nullable=False)
+    date = db.Column(db.DateTime, nullable=False, default=datetime.now())
+    user = db.relationship('User', backref=db.backref('user_product', lazy=True))
+    product = db.relationship('Product', backref=db.backref('user_product', lazy=True))    
