@@ -2,7 +2,7 @@ from project_files import app
 from project_files import db
 from project_files import login_manager
 
-from .database import User, Blocked, Product, UserProducts
+from .database import Users, Products, UsersProducts
 from sqlalchemy import desc, asc
 
 from .scripts.functions import check_admin, check_user, captcha
@@ -21,7 +21,7 @@ import random
 @login_manager.user_loader
 def load_user(user_id):
     try:
-        return User.query.get(user_id)
+        return Users.query.get(user_id)
     except Exception as e:
         save_event(event=e, site='login manager')
 
@@ -41,26 +41,26 @@ def before_request():
 @captcha('page')
 def page():
 
-  products = Product.query.all()
+  products = Products.query.all()
 
   if request.method == 'POST':
     queryset = request.form['search']
     sort_type = request.form['sort_type']
 
     products = (
-      Product.query.filter(
-        Product.name.contains(queryset) |
-        Product.category.contains(queryset) |
-        Product.company.contains(queryset)
+      Products.query.filter(
+        Products.name.contains(queryset) |
+        Products.category.contains(queryset) |
+        Products.company.contains(queryset)
       ).order_by(
-        desc(Product.name) if sort_type == 'desc_name' else \
-        asc(Product.name) if sort_type == 'asc_name' else \
-        desc(Product.category) if sort_type == 'desc_category' else \
-        asc(Product.category) if sort_type == 'asc_category' else \
-        desc(Product.company) if sort_type == 'desc_company' else \
-        asc(Product.company) if sort_type == 'asc_company' else \
-        desc(Product.price) if sort_type == 'desc_price' else \
-        asc(Product.price) if sort_type == 'asc_price' else None
+        desc(Products.name) if sort_type == 'desc_name' else \
+        asc(Products.name) if sort_type == 'asc_name' else \
+        desc(Products.category) if sort_type == 'desc_category' else \
+        asc(Products.category) if sort_type == 'asc_category' else \
+        desc(Products.company) if sort_type == 'desc_company' else \
+        asc(Products.company) if sort_type == 'asc_company' else \
+        desc(Products.price) if sort_type == 'desc_price' else \
+        asc(Products.price) if sort_type == 'asc_price' else None
       ).all()
     )
 
@@ -84,7 +84,7 @@ def page():
 @captcha('category')
 def category():
 
-  categories = db.session.query(Product.category.distinct()).all()
+  categories = db.session.query(Products.category.distinct()).all()
   categories = [str(category[0]) for category in categories]
   categories = list(categories)
 
@@ -95,7 +95,7 @@ def category():
 @captcha('products')
 def products(category):
 
-  list_of_products = Product.query.filter_by(category=category)
+  list_of_products = Products.query.filter_by(category=category)
 
   if category in request.cookies:
     money = request.cookies.get(category)
@@ -121,7 +121,7 @@ def products(category):
 @captcha('product_info')
 def product_info(product_id):
 
-  product = Product.query.filter_by(id=product_id).first()
+  product = Products.query.filter_by(id=product_id).first()
   discount = the_price(product=product, price_type='the_highest_price')
   discount = round(product.price*100/discount, 0)
 
@@ -149,7 +149,7 @@ def product_info(product_id):
 def shop_api():
 
   list_of_products = []
-  products = Product.query.all()
+  products = Products.query.all()
 
   for product in products:
     data = {}
@@ -165,13 +165,13 @@ def shop_api():
 @app.route('/test', methods=['GET', 'POST'])
 def test():
 
-  user = User.query.get(1)
-  product = Product.query.get(1)
-  user_product = UserProducts(user_id=user.id, product_id=product.id)
+  user = Users.query.get(1)
+  product = Products.query.get(1)
+  user_product = UsersProducts(user_id=user.id, product_id=product.id)
   db.session.add(user_product)
   db.session.commit()
 
-  user_product = UserProducts.query.join(Product).join(User).filter(User.id == 1).all()
+  user_product = UsersProducts.query.join(Products).join(Users).filter(Users.id == 1).all()
   for x in user_product:
     print(x.user.username)
   return 'x'

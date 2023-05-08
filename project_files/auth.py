@@ -7,7 +7,7 @@ from project_files import SESSIONS
 
 from .form import UserCreator, UserLogin, RemindPassword, NewPassword, Key
 
-from .database import User, Blocked
+from .database import Users, BlockedUsers
 
 from .scripts.functions import check_user, save_event, captcha
 from .scripts.functions import check_session, random_string, open_json, save_json
@@ -31,7 +31,7 @@ def account():
 
   session['username'] = current_user.username
   sess = random_string(size=39)
-  user = User.query.filter_by(username=current_user.username).first()
+  user = Users.query.filter_by(username=current_user.username).first()
 
   return render_template('account/account.html', sess=sess, newsletter=user.newsletter)
 
@@ -108,7 +108,7 @@ def register_session(rendered_session):
 
       for sess in session_list:
         if sess['session'] == rendered_session and sess['key'] == form.key.data:
-          user = User(
+          user = Users(
             username=sess['username'],
             first_name=sess['first_name'],
             surname=sess['surname'],
@@ -145,11 +145,11 @@ def login():
 
     if form.validate_on_submit():
 
-      user = User.query.filter_by(
+      user = Users.query.filter_by(
         email=form.email.data,
         username=form.username.data
       ).first()
-      has_access = Blocked.query.filter_by(username=user.username).first()
+      has_access = BlockedUsers.query.filter_by(username=user.username).first()
 
       if user and (bcrypt.check_password_hash(user.password, form.password.data)) \
         and not has_access:
@@ -182,7 +182,7 @@ def remind():
 
     if form.validate_on_submit():
         
-      user = User.query.filter_by(
+      user = Users.query.filter_by(
           username=form.username.data,
           email=form.email.data
         ).first()
@@ -253,7 +253,7 @@ def new_password(rendered_session):
 
         if form.validate_on_submit():
         
-          user = User.query.filter_by(username=session['username']).first()
+          user = Users.query.filter_by(username=session['username']).first()
           user.password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
           db.session.commit()
           session.pop('username', None)
@@ -275,7 +275,7 @@ def new_password(rendered_session):
 @captcha('account_details')
 def account_details():
 
-  user = User.query.get_or_404(current_user.id)
+  user = Users.query.get_or_404(current_user.id)
 
   if request.method == 'POST':
   
@@ -285,7 +285,7 @@ def account_details():
     try:
       db.session.commit()
       save_event(
-        event=f'The User {current_user.username} updated account details',
+        event=f'The Users {current_user.username} updated account details',
         site=account_details.__name__  
       )
 
@@ -297,7 +297,7 @@ def account_details():
       username = not_null(request.form['username'])
       if username != user.username:
 
-        if User.query.filter_by(username=username).first():
+        if Users.query.filter_by(username=username).first():
           #flash this username already exists
           return redirect( url_for('account_details'))
         
@@ -305,7 +305,7 @@ def account_details():
           user.username = username
           db.session.commit()
           save_event(
-            event=f'The User {current_user.username} updated username to {username}',
+            event=f'The Users {current_user.username} updated username to {username}',
             site=account_details.__name__  
           )
 
@@ -317,7 +317,7 @@ def account_details():
       email = not_null(request.form['email'])
       if email != user.email:
 
-        if User.query.filter_by(email=email).first():
+        if Users.query.filter_by(email=email).first():
           #flash this email already exists
           return redirect( url_for('account_details'))
         
@@ -356,7 +356,7 @@ def new_email(rendered_session):
   try:
     if session['username'] != None and session['username'] != '':
       
-      if user := User.query.filter_by(username=session['username']).first():
+      if user := Users.query.filter_by(username=session['username']).first():
 
         old_email = user.email
         user.email = session.get('new_email')
@@ -365,7 +365,7 @@ def new_email(rendered_session):
         session.pop('username', None)
         session.pop('new_email', None)
         save_event(
-          event=f'The User {current_user.username} updated email from {old_email} to {user.email}',
+          event=f'The Users {current_user.username} updated email from {old_email} to {user.email}',
           site=account_details.__name__  
         )
         #flash email was updated

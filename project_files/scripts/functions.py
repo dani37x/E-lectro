@@ -17,7 +17,7 @@ from project_files import app
 from project_files import EVENTS, DATA, CLASSIFIER, PRICES
 from project_files import disallowed_words
 
-from ..database import Blocked, User, Product
+from ..database import BlockedUsers, Users, Products
 
 from flask import request, abort, session, redirect, url_for
 from flask_login import  current_user
@@ -136,15 +136,15 @@ def check_user(name):
         @wraps(f)
         def wrapped(*args, **kwargs):
 
-            check = Blocked.query.filter_by(ip=request.remote_addr).first()
+            check = BlockedUsers.query.filter_by(ip=request.remote_addr).first()
             if check != None:
                 abort(403)
 
-            check = Blocked.query.filter_by(username=current_user.username).first()
+            check = BlockedUsers.query.filter_by(username=current_user.username).first()
             if check != None:
                 abort(403)
 
-            check = User.query.filter_by(username=current_user.username).first()
+            check = Users.query.filter_by(username=current_user.username).first()
             if check.active == False:
                 abort(403)
 
@@ -226,7 +226,7 @@ def generator(answer, obstacle):
 
 def unblock():
     app.app_context().push()
-    blocked_users = Blocked.query.all()
+    blocked_users = BlockedUsers.query.all()
 
     for blocked in blocked_users:
         if (datetime.now() > string_to_date(blocked.date)):
@@ -273,7 +273,7 @@ def similar_products_to_queries(username):
     queries = open_json(file_path=DATA)
     user_queries = [query for query in queries if query['username'] == username]
    
-    if products := Product.query.all():
+    if products := Products.query.all():
         
         if len(user_queries) == 0:
             random_products = []
@@ -381,7 +381,7 @@ def end_of_promo():
             if string_to_date(obj['end_date']) < datetime.now() \
                 and obj['start_date'] != obj['end_date']:
 
-                product = Product.query.get(int(obj['id']))
+                product = Products.query.get(int(obj['id']))
                 variable = product.price
                 product.price = product.old_price
                 product.old_price = variable

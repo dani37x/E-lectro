@@ -65,7 +65,7 @@ scheduler.add_job(
 scheduler.add_job(
   end_of_promo,
   trigger='interval', 
-  minutes=1
+  days=1
 )
 scheduler.start()
 

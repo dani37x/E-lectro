@@ -1,7 +1,7 @@
 """
 The actions.py file is an essential component of the admin panel. It serves
 as the backbone and contains various functions for managing different aspects
-of the panel, including User, Product, and Blocked sections.
+of the panel, including Users, Products, and BlockedUsers Users sections.
 
 Some of the functions you can find in this file include managing newsletters,
 creating backups and restoring data, managing user accounts and products, and
@@ -12,12 +12,12 @@ from project_files import db
 from project_files import app
 from project_files import mail
 from project_files import queue
-from project_files import BLOCKED, USER, PRODUCT
+from project_files import BLOCKED_USERS, USERS, PRODUCTS
 
 from .functions import open_json, save_json , string_to_date
 from .functions import save_price
 
-from ..database import User, Blocked, Product
+from ..database import Users, BlockedUsers, Products
 
 from flask_mail import Message
 
@@ -54,12 +54,12 @@ def rq_delete_db_row(obj):
 
 def backup(model):
 
-    if model == User:
-        path = USER
-    elif model == Product:
-        path = PRODUCT
+    if model == Users:
+        path = USERS
+    elif model == Products:
+        path = PRODUCTS
     else:
-        path = BLOCKED
+        path = BLOCKED_USERS
 
     data_from_file = open_json(file_path=path)
     objects_list = []
@@ -79,8 +79,8 @@ def backup(model):
 
 def restore_database(model):
 
-    if model == User:
-        data_from_file = open_json(file_path=USER)
+    if model == Users:
+        data_from_file = open_json(file_path=USERS)
 
         for data in data_from_file:
             user = model(
@@ -101,8 +101,8 @@ def restore_database(model):
                 db.session.add(user)
                 db.session.commit()
 
-    elif model == Product:
-        data_from_file = open_json(file_path=PRODUCT)
+    elif model == Products:
+        data_from_file = open_json(file_path=PRODUCTS)
 
         for data in data_from_file:
             product = model(
@@ -118,8 +118,8 @@ def restore_database(model):
                 db.session.add(product)
                 db.session.commit()
 
-    elif model == Blocked:
-        data_from_file = open_json(file_path=BLOCKED)
+    elif model == BlockedUsers:
+        data_from_file = open_json(file_path=BLOCKED_USERS)
 
         for data in data_from_file:
             blocked = model(
@@ -134,7 +134,7 @@ def restore_database(model):
                 db.session.commit()
 
 
-# The funcs of User panel
+# The funcs of Users panel
 
 
 def block_users(data):
@@ -142,11 +142,11 @@ def block_users(data):
     app.app_context().push()
 
     for id in data:
-        user_to_block = User.query.get(id)
-        whether_blocked = Blocked.query.filter_by(username=user_to_block.username).first()
+        user_to_block = Users.query.get(id)
+        whether_blocked = BlockedUsers.query.filter_by(username=user_to_block.username).first()
 
         if whether_blocked == None:
-            new_row = Blocked(
+            new_row = BlockedUsers(
                 username=user_to_block.username,
                 ip=user_to_block.ip,
                 date=str((datetime.now() + timedelta(days=7)).strftime("%d-%m-%Y  %H:%M:%S"))
@@ -178,7 +178,7 @@ def account_deactivation(model, data):
 def delete_inactive_accounts():
     time.sleep(60)
     app.app_context().push()
-    users = User.query.all()
+    users = Users.query.all()
 
     for user in users:
         if user.active ==  False:
@@ -228,9 +228,9 @@ def send_newsletter():
     time.sleep(15)
     app.app_context().push()
 
-    if users :=  User.query.filter_by(newsletter=True).all():
+    if users :=  Users.query.filter_by(newsletter=True).all():
         
-        if products := Product.query.all():
+        if products := Products.query.all():
             products = products[-5:]            
             mails = [user.email for user in users]
 
@@ -246,18 +246,18 @@ def send_newsletter():
 
 
 def newsletter_activation(username):
-    if user := User.query.filter_by(username=username).first():      
+    if user := Users.query.filter_by(username=username).first():      
         user.newsletter = True
         db.session.commit()
 
 
 def newsletter_deactivation(username):
-    if user := User.query.filter_by(username=username).first():
+    if user := Users.query.filter_by(username=username).first():
         user.newsletter = False
         db.session.commit()
 
 
-# The funcs of Product panel
+# The funcs of Products panel
 
 
 def discount(percent, data, days):
@@ -266,7 +266,7 @@ def discount(percent, data, days):
     percent = 1-(int(percent)/100)
     
     for product in data:
-        product = Product.query.filter_by(id=product).first()
+        product = Products.query.filter_by(id=product).first()
         product.old_price = product.price
         product.price *= percent
         product.price = round(product.price, 2)
@@ -280,7 +280,7 @@ def price_hike(percent, data, days):
     percent = 1+(int(percent)/100)
 
     for product in data:
-        product = Product.query.filter_by(id=product).first()
+        product = Products.query.filter_by(id=product).first()
         product.old_price = product.price
         product.price *= percent
         product.price = round(product.price, 2)
@@ -291,7 +291,7 @@ def price_hike(percent, data, days):
 def previous_price(data):
     app.app_context().push()
     for product in data:
-        product = Product.query.filter_by(id=product).first()
+        product = Products.query.filter_by(id=product).first()
         if product.old_price != 0:
             variable = product.price
             product.price = product.old_price
