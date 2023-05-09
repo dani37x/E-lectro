@@ -20,13 +20,6 @@ from rq.registry import FailedJobRegistry
 import os
 
 
-disallowed_words = [
-  'fuck', 'shit', 'hitler', 'stalin', '666', 
-  'admin', 'mod', 'product', 'blocked', 'user',
-  'the user', 'captcha'
-]
-
-
 # main config
 
 
@@ -119,3 +112,13 @@ job_registry = FailedJobRegistry(queue=queue)
 
 
 scheduler = BackgroundScheduler(timezone="Europe/Warsaw")
+
+
+# the others
+
+
+disallowed_words = [
+  'fuck', 'shit', 'hitler', 'stalin', '666', 
+  'admin', 'mod', 'product', 'blocked', 'user',
+  'the user', 'captcha'
+]

@@ -1,13 +1,11 @@
 from project_files import app
 from project_files import db
-from project_files import queue
-from project_files import login_manager
 from project_files import bcrypt
 from project_files import SESSIONS
 
 from .form import UserCreator, UserLogin, RemindPassword, NewPassword, Key
 
-from .database import Users, BlockedUsers
+from .database import Users, BlockedUsers, Products, UsersProducts
 
 from .scripts.functions import check_user, save_event, captcha
 from .scripts.functions import check_session, random_string, open_json, save_json
@@ -18,9 +16,9 @@ from .scripts.actions import newsletter_activation, newsletter_deactivation
 from .form import not_null
 
 from flask_login import login_user, logout_user, login_required, current_user
-from flask import render_template, url_for, redirect, request, abort, session
+from flask import render_template, url_for, redirect, request, session
 
-from datetime import datetime, timedelta
+from datetime import datetime
 
 
 @app.route('/account', methods=['GET', 'POST'])
@@ -33,7 +31,25 @@ def account():
   sess = random_string(size=39)
   user = Users.query.filter_by(username=current_user.username).first()
 
-  return render_template('account/account.html', sess=sess, newsletter=user.newsletter)
+  return render_template('auth/account.html', sess=sess, newsletter=user.newsletter)
+
+
+@app.route('/account/products', methods=['GET', 'POST'])
+# @check_user('account_products')
+@captcha('account_products')
+@login_required
+def account_products():
+  
+  user_products = (
+    UsersProducts.query
+    .join(Users)
+    .join(Products)
+    .filter(Users.id == 1)
+    .all()
+  )
+  print( current_user.id, user_products)
+
+  return render_template('auth/account_products.html', user_products=user_products)
 
 
 @app.route('/account/newsletter/register', methods=['GET', 'POST'])
@@ -346,7 +362,7 @@ def account_details():
     return redirect( url_for('account_details'))
         
   else:
-    return render_template('account/details.html', user=user)
+    return render_template('auth/details.html', user=user)
   
 
 

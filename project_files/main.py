@@ -167,11 +167,14 @@ def test():
 
   user = Users.query.get(1)
   product = Products.query.get(1)
-  user_product = UsersProducts(user_id=user.id, product_id=product.id)
+  user_product = UsersProducts(user_id=user.id, product_id=product.id, price=100)
   db.session.add(user_product)
   db.session.commit()
 
-  user_product = UsersProducts.query.join(Products).join(Users).filter(Users.id == 1).all()
+  # user_product = UsersProducts.query.join(Products).join(Users).filter(Users.id == 1).all()
+  # user_product = UsersProducts.query.join(Products).filter(user.id == 1).all()
+  user_product = Products.query.get(1)
+  user_product = user_product.user
   for x in user_product:
-    print(x.user.username)
+    print(x.users.surname)
   return 'x'

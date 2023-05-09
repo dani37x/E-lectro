@@ -347,7 +347,6 @@ def add_user():
       active=True,
       points=not_null(request.form['points']),
       newsletter=False,
-      # date = f"{str(datetime.now().strftime('%d-%m-%Y  %H:%M:%S'))}",
     )
 
     try:
@@ -445,7 +444,6 @@ def add_blocked():
     new_blocked = BlockedUsers(
       username=username,
       ip=not_null(request.form['ip']),
-      # date=f"{str(datetime.now().strftime('%d-%m-%Y  %H:%M:%S'))}",
     )
 
     try:
@@ -531,7 +529,6 @@ def add_product():
       company=not_null(request.form['company']),
       price=not_null(request.form['price']),
       old_price=not_null(request.form['old_price']),
-      # date=f"{str(datetime.now().strftime('%d-%m-%Y  %H:%M:%S'))}"
     )
 
     try:
