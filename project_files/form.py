@@ -1,5 +1,5 @@
 from project_files import disallowed_words
-from .database import User
+from .database import Users
 
 from flask_wtf import FlaskForm
 from wtforms import StringField, EmailField, PasswordField, BooleanField, IntegerField
@@ -42,7 +42,7 @@ def password_checking(form, field):
 
 
 def existing_user(form, field):
-  if field.data in User.query.filter(User.username).all():
+  if field.data in Users.query.filter(Users.username).all():
       raise ValidationError('this username already exist')
   for word in disallowed_words:
     if word in field.data or word.upper() in field.data:
@@ -50,7 +50,7 @@ def existing_user(form, field):
     
 
 def existing_email(form, field):
-  if field.data in User.query.filter(User.email).all():
+  if field.data in Users.query.filter(Users.email).all():
       raise ValidationError('this email already exist')
   for word in disallowed_words:
     if word in field.data or word.upper() in field.data:

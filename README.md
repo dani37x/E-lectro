@@ -8,7 +8,7 @@ One such solution is the Random Forest Classifier, which is used to classify use
 Another feature of E-lectro is the use of Redis queue, which is used as an asynchronous task queue. This allows for faster processing of user requests and helps to improve the overall performance of the application.
 The project is a full backend solution, with a strong emphasis on security. It includes ready-made solutions like entries limiter and SQLAlchemy ORM, but also incorporates custom functions to solve specific problems.
 
-Overall, E-lectro is a well-designed and fully-functional web application that demonstrates the power and flexibility of the Flask framework. Its unique features and emphasis on security make it a standout project in the world of e-commerce.
+Overall, E-lectro is a well-designed and fully-functional web application that demonstrates the power and flexibility of the Flask framework.
 
 <br>
 <div align="center">

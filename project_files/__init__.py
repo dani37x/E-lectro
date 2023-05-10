@@ -20,13 +20,6 @@ from rq.registry import FailedJobRegistry
 import os
 
 
-disallowed_words = [
-  'fuck', 'shit', 'hitler', 'stalin', '666', 
-  'admin', 'mod', 'product', 'blocked', 'user',
-  'the user', 'captcha'
-]
-
-
 # main config
 
 
@@ -44,9 +37,9 @@ SERVER_NAME = ''
 #  files' paths
 
 
-BLOCKED = r'D:\projekty\E-lectro\instance\BLOCKED.json'
-PRODUCT = r'D:\projekty\E-lectro\instance\PRODUCT.json'
-USER = r'D:\projekty\E-lectro\instance\USER.json'
+BLOCKED_USERS = r'D:\projekty\E-lectro\instance\BLOCKED_USERS.json'
+PRODUCTS = r'D:\projekty\E-lectro\instance\PRODUCTS.json'
+USERS = r'D:\projekty\E-lectro\instance\USERS.json'
 CLASSIFIER = r'D:\projekty\E-lectro\project_files\machine_learning\classifier.pkl'
 EVENTS = r'D:.\instance\EVENTS.json'
 DATA = r'.\instance\DATA.json'
@@ -57,7 +50,7 @@ PRICES = r'.\instance\PRICES.json'
 # database and login
 
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///user.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///electro.db'
 db = SQLAlchemy(app)
 
 login_manager = LoginManager()
@@ -119,3 +112,13 @@ job_registry = FailedJobRegistry(queue=queue)
 
 
 scheduler = BackgroundScheduler(timezone="Europe/Warsaw")
+
+
+# the others
+
+
+disallowed_words = [
+  'fuck', 'shit', 'hitler', 'stalin', '666', 
+  'admin', 'mod', 'product', 'blocked', 'user',
+  'the user', 'captcha'
+]

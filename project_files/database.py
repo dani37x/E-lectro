@@ -2,8 +2,10 @@ from project_files import db
 
 from flask_login import UserMixin
 
+from datetime import datetime
 
-class User(UserMixin, db.Model):
+
+class Users(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(30), unique=True, nullable=False)
     first_name = db.Column(db.String(30),unique=False, nullable=False)
@@ -15,31 +17,62 @@ class User(UserMixin, db.Model):
     active = db.Column(db.Boolean, default=True, nullable=False)
     points = db.Column(db.Integer, default=0)
     newsletter = db.Column(db.Boolean, nullable=False)
-    date = db.Column(db.String(30), unique=False, nullable=False)
+    date = db.Column(
+        db.String(30),
+        unique=False, 
+        nullable=False, 
+        default=datetime.now().strftime('%d-%m-%Y  %H:%M:%S')
+    )
+    product = db.relationship('UsersProducts', backref=db.backref('users', lazy=True))
 
     def __repr__(self):
         return f'User {self.username}'
     
 
 
-class Blocked(db.Model):
+class BlockedUsers(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(30), unique=False, nullable=False)
     ip = db.Column(db.String(30), unique=False, nullable=False)
-    date = db.Column(db.String(30), unique=False, nullable=False)
-
+    date = db.Column(
+        db.String(30), 
+        unique=False, 
+        nullable=False, 
+        default=datetime.now().strftime('%d-%m-%Y  %H:%M:%S')
+    )
     def __repr__(self):
         return f'Blocked {self.username}'
     
 
-class Product(db.Model):
+class Products(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(30), unique=False, nullable=False)
     category = db.Column(db.String(30), unique=False, nullable=False)
     company = db.Column(db.String(30), unique=False, nullable=False)
     price = db.Column(db.Float(), unique=False, nullable=False)
     old_price = db.Column(db.Float(), unique=False, nullable=False)
-    date = db.Column(db.String(30), unique=False, nullable=False)
+    date = db.Column(
+        db.String(30), 
+        unique=False, 
+        nullable=False, 
+        default=datetime.now().strftime('%d-%m-%Y  %H:%M:%S')
+    )
+    user = db.relationship('UsersProducts', backref=db.backref('products', lazy=True))
 
     def __repr__(self):
         return f'Product {self.name}'
+    
+
+class UsersProducts(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'),  nullable=False)
+    product_id = db.Column(db.Integer, db.ForeignKey('products.id'),  nullable=False)
+    date = db.Column(
+        db.String, 
+        nullable=False, 
+        default=datetime.now().strftime('%d-%m-%Y  %H:%M:%S')
+    )
+    price = db.Column(db.Float(), unique=False, nullable=False)
+
+    # def __repr__(self):
+    #     return f' {self.}'    

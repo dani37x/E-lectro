@@ -7,11 +7,11 @@ from project_files import bcrypt
 from flask_login import login_required, current_user
 from flask import render_template, url_for, redirect, request
 
-from .database import User, Blocked, Product
+from .database import Users, BlockedUsers, Products
 from sqlalchemy import desc, asc
 
 from .scripts.functions import check_admin, check_user, captcha
-from .scripts.functions import not_null, save_event
+from .scripts.functions import save_event, the_price, save_price
 
 from .scripts.actions import delete_rows, block_users, message, backup
 from .scripts.actions import account_activation, account_deactivation
@@ -19,6 +19,8 @@ from .scripts.actions import delete_inactive_accounts, restore_database
 from .scripts.actions import send_newsletter
 from .scripts.actions import discount, previous_price, price_hike
 from .scripts.actions import rq_add_row_to_db, rq_delete_db_row
+
+from .form import not_null
 
 from rq import Retry
 
@@ -31,7 +33,6 @@ from datetime import datetime
 # @check_admin('admin')
 @captcha('admin')
 def admin():
-
   return render_template('admin/admin.html')
 
 
@@ -42,35 +43,33 @@ def admin():
 @captcha('admin_user')
 def admin_user():
   
-  users = User.query.all() 
+  users = Users.query.all() 
 
   if request.method == 'POST':
     searching = request.form['search']
     sort_type = request.form['sort_type']
 
-    # if searching != None and searching != '':
     users = (
-      User.query.filter(
-        User.username.contains(searching) |
-        User.first_name.contains(searching) |
-        User.surname.contains(searching) |
-        User.email.contains(searching) |
-        User.account_type.contains(searching)
+      Users.query.filter(
+        Users.username.contains(searching) |
+        Users.first_name.contains(searching) |
+        Users.surname.contains(searching) |
+        Users.email.contains(searching) |
+        Users.account_type.contains(searching)
       ).order_by(
-        desc(User.username) if sort_type == 'desc_username' else \
-        asc(User.username) if sort_type == 'asc_username' else \
-        desc(User.first_name) if sort_type == 'desc_first_name' else \
-        asc(User.first_name) if sort_type == 'asc_first_name' else \
-        desc(User.surname) if sort_type == 'desc_surname' else \
-        asc(User.surname) if sort_type == 'asc_surname' else \
-        desc(User.email) if sort_type == 'desc_email' else \
-        asc(User.email) if sort_type == 'asc_email' else \
-        desc(User.account_type) if sort_type == 'desc_account_type' else \
-        asc(User.account_type) if sort_type == 'asc_account_type' else None
+        desc(Users.username) if sort_type == 'desc_username' else \
+        asc(Users.username) if sort_type == 'asc_username' else \
+        desc(Users.first_name) if sort_type == 'desc_first_name' else \
+        asc(Users.first_name) if sort_type == 'asc_first_name' else \
+        desc(Users.surname) if sort_type == 'desc_surname' else \
+        asc(Users.surname) if sort_type == 'asc_surname' else \
+        desc(Users.email) if sort_type == 'desc_email' else \
+        asc(Users.email) if sort_type == 'asc_email' else \
+        desc(Users.account_type) if sort_type == 'desc_account_type' else \
+        asc(Users.account_type) if sort_type == 'asc_account_type' else None
       ).all()
     )
-      # return render_template('admin/admin_user.html', users=users)
-
+    
     data = request.form.getlist('id')
     selected_action = request.form['action']
 
@@ -78,7 +77,7 @@ def admin_user():
       if selected_action == 'delete user':
         task = queue.enqueue(
           delete_rows,
-          model=User,
+          model=Users,
           data=data,
           retry=Retry(max=3, interval=[10, 30, 60])
         )
@@ -97,7 +96,7 @@ def admin_user():
       if selected_action == 'account activation':
         task = queue.enqueue(
           account_activation,
-            model=User,
+            model=Users,
             data=data,
             retry=Retry(max=3, interval=[10, 30, 60])
           )
@@ -107,7 +106,7 @@ def admin_user():
       if selected_action == 'account deactivation':
         task = queue.enqueue(
           account_deactivation,
-          model=User,
+          model=Users,
           data=data,
           retry=Retry(max=3, interval=[10, 30, 60])
         )
@@ -130,7 +129,7 @@ def admin_user():
       if selected_action == 'test email':
         users_emails = []
         for id in data:
-          user = User.query.filter_by(id=id).first()
+          user = Users.query.filter_by(id=id).first()
           users_emails.append(user.email)
 
         task = queue.enqueue(
@@ -143,10 +142,10 @@ def admin_user():
         return render_template('admin/admin_user.html', users=users, task=task)
 
       if selected_action == 'restore database':
-        restore_database(model=User)
+        restore_database(model=Users)
 
       if selected_action == 'backup':
-        backup(model=User)
+        backup(model=Users)
 
     except Exception as e:
       save_event(event=e, site=admin_user.__name__)
@@ -162,25 +161,23 @@ def admin_user():
 # @captcha('admin_blocked')
 def admin_blocked():
 
-  blocked = Blocked.query.all() 
+  blocked = BlockedUsers.query.all() 
 
   if request.method == 'POST':
     searching = request.form['search']
     sort_type = request.form['sort_type']
 
-    # if searching != None and searching != '':
     blocked = (
-      Blocked.query.filter(
-        User.username.contains(searching) |
-        Blocked.ip.contains(searching)
+      BlockedUsers.query.filter(
+        BlockedUsers.username.contains(searching) |
+        BlockedUsers.ip.contains(searching)
       ).order_by(
-        desc(Blocked.username) if sort_type == 'desc_username' else \
-        asc(Blocked.username) if sort_type == 'asc_username' else \
-        desc(Blocked.ip) if sort_type == 'desc_ip' else \
-        asc(Blocked.ip) if sort_type == 'asc_ip' else None
+        desc(BlockedUsers.username) if sort_type == 'desc_username' else \
+        asc(BlockedUsers.username) if sort_type == 'asc_username' else \
+        desc(BlockedUsers.ip) if sort_type == 'desc_ip' else \
+        asc(BlockedUsers.ip) if sort_type == 'asc_ip' else None
       ).all()
     )
-      # return render_template('admin/admin_blocked.html', blocked=blocked)
       
     data = request.form.getlist('id')
     selected_action = request.form['action']
@@ -189,17 +186,17 @@ def admin_blocked():
       if selected_action == 'delete user':
         task = queue.enqueue(
           delete_rows,
-          model=Blocked,
+          model=BlockedUsers,
           data=data,
           retry=Retry(max=3, interval=[10, 30, 60])
         )
         return render_template('admin/admin_blocked.html', blocked=blocked, task=task)
       
       if selected_action == 'backup':
-        backup(model=Blocked)
+        backup(model=BlockedUsers)
 
       if selected_action == 'restore database':
-        restore_database(model=Blocked)
+        restore_database(model=BlockedUsers)
 
     except Exception as e:
       save_event(event=e, site=admin_blocked.__name__)
@@ -215,30 +212,28 @@ def admin_blocked():
 @captcha('admin_product')
 def admin_product():
 
-  products = Product.query.all() 
+  products = Products.query.all() 
 
   if request.method == 'POST':
     searching = request.form['search']
     sort_type = request.form['sort_type']
 
-    # if searching != None and searching != '':
     products = (
-      Product.query.filter(
-        Product.name.contains(searching) |
-        Product.category.contains(searching) |
-        Product.company.contains(searching)
+      Products.query.filter(
+        Products.name.contains(searching) |
+        Products.category.contains(searching) |
+        Products.company.contains(searching)
       ).order_by(
-        desc(Product.name) if sort_type == 'desc_name' else \
-        asc(Product.name) if sort_type == 'asc_name' else \
-        desc(Product.category) if sort_type == 'desc_category' else \
-        asc(Product.category) if sort_type == 'asc_category' else \
-        desc(Product.company) if sort_type == 'desc_company' else \
-        asc(Product.company) if sort_type == 'asc_company' else \
-        desc(Product.price) if sort_type == 'desc_price' else \
-        asc(Product.price) if sort_type == 'asc_price' else None
+        desc(Products.name) if sort_type == 'desc_name' else \
+        asc(Products.name) if sort_type == 'asc_name' else \
+        desc(Products.category) if sort_type == 'desc_category' else \
+        asc(Products.category) if sort_type == 'asc_category' else \
+        desc(Products.company) if sort_type == 'desc_company' else \
+        asc(Products.company) if sort_type == 'asc_company' else \
+        desc(Products.price) if sort_type == 'desc_price' else \
+        asc(Products.price) if sort_type == 'asc_price' else None
       ).all()
     )
-      # return render_template('admin/admin_product.html', products=products)
       
     data = request.form.getlist('id')
     percent = request.form['percent']
@@ -249,7 +244,7 @@ def admin_product():
       if selected_action == 'delete products':
         task = queue.enqueue(
           delete_rows,
-          model=Product,
+          model=Products,
           data=data,
           retry=Retry(max=3, interval=[10, 30, 60])
         )
@@ -270,6 +265,7 @@ def admin_product():
           price_hike,
           percent=percent,
           data=data,
+          days=promo_days,
           retry=Retry(max=3, interval=[10, 30, 60])
         )
         return render_template('admin/admin_product.html', products=products, task=task)
@@ -281,13 +277,41 @@ def admin_product():
           retry=Retry(max=3, interval=[10, 30, 60])
         )
         return render_template('admin/admin_product.html', products=products, task=task)
+      
+      # if selected_action == 'the_lowest_price':
+      #   task = queue.enqueue(
+      #     the_price,
+      #     data=data,
+      #     price_type=selected_action,
+      #     retry=Retry(max=3, interval=[10, 30, 60])
+      #   )
+      #   return render_template('admin/admin_product.html', products=products, task=task)
+
+      # if selected_action == 'the_highest_price':
+      #   task = queue.enqueue(
+      #     the_price,
+      #     data=data,
+      #     price_type=selected_action,
+      #     retry=Retry(max=3, interval=[10, 30, 60])
+      #   )
+      #   return render_template('admin/admin_product.html', products=products, task=task)
+
+      # if selected_action == 'the_random_price':
+      #   task = queue.enqueue(
+      #     the_price,
+      #     data=data,
+      #     price_type=selected_action,
+      #     retry=Retry(max=3, interval=[10, 30, 60])
+      #   )
+      #   return render_template('admin/admin_product.html', products=products, task=task)
+
 
       if selected_action == 'backup':
-        backup(model=Product)
+        backup(model=Products)
         #flash message
 
       if selected_action == 'restore database':
-        restore_database(model=Product)
+        restore_database(model=Products)
 
     except Exception as e:
       save_event(event=e, site=admin_product.__name__)
@@ -312,7 +336,7 @@ def add_user():
     password = bcrypt.generate_password_hash(password).decode('utf-8')
     username = not_null(request.form['username'])
 
-    new_user = User(
+    new_user = Users(
       username=username,
       first_name=not_null(request.form['first_name']),
       surname=not_null(request.form['surname']),
@@ -323,7 +347,6 @@ def add_user():
       active=True,
       points=not_null(request.form['points']),
       newsletter=False,
-      date = f"{str(datetime.now().strftime('%d-%m-%Y  %H:%M:%S'))}",
     )
 
     try:
@@ -354,7 +377,7 @@ def add_user():
 @captcha('update_user')
 def update_user(id):
 
-  user = User.query.get_or_404(id)
+  user = Users.query.get_or_404(id)
   
   if request.method == 'POST':
 
@@ -394,7 +417,7 @@ def update_user(id):
 @captcha('delete_user')
 def delete_user(id):
 
-  name_to_delete = User.query.get_or_404(id)
+  name_to_delete = Users.query.get_or_404(id)
 
   try:
     queue.enqueue(
@@ -418,10 +441,9 @@ def add_blocked():
 
   if request.method == 'POST':
     username = not_null(request.form['username'])
-    new_blocked = Blocked(
+    new_blocked = BlockedUsers(
       username=username,
       ip=not_null(request.form['ip']),
-      date=f"{str(datetime.now().strftime('%d-%m-%Y  %H:%M:%S'))}",
     )
 
     try:
@@ -451,7 +473,7 @@ def add_blocked():
 @captcha('update_blocked')
 def update_blocked(id):
 
-  blocked = Blocked.query.get_or_404(id)
+  blocked = BlockedUsers.query.get_or_404(id)
 
   if request.method == 'POST':
     blocked.username = not_null(request.form['username'])
@@ -477,7 +499,7 @@ def update_blocked(id):
 @captcha('delete_blocked')
 def delete_blocked(id):
 
-  name_to_delete = Blocked.query.get_or_404(id)
+  name_to_delete = BlockedUsers.query.get_or_404(id)
 
   try:
     queue.enqueue(
@@ -501,13 +523,12 @@ def add_product():
 
   if request.method == 'POST':
     product = not_null(request.form['name'])
-    new_product = Product(
+    new_product = Products(
       name=product,
       category=not_null(request.form['category']),
       company=not_null(request.form['company']),
       price=not_null(request.form['price']),
       old_price=not_null(request.form['old_price']),
-      date=f"{str(datetime.now().strftime('%d-%m-%Y  %H:%M:%S'))}"
     )
 
     try:
@@ -538,7 +559,7 @@ def add_product():
 @captcha('update_product')
 def update_product(id):
 
-  product = Product.query.get_or_404(id)
+  product = Products.query.get_or_404(id)
 
   if request.method == 'POST':
     product.name = not_null(request.form['name'])
@@ -550,6 +571,7 @@ def update_product(id):
 
     try:
       db.session.commit()
+      save_price(data=[product])
       return redirect( url_for('admin_product'))
 
     except Exception as e:
@@ -567,7 +589,7 @@ def update_product(id):
 @captcha('delete_product')
 def delete_product(id):
 
-  name_to_delete = Product.query.get_or_404(id)
+  name_to_delete = Products.query.get_or_404(id)
 
   try:
     queue.enqueue(
