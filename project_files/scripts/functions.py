@@ -338,21 +338,20 @@ def classification(category, money):
 # pricing system
 
 
-def save_price(data, days=0):
+def save_price(product, days=0):
     file_path = back_to_slash(PRICES)
     objects_list = open_json(file_path=file_path)
-    days = int(days)
+    days = int(days) if days != '' else 0
 
-    for obj in data:
-        objects_list.append({
-                "id": f"{obj.id}",
-                "name": f"{obj.name}",
-                "price": f"{obj.price}",
-                "old_price": f"{obj.old_price}",
-                "start_date": f"{datetime.now().strftime('%d-%m-%Y  %H:%M:%S')}",
-                "end_date": f"{(datetime.now() + timedelta(days=days)).strftime('%d-%m-%Y  %H:%M:%S')}"
-            })
-        
+    objects_list.append({
+            "id": f"{product.id}",
+            "name": f"{product.name}",
+            "price": f"{product.price}",
+            "old_price": f"{product.old_price}",
+            "start_date": f"{datetime.now().strftime('%d-%m-%Y  %H:%M:%S')}",
+            "end_date": f"{(datetime.now() + timedelta(days=days)).strftime('%d-%m-%Y  %H:%M:%S')}"
+        })
+    
     save_json(file_path=file_path, data=objects_list)
 
 
@@ -382,10 +381,12 @@ def end_of_promo():
                 and obj['start_date'] != obj['end_date']:
 
                 product = Products.query.get(int(obj['id']))
-                variable = product.price
-                product.price = product.old_price
-                product.old_price = variable
-                db.session.commit()
+                
+                if float(obj['price']) == product.price: 
+                    variable = product.price
+                    product.price = product.old_price
+                    product.old_price = variable
+                    db.session.commit()
 
             else:
                 not_ended.append(obj)
