@@ -52,7 +52,7 @@ Overall, E-lectro is a well-designed and fully-functional web application that d
   - [x] set the random price for products from last month
 - [x] Redis and Redis queue
   - [x] Redis queue and workers
-  - [x] old functions with async queue usage
+  - [x] old and new functions with co-work with async queue usage
   - [x] time to cancel task from queue
   - [x] delete cancelled task from rq history
 - [x] Forms
@@ -61,6 +61,7 @@ Overall, E-lectro is a well-designed and fully-functional web application that d
   - [x] Key form
   - [x] New Password form
   - [x] Remind Password form
+  - [x] Captcha Chars Counter form
 - [x] Flask Login
   - [x] Login
   - [x] Authantacion

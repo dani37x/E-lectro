@@ -32,26 +32,14 @@ import random
 
 # joint funcs
 
-
-def rq_add_row_to_db(obj):
-    app.app_context().push()
-    db.session.add(obj)
-    db.session.commit()
-
-
 def delete_rows(model, data):
     time.sleep(10)
     app.app_context().push()
 
+
     for number in data:
         model.query.filter_by(id=number).delete()
         db.session.commit()
-
-
-def rq_delete_db_row(obj):
-    app.app_context().push()
-    db.session.delete(obj)
-    db.session.commit()
 
 
 def backup(model):

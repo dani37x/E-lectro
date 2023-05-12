@@ -6,13 +6,20 @@
 <br>
 {{product.category}}
 <br>
-{{product.price}}  
-{% if discount %}
-    <del> {{the_highest_price}} </del>
-    <span style="color:grey"> DISCOUNT {{discount}}% </span>
-{% endif %}
+<form action="" method="post">
+    {{product.price}}  
+    {% if discount %}
+        <del> {{the_highest_price}} </del>
+        <span style="color:grey"> DISCOUNT {{discount}}% </span>
+    {% endif %}
+    <br>
+    <label for="buy"> Do you want buy this product? </label>
+        <input type="submit" value="BUY NOW" id="buy">
+</form>
 <br>
 <p> 
     the lowest price from the last 30 days:
     {{the_lowest_price}}
 </p>
+
+

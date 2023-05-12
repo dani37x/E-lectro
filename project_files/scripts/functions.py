@@ -115,6 +115,21 @@ def random_string(size):
     return string_to_return
 
 
+# database functions
+
+
+def rq_add_row_to_db(obj):
+    app.app_context().push()
+    db.session.add(obj)
+    db.session.commit()
+
+
+def rq_delete_db_row(obj):
+    app.app_context().push()
+    db.session.delete(obj)
+    db.session.commit()
+
+
 # protection wrappers
 
 

@@ -12,13 +12,13 @@ from sqlalchemy import desc, asc
 
 from .scripts.functions import check_admin, check_user, captcha
 from .scripts.functions import save_event, the_price, save_price
+from .scripts.functions import rq_add_row_to_db, rq_delete_db_row
 
 from .scripts.actions import delete_rows, block_users, message, backup
 from .scripts.actions import account_activation, account_deactivation
 from .scripts.actions import delete_inactive_accounts, restore_database
 from .scripts.actions import send_newsletter, the_price_actions
 from .scripts.actions import discount, previous_price, price_hike
-from .scripts.actions import rq_add_row_to_db, rq_delete_db_row
 
 from .form import not_null
 
