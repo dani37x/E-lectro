@@ -7,6 +7,9 @@
 <a href="{{ url_for('new_password', rendered_session = sess ) }}"> change password </a>
 <br>
 <br>
+<a href="{{ url_for('account_products') }}"> bought products</a>
+<br>
+<br>
     {% if newsletter ==  False %}
         <a href="{{ url_for('register_newsletter') }}"> Sign up for the newsletter </>
     {% else %}

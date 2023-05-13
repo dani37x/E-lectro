@@ -136,12 +136,16 @@ Overall, E-lectro is a well-designed and fully-functional web application that d
   - [x] users can see how much money they will save on each product during the promotion, thanks to the discount
 - [x] User panel
   - [x] a user can change his nickname, e-mail, and the personal data
+  - [x] history of boughted products by users
 - [ ] better Readme section of installation which depict the correct process with Redis and Redis queue
+- [ ] option of payment for products
+- [ ] descriptions of funcs
+- [ ] more descriptions of files
+- [ ] tests of funcs
+- [ ] shop cart
 - [ ] multi-device login (max 3)
 - [ ] account lvl and points system with discounts.
 - [ ] payments for products
-- [ ] boughted products by users
-- [ ] list of products
 - [ ] own hash password algorithm
 - [ ] own authentication system
 
