@@ -1,6 +1,19 @@
 
+<a href="{{ url_for('account') }}">return</a>
+<br>
 
 {% for product in user_products %}
-    {{ product.products.name }}
+    <p>
+        {{ product.products.name }}
+        <br>
+        was bought:
+        {{ product.products.date }}
+        <br>
+        for:
+        {{ product.products.price }}$
+    </p>
+    <br>
     <br>
 {% endfor %}
+
+<a href="{{ url_for('account') }}">return</a>

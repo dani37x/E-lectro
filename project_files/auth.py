@@ -82,7 +82,6 @@ def register():
   if form.validate_on_submit():
 
     try:
-
       session_list = open_json(file_path=SESSIONS)
       sess = check_session(session_list=session_list)    
       key = random_string(size=6)
@@ -105,7 +104,6 @@ def register():
       return redirect( url_for('register_session', rendered_session=sess))
 
     except Exception as e:
-
       save_event(event=e, site=register.__name__)
       return 'Error with add register sessions'
 
@@ -160,7 +158,6 @@ def login():
   if request.method == 'POST':
 
     if form.validate_on_submit():
-
       user = Users.query.filter_by(
         email=form.email.data,
         username=form.username.data
@@ -197,7 +194,7 @@ def remind():
   if request.method == 'POST':
 
     if form.validate_on_submit():
-        
+
       user = Users.query.filter_by(
           username=form.username.data,
           email=form.email.data
@@ -225,7 +222,6 @@ def remind():
           return 'xd'
 
         save_json(file_path=SESSIONS, data=session_list)
-
         return redirect( url_for( 'hash_session', rendered_session=sess))
 
   return render_template('auth/remind_password.html', form=form)

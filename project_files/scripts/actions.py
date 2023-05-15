@@ -12,10 +12,10 @@ from project_files import db
 from project_files import app
 from project_files import mail
 from project_files import queue
-from project_files import BLOCKED_USERS, USERS, PRODUCTS
+from project_files import BLOCKED_USERS, USERS, PRODUCTS, PRICES
 
 from .functions import open_json, save_json , string_to_date
-from .functions import save_price
+from .functions import save_price, back_to_slash
 
 from ..database import Users, BlockedUsers, Products
 
@@ -27,29 +27,19 @@ from rq import Retry
 
 import time
 
+import random
+
 
 # joint funcs
-
-
-def rq_add_row_to_db(obj):
-    app.app_context().push()
-    db.session.add(obj)
-    db.session.commit()
-
 
 def delete_rows(model, data):
     time.sleep(10)
     app.app_context().push()
 
+
     for number in data:
         model.query.filter_by(id=number).delete()
         db.session.commit()
-
-
-def rq_delete_db_row(obj):
-    app.app_context().push()
-    db.session.delete(obj)
-    db.session.commit()
 
 
 def backup(model):
@@ -260,7 +250,7 @@ def newsletter_deactivation(username):
 # The funcs of Products panel
 
 
-def discount(percent, data, days):
+def discount(percent, data, days=0):
     time.sleep(10)
     app.app_context().push()
     percent = 1-(int(percent)/100)
@@ -271,10 +261,10 @@ def discount(percent, data, days):
         product.price *= percent
         product.price = round(product.price, 2)
         db.session.commit()
-        save_price(data=[product], days=days)
+        save_price(product=product, days=days)
 
 
-def price_hike(percent, data, days):
+def price_hike(percent, data, days=0):
     time.sleep(10)
     app.app_context().push()
     percent = 1+(int(percent)/100)
@@ -285,7 +275,7 @@ def price_hike(percent, data, days):
         product.price *= percent
         product.price = round(product.price, 2)
         db.session.commit()
-        save_price(data=[product], days=days)
+        save_price(product=product, days=days)
 
 
 def previous_price(data):
@@ -297,8 +287,38 @@ def previous_price(data):
             product.price = product.old_price
             product.old_price = variable
             db.session.commit()
-            save_price(data=[product])
+            save_price(product=product)
 
 
-    
+def the_price_actions(data, price_type):
+    app.app_context().push()
+    file_path = back_to_slash(PRICES)
+    objects_list = open_json(file_path=file_path)
+
+    for number in data:
+        product = Products.query.get(int(number))
+        product_info = []
+        for obj in objects_list:
+            if int(obj['id']) == product.id:
+                product_info.append(float(obj['price']))
+                product_info.append(float(obj['old_price']))
+
+        variable = product.price
+
+        if price_type == 'the_lowest_price':
+            product.price = min(product_info)
+            product.old_price = variable
+
+        elif price_type == 'the_highest_price':
+            variable = product.price
+            product.price = max(product_info)
+            product.old_price = variable
+
+        elif price_type == 'the_random_price':
+            product.price = random.choice(product_info)
+            product.old_price = variable
+
+        save_price(product=product)
+        
+    db.session.commit()
 

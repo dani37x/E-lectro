@@ -1,3 +1,14 @@
+"""
+The file errors.py contains error handlers for the entire application
+and addresses the most common errors. These error handlers collect the
+errors and store them in a file called EVENTS.json, which works in
+conjunction with the event system. 
+
+This approach can help to streamline the error handling process and 
+ensure that issues are properly recorded for future reference.
+"""
+
+
 from project_files import app
 
 from .scripts.functions import save_event
@@ -11,7 +22,6 @@ def handle_405(e):
 
 @app.errorhandler(404)
 def handle_404(e):
-    # save_event(event=e, site=handle_404.__name__)
     return '404'
 
 

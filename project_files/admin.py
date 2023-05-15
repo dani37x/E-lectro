@@ -12,13 +12,13 @@ from sqlalchemy import desc, asc
 
 from .scripts.functions import check_admin, check_user, captcha
 from .scripts.functions import save_event, the_price, save_price
+from .scripts.functions import rq_add_row_to_db, rq_delete_db_row
 
 from .scripts.actions import delete_rows, block_users, message, backup
 from .scripts.actions import account_activation, account_deactivation
 from .scripts.actions import delete_inactive_accounts, restore_database
-from .scripts.actions import send_newsletter
+from .scripts.actions import send_newsletter, the_price_actions
 from .scripts.actions import discount, previous_price, price_hike
-from .scripts.actions import rq_add_row_to_db, rq_delete_db_row
 
 from .form import not_null
 
@@ -278,32 +278,32 @@ def admin_product():
         )
         return render_template('admin/admin_product.html', products=products, task=task)
       
-      # if selected_action == 'the_lowest_price':
-      #   task = queue.enqueue(
-      #     the_price,
-      #     data=data,
-      #     price_type=selected_action,
-      #     retry=Retry(max=3, interval=[10, 30, 60])
-      #   )
-      #   return render_template('admin/admin_product.html', products=products, task=task)
+      if selected_action == 'the_lowest_price':
+        task = queue.enqueue(
+          the_price_actions,
+          data=data,
+          price_type=selected_action,
+          retry=Retry(max=3, interval=[10, 30, 60])
+        )
+        return render_template('admin/admin_product.html', products=products, task=task)
 
-      # if selected_action == 'the_highest_price':
-      #   task = queue.enqueue(
-      #     the_price,
-      #     data=data,
-      #     price_type=selected_action,
-      #     retry=Retry(max=3, interval=[10, 30, 60])
-      #   )
-      #   return render_template('admin/admin_product.html', products=products, task=task)
+      if selected_action == 'the_highest_price':
+        task = queue.enqueue(
+          the_price_actions,
+          data=data,
+          price_type=selected_action,
+          retry=Retry(max=3, interval=[10, 30, 60])
+        )
+        return render_template('admin/admin_product.html', products=products, task=task)
 
-      # if selected_action == 'the_random_price':
-      #   task = queue.enqueue(
-      #     the_price,
-      #     data=data,
-      #     price_type=selected_action,
-      #     retry=Retry(max=3, interval=[10, 30, 60])
-      #   )
-      #   return render_template('admin/admin_product.html', products=products, task=task)
+      if selected_action == 'the_random_price':
+        task = queue.enqueue(
+          the_price_actions,
+          data=data,
+          price_type=selected_action,
+          retry=Retry(max=3, interval=[10, 30, 60])
+        )
+        return render_template('admin/admin_product.html', products=products, task=task)
 
 
       if selected_action == 'backup':

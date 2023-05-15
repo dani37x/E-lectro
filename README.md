@@ -52,7 +52,7 @@ Overall, E-lectro is a well-designed and fully-functional web application that d
   - [x] set the random price for products from last month
 - [x] Redis and Redis queue
   - [x] Redis queue and workers
-  - [x] old functions with async queue usage
+  - [x] old and new functions with co-work with async queue usage
   - [x] time to cancel task from queue
   - [x] delete cancelled task from rq history
 - [x] Forms
@@ -61,6 +61,7 @@ Overall, E-lectro is a well-designed and fully-functional web application that d
   - [x] Key form
   - [x] New Password form
   - [x] Remind Password form
+  - [x] Captcha Chars Counter form
 - [x] Flask Login
   - [x] Login
   - [x] Authantacion
@@ -135,12 +136,16 @@ Overall, E-lectro is a well-designed and fully-functional web application that d
   - [x] users can see how much money they will save on each product during the promotion, thanks to the discount
 - [x] User panel
   - [x] a user can change his nickname, e-mail, and the personal data
+  - [x] history of boughted products by users
 - [ ] better Readme section of installation which depict the correct process with Redis and Redis queue
+- [ ] option of payment for products
+- [ ] descriptions of funcs
+- [ ] more descriptions of files
+- [ ] tests of funcs
+- [ ] shop cart
 - [ ] multi-device login (max 3)
 - [ ] account lvl and points system with discounts.
 - [ ] payments for products
-- [ ] boughted products by users
-- [ ] list of products
 - [ ] own hash password algorithm
 - [ ] own authentication system
 

@@ -1,5 +1,6 @@
 from project_files import app
 from project_files import db
+from project_files import queue
 from project_files import login_manager
 
 from .database import Users, Products, UsersProducts
@@ -8,10 +9,12 @@ from sqlalchemy import desc, asc
 from .scripts.functions import check_admin, check_user, captcha
 from .scripts.functions import similar_products_to_queries, recently_searched
 from .scripts.functions import classification, save_event, user_searched
-from .scripts.functions import the_price
+from .scripts.functions import the_price, rq_add_row_to_db
 
 from flask_login import login_required, current_user
 from flask import render_template, url_for, redirect, request, session, make_response
+
+from rq import Retry
 
 from datetime import datetime
 
@@ -125,7 +128,6 @@ def product_info(product_id):
   discount = the_price(product=product, price_type='the_highest_price')
   discount = round(product.price*100/discount, 0)
 
-
   resp = make_response(
     render_template(
       'shop/product_info.html', 
@@ -134,12 +136,26 @@ def product_info(product_id):
       the_lowest_price=the_price(product=product, price_type='the_lowest_price'),
       the_highest_price=the_price(product=product, price_type='the_highest_price')
   ))
-
   resp.set_cookie(
     key=f'{product.category}', 
     value=f'{product.price}',
     max_age=10*60*60*24
   )
+
+  if request.method == 'POST':
+    buy_product = UsersProducts(
+      user_id=current_user.id,
+      product_id=product.id,
+      price=product.price
+    )
+    queue.enqueue(
+      rq_add_row_to_db,
+      obj=buy_product,
+      retry=Retry(max=3, interval=[10, 30, 60])
+    )
+    # flash message
+    return redirect( url_for('product_info', product_id=product_id))
+
   return resp
 
 
