@@ -25,8 +25,35 @@ class Users(UserMixin, db.Model):
     )
     product = db.relationship('UsersProducts', backref=db.backref('users', lazy=True))
 
+
     def __repr__(self):
         return f'User {self.username}'
+    
+
+    @property
+    def show_all_rows(self):
+        return self.query.all()
+    
+    
+    def show_one_row(self, column, value):
+        filter_condition = {column: value}
+        return self.query.filter_by(**filter_condition).first()
+
+
+    def add_row_to_db(self):
+        db.session.add(self)
+        db.session.commit()
+
+
+    def update_row(self, **kwargs):
+        for key, value in kwargs.items():
+            setattr(self, key, value)
+        db.session.commit()
+    
+
+    def delete_row(self):
+        db.session.delete(self)
+        db.session.commit()
     
 
 
@@ -40,9 +67,33 @@ class BlockedUsers(db.Model):
         nullable=False, 
         default=datetime.now().strftime('%d-%m-%Y  %H:%M:%S')
     )
+
+
     def __repr__(self):
         return f'Blocked {self.username}'
     
+
+    @property
+    def show_all_rows(self):
+        return self.query.all()
+    
+
+    def add_row_to_db(self):
+        db.session.add(self)
+        db.session.commit()
+
+
+    def update_row(self, **kwargs):
+        for key, value in kwargs.items():
+            setattr(self, key, value)
+        db.session.commit()
+    
+
+    def delete_row(self):
+        db.session.delete(self)
+        db.session.commit()
+    
+
 
 class Products(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -59,9 +110,31 @@ class Products(db.Model):
     )
     user = db.relationship('UsersProducts', backref=db.backref('products', lazy=True))
 
+
     def __repr__(self):
         return f'Product {self.name}'
     
+    @property
+    def show_all_rows(self):
+        return self.query.all()
+    
+
+    def add_row_to_db(self):
+        db.session.add(self)
+        db.session.commit()
+
+
+    def update_row(self, **kwargs):
+        for key, value in kwargs.items():
+            setattr(self, key, value)
+        db.session.commit()
+    
+
+    def delete_row(self):
+        db.session.delete(self)
+        db.session.commit()
+    
+
 
 class UsersProducts(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -75,4 +148,24 @@ class UsersProducts(db.Model):
     price = db.Column(db.Float(), unique=False, nullable=False)
 
     # def __repr__(self):
-    #     return f' {self.}'    
+    #     return f' {self.}'
+
+
+    @property
+    def show_all_rows(self):
+        return self.query.all()
+
+    def add_row_to_db(self):
+        db.session.add(self)
+        db.session.commit()
+
+
+    def update_row(self, **kwargs):
+        for key, value in kwargs.items():
+            setattr(self, key, value)
+        db.session.commit()
+    
+
+    def delete_row(self):
+        db.session.delete(self)
+        db.session.commit()

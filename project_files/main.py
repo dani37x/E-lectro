@@ -180,7 +180,11 @@ def shop_api():
 
 @app.route('/test', methods=['GET', 'POST'])
 def test():
+  for i in Users().show_all_rows:
+    print(i)
 
+  x = Users()
+  print(x.show_one_row(column='id', value=1))
   user = Users.query.get(1)
   product = Products.query.get(1)
   user_product = UsersProducts(user_id=user.id, product_id=product.id, price=100)

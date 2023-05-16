@@ -62,7 +62,6 @@ def backup(model):
             data[column_name] = getattr(row, column_name)
         objects_list.append(data)
 
-
     if objects_list != data_from_file:
         save_json(file_path=path, data=objects_list)
 
