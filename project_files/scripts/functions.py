@@ -241,7 +241,7 @@ def generator(answer, obstacle):
 
 def unblock():
     app.app_context().push()
-    blocked_users = BlockedUsers.query.all()
+    blocked_users = BlockedUsers().all_rows
 
     for blocked in blocked_users:
         if (datetime.now() > string_to_date(blocked.date)):
@@ -288,7 +288,7 @@ def similar_products_to_queries(username):
     queries = open_json(file_path=DATA)
     user_queries = [query for query in queries if query['username'] == username]
    
-    if products := Products.query.all():
+    if products := Products().all_rows:
         
         if len(user_queries) == 0:
             random_products = []

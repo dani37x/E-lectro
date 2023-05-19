@@ -8,11 +8,11 @@ from datetime import datetime
 class Base():
 
     @property
-    def show_all_rows(self):
+    def all_rows(self):
         return self.query.all()
     
     
-    def show_one_row(self, column, value):
+    def show_row(self, column, value):
         filter_condition = {column: value}
         return self.query.filter_by(**filter_condition).first()
 
@@ -24,6 +24,8 @@ class Base():
 
     def update_row(self, **kwargs):
         for key, value in kwargs.items():
+            if value == '' or value == None:
+                return ValueError('Field can not be empty')
             setattr(self, key, value)
         db.session.commit()
     
@@ -33,7 +35,8 @@ class Base():
         db.session.commit()
 
 
-class Users(UserMixin, db.Model, Base):
+
+class Users(db.Model, UserMixin, Base):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(30), unique=True, nullable=False)
     first_name = db.Column(db.String(30),unique=False, nullable=False)
@@ -51,7 +54,10 @@ class Users(UserMixin, db.Model, Base):
         nullable=False, 
         default=datetime.now().strftime('%d-%m-%Y  %H:%M:%S')
     )
-    product = db.relationship('UsersProducts', backref=db.backref('users', lazy=True))
+    product = db.relationship(
+        'UsersProducts', 
+        backref=db.backref('users', lazy=True)
+    )
 
 
     def __repr__(self):
@@ -59,7 +65,7 @@ class Users(UserMixin, db.Model, Base):
         
 
 
-class BlockedUsers(db.Model, Base):
+class BlockedUsers(Base, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(30), unique=False, nullable=False)
     ip = db.Column(db.String(30), unique=False, nullable=False)
@@ -77,7 +83,7 @@ class BlockedUsers(db.Model, Base):
     
 
 
-class Products(db.Model, Base):
+class Products(Base, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(30), unique=False, nullable=False)
     category = db.Column(db.String(30), unique=False, nullable=False)
@@ -90,19 +96,30 @@ class Products(db.Model, Base):
         nullable=False, 
         default=datetime.now().strftime('%d-%m-%Y  %H:%M:%S')
     )
-    user = db.relationship('UsersProducts', backref=db.backref('products', lazy=True))
+    user = db.relationship(
+        'UsersProducts', 
+        backref=db.backref('products', lazy=True)
+    )
 
 
     def __repr__(self):
-        return f'Products(id={self.id}, username={self.name})'
+        return f'Products(id={self.id}, name={self.name})'
 
     
     
 
-class UsersProducts(db.Model, Base):
+class UsersProducts(Base, db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'),  nullable=False)
-    product_id = db.Column(db.Integer, db.ForeignKey('products.id'),  nullable=False)
+    user_id = db.Column(
+        db.Integer, 
+        db.ForeignKey('users.id'), 
+        nullable=False
+    )
+    product_id = db.Column(
+        db.Integer, 
+        db.ForeignKey('products.id'), 
+        nullable=False
+    )
     date = db.Column(
         db.String, 
         nullable=False, 

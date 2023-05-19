@@ -1,7 +1,9 @@
 
 
  <form action="/update-user/{{user.id}}" method="post">
-
+   <label for="id">id</label>
+      <input type="text" name="id" value="{{user.id}}"/>
+      <br>
    <label for="username">username</label>
       <input type="text" name="username" value="{{user.username}}"/>
       <br>
