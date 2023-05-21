@@ -380,26 +380,8 @@ def update_user(id):
   user = Users.query.get_or_404(id)
   
   if request.method == 'POST':
-
-    password = not_null(request.form['password'])
-    password = bcrypt.generate_password_hash(password).decode('utf-8')
-
-    user.username = not_null(request.form['username'])
-    user.first_name = not_null(request.form['first_name'])
-    user.surname = not_null(request.form['surname'])
-    user.email = not_null(request.form['email'])
-    user.password = password
-    user.account_type = not_null(request.form['account_type'])
-    user.points = not_null(request.form['points'])
-    user.date = not_null(request.form['date'])
-    newsletter = not_null(request.form['newsletter'])
-    active = not_null(request.form['active'])
-    
-    user.active = True if 'True' in active or 'true' in active else False
-    user.newsletter = True if 'True' in newsletter or 'true' in newsletter else False
-
     try:
-      db.session.commit()
+      user.update_row(**dict(request.form))
       return redirect( url_for('admin_user'))
 
     except Exception as e:

@@ -1,4 +1,5 @@
 from project_files import db
+from project_files import bcrypt
 
 from flask_login import UserMixin
 
@@ -12,6 +13,15 @@ class Base():
         return self.query.all()
     
     
+    @staticmethod
+    def password_hash(password):
+        return bcrypt.generate_password_hash(password).decode('utf-8')
+
+    
+    def get_by_row_id(self, value):
+        return self.query.get(int(value))
+
+
     def show_row(self, column, value):
         filter_condition = {column: value}
         return self.query.filter_by(**filter_condition).first()
@@ -26,6 +36,10 @@ class Base():
         for key, value in kwargs.items():
             if value == '' or value == None:
                 return ValueError('Field can not be empty')
+            if value == 'False' or value == 'True':
+                value = True if 'True' in value else False
+            if key == 'password':
+                value = self.password_hash(value)
             setattr(self, key, value)
         db.session.commit()
     
@@ -42,7 +56,7 @@ class Users(db.Model, UserMixin, Base):
     first_name = db.Column(db.String(30),unique=False, nullable=False)
     surname = db.Column(db.String(30), unique=False, nullable=False)
     email = db.Column(db.String(50), unique=True, nullable=False)
-    password = db.Column(db.String(100), unique=False, nullable=False)
+    password = db.Column(db.String(200), unique=False, nullable=False)
     ip = db.Column(db.String(20), unique=False, nullable=False)
     account_type = db.Column(db.String(30), unique=False, nullable=False)
     active = db.Column(db.Boolean, default=True, nullable=False)
