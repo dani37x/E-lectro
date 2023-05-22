@@ -1,7 +1,9 @@
 
 
  <form action="/update-blocked/{{blocked.id}}" method="post">
-
+   <label for="id">id:</label>
+      <input type="text" name="id" value="{{id.username}}"/>
+      <br>
    <label for="username">username:</label>
       <input type="text" name="username" value="{{blocked.username}}"/>
       <br>

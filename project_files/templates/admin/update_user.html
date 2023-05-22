@@ -1,7 +1,10 @@
 
 
- <form action="/update-user/{{user.id}}" method="post">
 
+ <form action="/update-user/{{user.id}}" method="post" >
+   <label for="id">id</label>
+      <input type="text" name="id" value="{{user.id}}"/>
+      <br>
    <label for="username">username</label>
       <input type="text" name="username" value="{{user.username}}"/>
       <br>
@@ -21,13 +24,21 @@
       <input type="text" name="account_type" value="{{user.account_type}}"/>
       <br>
    <label for="active">active</label>
-      <input type="text" name="active" value="{{user.active}}"/>
+      <select id="action" name="active">
+         <option value="{{user.active}}">{{user.active}} </option>    
+         <option value="False"> False</option>    
+         <option value="True"> True</option>
+      </select>
       <br>
    <label for="points">points</label>
       <input type="number" name="points" value="{{user.points}}"/>
       <br>
    <label for="newsletter">newsletter</label>
-      <input type="text" name="newsletter" value="{{user.newsletter}}"/>
+      <select id="action" name="newsletter">
+          <option value="{{user.newsletter}}">{{user.newsletter}} </option>    
+          <option value="False"> False</option>    
+          <option value="True"> True</option>    
+      </select>
       <br>
    <label for="date">date</label>
       <input type="text" name="date" value="{{user.date}}"/>

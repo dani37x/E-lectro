@@ -43,7 +43,7 @@ def admin():
 @captcha('admin_user')
 def admin_user():
   
-  users = Users.query.all() 
+  users = Users().all_rows 
 
   if request.method == 'POST':
     searching = request.form['search']
@@ -128,8 +128,8 @@ def admin_user():
 
       if selected_action == 'test email':
         users_emails = []
-        for id in data:
-          user = Users.query.filter_by(id=id).first()
+        for user_id in data:
+          user = Users.query.filter_by(id=user_id).first()
           users_emails.append(user.email)
 
         task = queue.enqueue(
@@ -161,7 +161,7 @@ def admin_user():
 # @captcha('admin_blocked')
 def admin_blocked():
 
-  blocked = BlockedUsers.query.all() 
+  blocked = BlockedUsers().all_rows
 
   if request.method == 'POST':
     searching = request.form['search']
@@ -212,7 +212,7 @@ def admin_blocked():
 @captcha('admin_product')
 def admin_product():
 
-  products = Products.query.all() 
+  products = Products().all_rows
 
   if request.method == 'POST':
     searching = request.form['search']
@@ -380,26 +380,8 @@ def update_user(id):
   user = Users.query.get_or_404(id)
   
   if request.method == 'POST':
-
-    password = not_null(request.form['password'])
-    password = bcrypt.generate_password_hash(password).decode('utf-8')
-
-    user.username = not_null(request.form['username'])
-    user.first_name = not_null(request.form['first_name'])
-    user.surname = not_null(request.form['surname'])
-    user.email = not_null(request.form['email'])
-    user.password = password
-    user.account_type = not_null(request.form['account_type'])
-    user.points = not_null(request.form['points'])
-    user.date = not_null(request.form['date'])
-    newsletter = not_null(request.form['newsletter'])
-    active = not_null(request.form['active'])
-    
-    user.active = True if 'True' in active or 'true' in active else False
-    user.newsletter = True if 'True' in newsletter or 'true' in newsletter else False
-
     try:
-      db.session.commit()
+      user.update_row(**dict(request.form))
       return redirect( url_for('admin_user'))
 
     except Exception as e:
@@ -474,14 +456,10 @@ def add_blocked():
 def update_blocked(id):
 
   blocked = BlockedUsers.query.get_or_404(id)
-
+  
   if request.method == 'POST':
-    blocked.username = not_null(request.form['username'])
-    blocked.ip = not_null( request.form['ip'])
-    blocked.date = not_null( request.form['date'])
-
     try:
-      db.session.commit()
+      blocked.update_row(**dict(request.form))
       return redirect(url_for('admin_blocked'))
 
     except Exception as e:
@@ -562,16 +540,10 @@ def update_product(id):
   product = Products.query.get_or_404(id)
 
   if request.method == 'POST':
-    product.name = not_null(request.form['name'])
-    product.category = not_null(request.form['category'])
-    product.company = not_null(request.form['company'])
-    product.price = not_null(request.form['price'])
-    product.old_price = not_null(request.form['old_price'])
-    product.date = not_null(request.form['date'])
 
     try:
-      db.session.commit()
-      save_price(data=[product])
+      product.update_row(**dict(request.form))
+      save_price(product=product)
       return redirect( url_for('admin_product'))
 
     except Exception as e:

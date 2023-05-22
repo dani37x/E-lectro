@@ -48,20 +48,19 @@ def backup(model):
         path = USERS
     elif model == Products:
         path = PRODUCTS
-    else:
+    elif model == BlockedUsers:
         path = BLOCKED_USERS
 
     data_from_file = open_json(file_path=path)
     objects_list = []
     columns = tuple([m.key for m in model.__table__.columns])
-    model_data = model.query.all()
+    model_data = model().all_rows
 
     for row in model_data:
         data = {}
         for column_name in columns:
             data[column_name] = getattr(row, column_name)
         objects_list.append(data)
-
 
     if objects_list != data_from_file:
         save_json(file_path=path, data=objects_list)
@@ -83,7 +82,8 @@ def restore_database(model):
                 account_type=data['account_type'],
                 active=data['active'],
                 points=data['points'],
-                newsletter=data['newsletter']
+                newsletter=data['newsletter'],
+                date=data['date']
             )
             whether_exist = model.query.filter_by(username=data['username']).first()
             
@@ -168,7 +168,7 @@ def account_deactivation(model, data):
 def delete_inactive_accounts():
     time.sleep(60)
     app.app_context().push()
-    users = Users.query.all()
+    users = Users().all_rows
 
     for user in users:
         if user.active ==  False:
@@ -220,7 +220,7 @@ def send_newsletter():
 
     if users :=  Users.query.filter_by(newsletter=True).all():
         
-        if products := Products.query.all():
+        if products := Products().all_rows:
             products = products[-5:]            
             mails = [user.email for user in users]
 
