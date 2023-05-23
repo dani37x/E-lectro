@@ -1,16 +1,33 @@
+"""
+This file contains a comprehensive collection of forms along with their
+corresponding validators. Included in the forms are Register, Login, 
+and the Captcha system, as well as a new password form. Each form is 
+equipped with its own specialized validator to ensure the accuracy and 
+security of the submitted data.
+
+These validators serve specific purposes, such as validating the strength 
+of passwords, verifying the existence of a user or email address, and
+performing a "not null" check to ensure all required fields are filled.
+"""
+
 from project_files import disallowed_words
+
 from .database import Users
 
 from flask_wtf import FlaskForm
-from wtforms import StringField, EmailField, PasswordField, BooleanField, IntegerField
-from wtforms.validators import DataRequired, Length, EqualTo, ValidationError
+from wtforms import StringField, EmailField, PasswordField, BooleanField
+from wtforms import IntegerField
+from wtforms.validators import DataRequired, Length, EqualTo
+from wtforms.validators import ValidationError
 
 import string
 
 
 def password_checking(form, field):
   if len(field.data) < 9 or len(field.data) > 20:
-    raise ValidationError('Password must have minimum 9 length and maximum 20 length')
+    raise ValidationError(
+      'Password must have minimum 9 length and maximum 20 length'
+    )
   punctuation = string.punctuation
   contain = False
   for char in punctuation:
@@ -71,15 +88,24 @@ class UserCreator(FlaskForm):
       Length(min=6, max=30),
       existing_user,
     ])
-  first_name = StringField('first_name', validators=[DataRequired(), Length(min=2, max=20)])
-  surname = StringField('surname', validators=[DataRequired(), Length(min=2, max=30)])
+  first_name = StringField(
+    'first_name', 
+    validators=[DataRequired(), Length(min=2, max=20)]
+  )
+  surname = StringField(
+    'surname', 
+    validators=[DataRequired(), Length(min=2, max=30)]
+  )
   email = EmailField('e-mail',
    validators=[
       DataRequired(),
       Length(min=4, max=20),
       existing_email
     ])
-  password = PasswordField('password', validators=[DataRequired(), password_checking])
+  password = PasswordField(
+    'password', 
+    validators=[DataRequired(), password_checking]
+  )
   password_2 = PasswordField('repeat password', 
     validators=[
       DataRequired(),
@@ -96,11 +122,17 @@ class UserLogin(FlaskForm):
 
 
 class Key(FlaskForm):
-  key = StringField('Enter the key', validators=[DataRequired(), Length(min=2, max=10)])
+  key = StringField(
+    'Enter the key'
+    , validators=[DataRequired(), Length(min=2, max=10)]
+  )
 
 
 class NewPassword(FlaskForm):
-  password = PasswordField('new password', validators=[DataRequired(), password_checking])
+  password = PasswordField(
+    'new password', 
+    validators=[DataRequired(), password_checking]
+  )
   password_2 = PasswordField('repeat password', validators=[
     DataRequired(),
     EqualTo('password'),
@@ -109,8 +141,14 @@ class NewPassword(FlaskForm):
     
 
 class RemindPassword(FlaskForm):
-  username = StringField('username', validators=[DataRequired(), Length(max=30)])
-  email = EmailField('e-mail', validators=[DataRequired(), Length(max=50)])
+  username = StringField(
+    'username', 
+    validators=[DataRequired(), Length(max=30)]
+  )
+  email = EmailField(
+    'e-mail', 
+    validators=[DataRequired(), Length(max=50)]
+  )
 
 
 class CharsCounter(FlaskForm):
