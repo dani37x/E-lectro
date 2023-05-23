@@ -162,13 +162,19 @@ def login():
         email=form.email.data,
         username=form.username.data
       ).first()
-      has_access = BlockedUsers.query.filter_by(username=user.username).first()
 
-      if user and (bcrypt.check_password_hash(user.password, form.password.data)) \
-        and not has_access:
-        login_user(user, remember=form.remember.data)
-        session['chances'] = 4
-        return redirect( url_for('page'))
+      try:
+        has_access = BlockedUsers.query.filter_by(username=user.username).first()
+
+        if user and not has_access and \
+          user.password_check(password=user.password, hash_pw=form.password.data): 
+
+          login_user(user, remember=form.remember.data)
+          session['chances'] = 4
+          return redirect( url_for('page'))
+        
+      except Exception as e:
+        save_event(event=e, site=login.__name__)
 
   return render_template('auth/login.html', form=form)
 
@@ -266,7 +272,7 @@ def new_password(rendered_session):
         if form.validate_on_submit():
         
           user = Users.query.filter_by(username=session['username']).first()
-          user.password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
+          user.password = user.password_hash(password=form.password.data)
           db.session.commit()
           session.pop('username', None)
           return redirect( url_for('login'))
