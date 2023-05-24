@@ -99,7 +99,12 @@ def register():
           })
 
       save_json(file_path=SESSIONS, data=session_list)
-      # message('register', 'electro@team.com', form.email.data, key)
+      # message(
+      #   message_type='register', 
+      #   sender='electro@team.com', 
+      #   recipetns=[form.email.data], 
+      #   key=key
+      # )
 
       return redirect( url_for('register_session', rendered_session=sess))
 
@@ -221,7 +226,12 @@ def remind():
 
         try:
           pass
-          # message('code', 'Electro@team.com', form.email.data, key)
+          # message(
+          #   message_type='code', 
+          #   sender='Electro@team.com', 
+          #   recipents=[form.email.data], 
+          #   key=key
+          # )
 
         except Exception as e:
           save_event(event=e, site=remind.__name__)
@@ -352,7 +362,12 @@ def account_details():
             "key": f"{key}"
           })
           
-          # message('code', 'Electro@team.com', form.email.data, key)
+          # message(
+          #   message_type='code', 
+          #   sender='Electro@team.com', 
+          #   recipents=[request.form['email']],
+          #   key=key
+          # )
           save_json(file_path=SESSIONS, data=session_list)
           
           return redirect( url_for('hash_session', rendered_session=sess))
