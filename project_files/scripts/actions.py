@@ -85,7 +85,9 @@ def restore_database(model):
                 newsletter=data['newsletter'],
                 date=data['date']
             )
-            whether_exist = model.query.filter_by(username=data['username']).first()
+            whether_exist = model.query.filter_by(
+                username=data['username']
+            ).first()
             
             if whether_exist == None:
                 db.session.add(user)
@@ -133,13 +135,17 @@ def block_users(data):
 
     for id in data:
         user_to_block = Users.query.get(id)
-        whether_blocked = BlockedUsers.query.filter_by(username=user_to_block.username).first()
+        whether_blocked = BlockedUsers.query.filter_by(
+            username=user_to_block.username
+        ).first()
 
         if whether_blocked == None:
             new_row = BlockedUsers(
                 username=user_to_block.username,
                 ip=user_to_block.ip,
-                date=str((datetime.now() + timedelta(days=7)).strftime("%d-%m-%Y  %H:%M:%S"))
+                date=str(
+                    (datetime.now() + timedelta(days=7)).strftime("%d-%m-%Y  %H:%M:%S")
+                )
             )
             db.session.add(new_row)
             db.session.commit()
@@ -176,39 +182,42 @@ def delete_inactive_accounts():
             db.session.commit()
 
 
-def message(*args):
+def message(message_type, sender, recipents, products=None, key=None):
     app.app_context().push()  
 
-    if args[0] == 'register':
+    if message_type == 'register':
         subject = 'Register message'
-        body = f'Welcome {args[2]}. This is your activation key {args[3]}'
+        body = f'Welcome {recipents[0]}. This is your activation key {key}'
 
-    if args[0] == 'no-reply':
+    elif message_type == 'no-reply':
         time.sleep(30)
 
         subject = 'no-reply-message'
         body = 'Do not reply for this message. This is only test.'
 
-    if args[0] == 'code':
+    elif message_type == 'code':
         subject = 'Forgotten password'
-        body = f'This is your key {args[3]}'
+        body = f'This is your key {key}'
 
-    if args[0] == 'newsletter':
+    elif message_type == 'newsletter':
         subject = 'Special Offer for you'
-        a_0 = f'<a href="/shop/products/{args[3][0].id} "> {args[3][0].name} </a> \n'
-        a_1 = f'<a href="/shop/products/{args[3][1].id} "> {args[3][1].name} </a> \n'
-        a_2 = f'<a href="/shop/products/{args[3][2].id} "> {args[3][2].name} </a> \n'
-        a_3 = f'<a href="/shop/products/{args[3][3].id} "> {args[3][3].name} </a> \n'
-        a_4 = f'<a href="/shop/products/{args[3][4].id} "> {args[3][4].name} </a> \n\n'
-        disclaimer = f'if you do not want receive our the latest products click here \n'
-        unsign = f'<a href="/account/newsletter/unregister"> unsign newsletter </a> \n'
-        
-        body = a_0 + a_1  + a_2 + a_3 + a_4 + disclaimer + unsign
+        products_for_user = ''
+        for product in products:
+            products_for_user += (
+                f'<a href="/shop/products/{product.id} "> {product.name} </a> \n'
+            )
+        disclaimer = (
+            f'\n if you do not want receive our the latest products click here \n'
+        )
+        unsign = (
+            f'<a href="/account/newsletter/unregister"> unsign newsletter </a> \n'
+        )
+        body = products_for_user + disclaimer + unsign
  
     msg = Message(
         subject=subject,
-        sender=args[1],
-        recipients=args[2]
+        sender=sender,
+        recipients=recipents
     )
     msg.body = body
     mail.send(msg)
@@ -229,9 +238,9 @@ def send_newsletter():
                 'newsletter', 
                 'electro@team.com', 
                 mails, 
-                products,
+                [products],
                 retry=Retry(max=3, interval=[10, 30, 60])
-                )
+            )
 
 
 

@@ -134,9 +134,9 @@ def admin_user():
 
         task = queue.enqueue(
           message,
-          'no-reply', 
-          current_user.username, 
-          users_emails,
+          message_type='no-reply', 
+          sender=current_user.username, 
+          recipents=[users_emails],
           retry=Retry(max=3, interval=[50, 100, 200])
         )
         return render_template('admin/admin_user.html', users=users, task=task)

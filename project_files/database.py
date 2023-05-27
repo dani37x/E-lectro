@@ -17,7 +17,12 @@ class Base():
     def password_hash(password):
         return bcrypt.generate_password_hash(password).decode('utf-8')
 
+
+    @staticmethod
+    def password_check(password, hash_pw):
+        return bcrypt.check_password_hash(password, hash_pw)
     
+
     def get_by_row_id(self, value):
         return self.query.get(int(value))
 
@@ -78,7 +83,6 @@ class Users(db.Model, UserMixin, Base):
         return f'Users(id={self.id}, username={self.username})'
         
 
-
 class BlockedUsers(Base, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(30), unique=False, nullable=False)
@@ -95,7 +99,6 @@ class BlockedUsers(Base, db.Model):
         return f'BlockedUsers(id={self.id}, username={self.username})'
     
     
-
 
 class Products(Base, db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -121,7 +124,6 @@ class Products(Base, db.Model):
 
     
     
-
 class UsersProducts(Base, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(

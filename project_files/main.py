@@ -165,7 +165,7 @@ def product_info(product_id):
 def shop_api():
 
   list_of_products = []
-  products = Products.query.all()
+  products = Products().all_rows
 
   for product in products:
     data = {}
@@ -177,24 +177,3 @@ def shop_api():
     
   return list_of_products
 
-
-@app.route('/test', methods=['GET', 'POST'])
-def test():
-  for i in Users().show_all_rows:
-    print(i)
-
-  x = Users()
-  print(x.show_one_row(column='id', value=1))
-  user = Users.query.get(1)
-  product = Products.query.get(1)
-  user_product = UsersProducts(user_id=user.id, product_id=product.id, price=100)
-  db.session.add(user_product)
-  db.session.commit()
-
-  # user_product = UsersProducts.query.join(Products).join(Users).filter(Users.id == 1).all()
-  # user_product = UsersProducts.query.join(Products).filter(user.id == 1).all()
-  user_product = Products.query.get(1)
-  user_product = user_product.user
-  for x in user_product:
-    print(x.users.surname)
-  return 'x'

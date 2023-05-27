@@ -34,7 +34,7 @@ FLASK_ENV = 'env'
 SERVER_NAME = ''
 
 
-#  files' paths
+#  paths of files
 
 
 BLOCKED_USERS = r'D:\projekty\E-lectro\instance\BLOCKED_USERS.json'

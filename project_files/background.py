@@ -90,7 +90,9 @@ def captcha():
       return redirect( url_for('logout'))
     
 
-    prohibited_chars = ['i', 'l', '_', '-', '`', '"', '=', '.', ',']
+    prohibited_chars = [
+      'i', 'l', '_', '-', '`', '"', '=', '.', ',', '>', '{', ')'
+    ]
     answer = random_char(without=prohibited_chars)
     obstacle = random_char(disabled_char=answer, without=prohibited_chars)
     data = generator(answer=answer, obstacle=obstacle)
