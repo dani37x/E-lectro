@@ -1,0 +1,30 @@
+
+
+<form action="/update-user-products/{{user_prod.id}}" method="post">
+   
+    <label for="id">id</label>
+       <input type="number" name="id" value="{{user_prod.id}}"/>
+       <br>
+    <label for="user_id">user id</label>
+       <input type="number" name="id" value="{{user_prod.user_id}}"/>
+       <br>
+    <label for="product_id">product id</label>
+       <input type="number" name="name" value="{{user_prod.product_id}}"/>
+       <br>
+    <label for="date">date</label>
+       <input type="text" name="name" value="{{user_prod.date}}"/>
+       <br>
+    <label for="price">price</label>
+       <input type="text" name="name" value="{{user_prod.price}}"  step="any"/>
+       <br>
+    <label for="category">category</label>
+       <select name="category" id="category">
+          <option value="AGD">AGD</option>
+          <option value="TOYS">TOYS</option>
+       </select>
+       <br>
+ 
+    <input type="submit" value="send data">
+     
+  </form>
+ 

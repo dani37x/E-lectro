@@ -1,3 +1,11 @@
+"""
+The "database.py" file that includes classes for the database with their
+methods. The classes are designed with Flask-SQLAlchemy and there are
+four class-tables: Users, Products, BlockedUsers, and UserProducts. 
+There is also a Base class with joint methods.
+"""
+
+
 from project_files import db
 from project_files import bcrypt
 
