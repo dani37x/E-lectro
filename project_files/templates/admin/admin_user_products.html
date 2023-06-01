@@ -1,0 +1,52 @@
+<a href="{{ url_for('add_user_products') }}"> add a product for a user </a>
+<br>
+
+<form method="post" action="">
+    <label for="action">Choose action:</label>
+    <select id="action" name="action">
+        <option value="-----"> </option>
+        <option value="delete rows"> delete rows</option>
+        <option value="backup"> backup</option>
+        <option value="restore database"> restore database</option>
+    </select>
+    <br>
+    <label for="sort_type">sort by</label>
+        <select id="sort_type" name="sort_type">
+            <option value="----------"></option>
+            <option value="asc_"> Ascending </option>
+            <option value="desc_"> Descending </option>
+        </select>
+    <br>
+    <label for="search">Serach:</label>
+    <input type="text" id="search" name="search">
+    <table border="1px">
+        <th> id </th>
+        <th> user id</th>
+        <th> product id</th>
+        <th> date</th>
+        <th> price</th>
+        <th> actions</th>
+        {% for uproduct in user_prods %}
+        <tr>
+            <td><input type="checkbox" name="id" value="{{uproduct.id }}"></td>
+            <td>{{ uproduct.id }}</td>
+            <td>{{ uproduct.user_id }}</td>
+            <td>{{ uproduct.product_id }}</td>
+            <td>{{ uproduct.date }}</td>
+            <td>{{ uproduct.price }}</td>
+            <td>
+                <a href="{{ url_for('update_user_products', id=uproduct.id) }}"> edit </a>
+                <a href="{{ url_for('delete_user_products', id=uprodct.id) }}"> delete </a>
+            </td>
+        </tr>
+        {% endfor %}
+        <input type="submit">
+    </table>
+</form>
+
+<br>
+    {% if task %}
+        <a href="{{ url_for('cancel_task', task_id=task.id) }}"> cancel task </a>
+    {% endif %}
+<br>
+    <a href="{{ url_for('admin') }}"> admin panel</a>

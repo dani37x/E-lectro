@@ -7,7 +7,7 @@ from project_files import bcrypt
 from flask_login import login_required, current_user
 from flask import render_template, url_for, redirect, request
 
-from .database import Users, BlockedUsers, Products
+from .database import Users, BlockedUsers, Products, UsersProducts
 from sqlalchemy import desc, asc
 
 from .scripts.functions import check_admin, check_user, captcha
@@ -152,6 +152,38 @@ def admin_user():
       return 'Error with actions'
   
   return render_template('admin/admin_user.html', users=users)
+
+
+
+@app.route('/admin/user-products', methods=['GET', 'POST'])
+# @login_required
+# @check_admin('admin_blocked')
+# @check_user('admin_blocked')
+# @captcha('admin_blocked')
+def user_products():
+  
+  user_prods = UsersProducts().all_rows
+  # if request.method == 'POST':
+  #   searching = request.form['search']
+  #   sort_type = request.form['sort_type']
+
+    # products_of_user = (
+    #   UsersProducts.query.filter(
+    #     UsersProducts.username.contains(searching) |
+    #     BlockedUsers.ip.contains(searching)
+    #   ).order_by(
+    #     desc(BlockedUsers.username) if sort_type == 'desc_username' else \
+    #     asc(BlockedUsers.username) if sort_type == 'asc_username' else \
+    #     desc(BlockedUsers.ip) if sort_type == 'desc_ip' else \
+    #     asc(BlockedUsers.ip) if sort_type == 'asc_ip' else None
+    #   ).all()
+    # )
+
+
+  return render_template(
+    'admin/admin_user_products.html', 
+    user_prods=user_prods
+  )
 
 
 @app.route('/admin/blocked', methods=['GET', 'POST'])
@@ -414,6 +446,86 @@ def delete_user(id):
     return 'xd'
 
 
+@app.route('/add-user-products', methods=['GET', 'POST'])
+@login_required
+# @check_admin('add_ser_products')
+# @check_user('add_ser_products')
+@captcha('add_user_products')
+def add_user_products():
+  
+  if request.method == 'POST':
+    username = not_null(request.form['username'])
+    new_blocked = BlockedUsers(
+      username=username,
+      ip=not_null(request.form['ip']),
+    )
+
+    try:
+      queue.enqueue(
+        rq_add_row_to_db, 
+        obj=new_blocked,
+        retry=Retry(max=3, interval=[10, 30, 60])
+      )
+
+      save_event(
+        event=f'{username} was added by {current_user.username}', 
+        site=add_blocked.__name__
+      )
+
+    except Exception as e:
+      save_event(event=e, site=add_blocked.__name__)
+      return 'xd'
+
+    return redirect( url_for('user_products'))
+  return render_template('admin/add_user_products.html')
+
+
+@app.route('/update-user-products/<int:id>', methods=['GET', 'POST'])
+@login_required
+# @check_admin('update_user_products')
+# @check_user('update_user_products')
+@captcha('update_user_products')
+def update_user_products(id):
+
+  user_prod = UsersProducts.query.get_or_404(id)
+  
+  if request.method == 'POST':
+    try:
+      user_prod.update_row(**dict(request.form))
+      return redirect( url_for('admin_user'))
+
+    except Exception as e:
+      save_event(event=e, site=update_user_products.__name__)
+      return 'xd'
+  
+  return render_template(
+    'admin/update_user_products.html', 
+    user_prod=user_prod
+  )
+
+
+@app.route('/delete-user-products/<int:id>')
+@login_required
+# @check_admin('delete_user_products')
+# @check_user('delete_user_products')
+@captcha('delete_user_products')
+def delete_user_products(id):
+
+  name_to_delete = UsersProducts.query.get_or_404(id)
+
+  try:
+    queue.enqueue(
+      rq_delete_db_row, 
+      obj=name_to_delete,
+      retry=Retry(max=3, interval=[10, 30, 60])
+    )
+    return redirect(url_for('user_products'))
+
+  except Exception as e:
+    save_event(event=e, site=UsersProducts.__name__)
+    return 'xd'
+
+
 @app.route('/add-blocked', methods=['GET', 'POST'])
 @login_required
 # @check_admin('add_blocked')
@@ -466,8 +578,7 @@ def update_blocked(id):
       save_event(event=e, site=update_blocked.__name__)
       return 'xd'
 
-  else:
-    return render_template('admin/update_blocked.html', blocked=blocked )
+  return render_template('admin/update_blocked.html', blocked=blocked )
 
 
 @app.route('/delete-blocked/<int:id>')
@@ -550,8 +661,7 @@ def update_product(id):
       save_event(event=e, site=update_product.__name__)
       return 'xd'
     
-  else:
-    return render_template('admin/update_product.html', product=product )
+  return render_template('admin/update_product.html', product=product )
 
 
 @app.route('/delete-product/<int:id>')

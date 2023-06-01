@@ -137,6 +137,7 @@ Overall, E-lectro is a well-designed and fully-functional web application that d
 - [x] User panel
   - [x] a user can change his nickname, e-mail, and the personal data
   - [x] history of boughted products by users
+- [x] classes of database with methods
 - [ ] better Readme section of installation which depict the correct process with Redis and Redis queue
 - [ ] option of payment for products
 - [ ] descriptions of funcs
