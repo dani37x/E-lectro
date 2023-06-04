@@ -1,3 +1,10 @@
+"""
+The "main.py" file is a central point whole project. Its destination is
+subpages that are visible to customers of this shop. There are views
+for categories and products. There are other features for the 
+application as well, but only temporary. A new place will be found for them.
+"""
+
 from project_files import app
 from project_files import db
 from project_files import queue

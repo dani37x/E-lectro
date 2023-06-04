@@ -16,6 +16,18 @@ from datetime import datetime
 
 class Base():
 
+
+    def __init__(self, **kwargs):
+        for key, value in kwargs.items():
+            if value == '' or value == None:
+                return ValueError('Field can not be empty')
+            if value == 'False' or value == 'True':
+                value = True if 'True' in value else False
+            if key == 'password':
+                value = self.password_hash(value)
+            setattr(self, key, value)
+
+
     @property
     def all_rows(self):
         return self.query.all()
@@ -55,7 +67,7 @@ class Base():
                 value = self.password_hash(value)
             setattr(self, key, value)
         db.session.commit()
-    
+
 
     def delete_row(self):
         db.session.delete(self)

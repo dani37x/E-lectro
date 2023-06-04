@@ -534,11 +534,7 @@ def delete_user_products(id):
 def add_blocked():
 
   if request.method == 'POST':
-    username = not_null(request.form['username'])
-    new_blocked = BlockedUsers(
-      username=username,
-      ip=not_null(request.form['ip']),
-    )
+    new_blocked = BlockedUsers(**dict(request.form))
 
     try:
       queue.enqueue(
@@ -547,6 +543,7 @@ def add_blocked():
         retry=Retry(max=3, interval=[10, 30, 60])
       )
 
+      username = request.form['username']
       save_event(
         event=f'{username} was added by {current_user.username}', 
         site=add_blocked.__name__
